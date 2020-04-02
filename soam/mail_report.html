@@ -1,4 +1,5 @@
-{% macro mail_body(kpi, end_date, img_dict={}, anomaly_range_stats={}, anomaly_window=none, granularity=None, oracle_insertion_id=None, time_granularity=None) %}
+{# {% macro mail_body(kpi, end_date, img_dict={}, anomaly_range_stats={}, anomaly_window=none, oracle_insertion_id=None, time_granularity=None) %} #}
+{% macro mail_body(kpi, end_date, img_dict={}, anomaly_range_stats={}, anomaly_window=none, run_id=None, time_granularity=None) %}
 <p>
     Buen día,<br />
     <br />
@@ -41,21 +42,17 @@
       {% if time_granularity == 'H' %}
       a las {{ anomaly_range_stats.get('worst_anomaly_hour')}} horas
       {% endif %}
-      {#
-      {% if geo_gran == 'Provincial' %}
-        (en {{ anomaly_range_stats.get('worst_anomaly_prov') }})
+      {% if len(img_dict) > 0 %}
+        (en {{ anomaly_range_stats.get('worst_anomaly_by_factor_val') }})
       {% endif %}
-      #}
     </li>
-    {#
-    {% if geo_gran == 'Provincial' %}
-      {% if anomaly_range_stats.get('most_anom_prov')|length > 0 %}
-        <li>Las {{ anomaly_range_stats.get('most_anom_prov')|length }} provincias
+    {% if len(img_dict) > 0 %}
+      {% if anomaly_range_stats.get('most_anom_by_factor_val')|length > 0 %}
+        <li>Los factores {{ anomaly_range_stats.get('most_anom_by_factor_val')|length }}
           con más anomalías fueron: {{
-          anomaly_range_stats.get('most_anom_prov')|join(', ') }}</li>
+          anomaly_range_stats.get('most_anom_by_factor_val')|join(', ') }}</li>
       {% endif %}
     {% endif %}
-    #}
   {% endif %}
   </ul>
 </p>
@@ -80,11 +77,11 @@
 Saludos y gracias,<br />
 Delver<br />
 <br />
-<small>PD: Oracle run_id: {{ oracle_insertion_id }}</small>
+{# <small>PD: run_id: {{ run_id }}</small> #}
 {% endmacro %}
 
 {% macro aggregated_mail_body(kpis, time_window, img_dict, total, top_pos,
-top_neg, top_prov_table) %}
+top_neg, top_factor_val_table) %}
 <p>
     Buen día,<br />
     <br />
@@ -109,9 +106,9 @@ top_neg, top_prov_table) %}
     </table>
     <br />
     <p>
-      Detalle provincias con mayor cantidad de anomalías:<br />
+      Detalle factores con mayor cantidad de anomalías:<br />
         <center>
-        {{ top_prov_table }}
+        {{ top_factor_val_table }}
         </center>
         <br />
     </p>

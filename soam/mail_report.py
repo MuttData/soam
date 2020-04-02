@@ -1,4 +1,3 @@
-# mail_report.py
 """Mail creator and sender."""
 import io
 import logging
@@ -10,20 +9,20 @@ from email.mime.text import MIMEText
 
 import pandas as pd
 
-"""
-import forecast_plotter
+
+from forecast_plotter import anomaly_plot
 from cfg import MAIL_TEMPLATE
 from constants import (
     DAILY_TIME_GRANULARITY,
     DS_COL,
     HOURLY_TIME_GRANULARITY,
-    MAIL_WORST_PROVINCES_NR,
+    MAIL_WORST_FACTOR_VALS_NR,
     PARENT_LOGGER,
-    PROVINCIAL_GEO_GRANULARITY,
+    # PROVINCIAL_GEO_GRANULARITY,
 )
 from forecaster import OUTLIER_SIGN_COL, OUTLIER_VALUE_COL, forecasts_fig_path
 from helpers import AttributeHelperMixin
-"""
+
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -65,7 +64,6 @@ def _build_subject_n_msg_body(
     img_dict,
     anomaly_range_stats,
     anomaly_window,
-    # geo_granularity,
     granularity,
     oracle_insertion_id,
     time_granularity,
@@ -102,7 +100,7 @@ def _build_subject_n_msg_body(
         "anomaly_range_stats": anomaly_range_stats,
         "anomaly_window": anomaly_window,
         "granularity": granularity,
-        "oracle_insertion_id": oracle_insertion_id,
+        # "oracle_insertion_id": oracle_insertion_id,
         "time_granularity": time_granularity,
     }
     msg_body = getattr(MAIL_TEMPLATE, "mail_body")(**jparams)
@@ -136,7 +134,6 @@ def _get_mime_images(
     outliers_imgs = {}  # type: ignore
     for factor_val in factor_levels:
         df_forecast = forecast_df[forecast_df["factor_val"] == factor_val]
-        # fig = forecast_plotter.anomaly_plot(
         fig = anomaly_plot(
             kpi_plot_name=kpi.anomaly_plot_ylabel,
             kpi_name=kpi.mail_kpi,
@@ -207,35 +204,18 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
         d["pos_anomalies_news"] = len(df_news[df_news[f"{OUTLIER_SIGN_COL}"] == 1])
         d["neg_anomalies_news"] = len(df_news[df_news[f"{OUTLIER_SIGN_COL}"] == -1])
 
-        # Provincial anomalies
-        """
-        if geo_gran == PROVINCIAL_GEO_GRANULARITY:
-            worst_anomaly_prov = df[
-                df[OUTLIER_VALUE_COL] == df[OUTLIER_VALUE_COL].max()
-            ]['factor_val']
-            d['worst_anomaly_prov'] = worst_anomaly_prov.squeeze()
-            df_prov = (
-                df['factor_val']
-                .value_counts()
-                .head(MAIL_WORST_PROVINCES_NR)
-                .reset_index()
-            )
-            d['most_anom_prov'] = df_prov['index'].tolist()
-        """
-        if (
-            False
-        ):  # This part should be it's a trivial factorization: len(factor_levels) > 1
-            worst_anomaly_prov = df[
-                df[OUTLIER_VALUE_COL] == df[OUTLIER_VALUE_COL].max()
-            ]["factor_val"]
-            d["worst_anomaly_factor_val"] = worst_anomaly_prov.squeeze()
-            df_prov = (
-                df["factor_val"]
-                .value_counts()
-                .head(MAIL_WORST_PROVINCES_NR)
-                .reset_index()
-            )
-            d["most_anom_factor "] = df_prov["index"].tolist()
+        # Anomalies by factor value.
+        worst_anomaly_by_factor_val = df[
+            df[OUTLIER_VALUE_COL] == df[OUTLIER_VALUE_COL].max()
+        ]["factor_val"]
+        d["worst_anomaly_factor_val"] = worst_anomaly_by_factor_val.squeeze()
+        df_by_factor = (
+            df["factor_val"]
+            .value_counts()
+            .head(MAIL_WORST_FACTOR_VALS_NR)
+            .reset_index()
+        )
+        d["most_anom_by_factor_val"] = df_by_factor["index"].tolist()
 
         # Build summary table
         pd.set_option("display.max_colwidth", -1)
@@ -248,7 +228,7 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
             columns={
                 DS_COL: "Fecha",
                 f"{OUTLIER_SIGN_COL}": "Impacto",
-                "factor_val": "Provincias",
+                "factor_val": granularity,
             }
         )
         # if geo_gran != PROVINCIAL_GEO_GRANULARITY:

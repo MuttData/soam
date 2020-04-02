@@ -5,6 +5,8 @@ from utils import sanitize_arg_empty_dict, sanitize_arg
 
 from helpers import AttributeHelperMixin
 
+logger = logging.getLogger(__name__)
+
 
 class SeriesManager(AttributeHelperMixin):
     def __init__(self, series_dict=None):
@@ -68,15 +70,9 @@ class FactorManager(AttributeHelperMixin):
         # FIXME: Ideally we would want `granularity` to be a list of columns used for factorization.
         self.granularity = [self.factor_col]
 
-        # assert self.geo_granularity in GEO_GRANULARITIES, logger.error(  # type: ignore
-        #     f'Bad geo granularity passed:{self.geo_granularity}, '
-        #     f'Possible values are: {GEO_GRANULARITIES}\n'
-        # )
 
     def process(self, target_series, series):
         """Process factor column and obtain level values + filter query.
-
-        If factor-col = provincial then filter for a pre-coded list.
         """
         self.target_series = target_series
         col = self.factor_col
@@ -93,12 +89,6 @@ class FactorManager(AttributeHelperMixin):
         # TODO: Since factor filtering will be done by filter_df factor_query
         # will be have to be removed in a future refactor.
         self.factor_query = f"{col} == @factor_val"
-
-    # def is_national(self):
-    #     return self.geo_granularity == NATIONAL_GEO_GRANULARITY
-
-    # def is_provincial(self):
-    #     return self.geo_granularity == PROVINCIAL_GEO_GRANULARITY
 
     def factor_conf_to_pretty_str(self, factor_conf):
         """Format factor configuration to something printable.

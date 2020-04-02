@@ -36,8 +36,8 @@ from cfg import (
 )
 from constants import PARENT_LOGGER
 
-# from constants import PARENT_LOGGER, VARCHAR_BIG, VARCHAR_SMALL
-# from utils import classproperty
+from constants import PARENT_LOGGER, VARCHAR_BIG, VARCHAR_SMALL
+from utils import classproperty
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -107,11 +107,8 @@ class KpiModel(AbstractIDBase):
     name_spanish = Column(Text)
     description_spanish = Column(Text)
     daily_status = Column(Text)
-    national_daily_status = Column(Text)
-    provincial_daily_status = Column(Text)
     hourly_status = Column(Text)
     national_hourly_status = Column(Text)
-    provincial_hourly_status = Column(Text)
     unit = Column(Text)
     client_type = Column(Text)
     created_at = Column(DateTime, nullable=False, default=now_getter)

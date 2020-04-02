@@ -40,8 +40,6 @@ HOURS = 24
 END_HOUR = 23
 HOURLY_TIME_GRANULARITY = "H"
 DAILY_TIME_GRANULARITY = "D"
-# NATIONAL_GEO_GRANULARITY = 'National'
-# PROVINCIAL_GEO_GRANULARITY = 'Provincial'
 
 TIME_GRANULARITY_NAME_MAP = {
     HOURLY_TIME_GRANULARITY: "hourly",
@@ -78,7 +76,9 @@ YESTERDAY = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 # [REMOVED]
 
 # Mail report constants
-# [REMOVED]
+MAIL_WORST_FACTOR_VALS_NR = 3
+
+
 
 DEFAULT_PROPHET_ARGS = dict(
     # changepoint_range=0.75,

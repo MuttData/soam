@@ -8,43 +8,28 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
 
-"""
 from constants import (
     DAILY_TIME_GRANULARITY,
     DS_COL,
+    Y_COL,
+    PRED_COLS,
     HOURLY_TIME_GRANULARITY,
     NATION_NAME,
     PARENT_LOGGER,
     PLOT_CONFIG,
     TIME_GRANULARITY_NAME_MAP,
+    TIME_GRANULARITIES,
+    HOURS,
+    END_HOUR,
+    FORECASTER_FUTURE_WINDOW,
+    FORECASTER_FUTURE_WINDOW_CUMSUM_KPI,
+    FORECASTER_TRAIN_WINDOW,
+    ANOMALY_WINDOW,
+    CLF_TRAIN_WINDOW,
+    SAMPLE_SIZE,
+    TOP_K_INFLUENCERS,
 )
 from forecaster import OUTLIER_SIGN_COL, Y_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
-"""
-# CLI defaults
-FORECASTER_FUTURE_WINDOW = 15
-FORECASTER_FUTURE_WINDOW_CUMSUM_KPI = 30
-FORECASTER_TRAIN_WINDOW = 90
-ANOMALY_WINDOW = 7
-CLF_TRAIN_WINDOW = 7
-SAMPLE_SIZE = 2
-TOP_K_INFLUENCERS = 12
-
-DS_COL = "ds"
-Y_COL = "y"
-PRED_COLS = ["ds", "yhat", "yhat_lower", "yhat_upper", Y_COL]
-
-
-# Time
-HOURS = 24
-END_HOUR = 23
-HOURLY_TIME_GRANULARITY = "H"
-DAILY_TIME_GRANULARITY = "D"
-
-TIME_GRANULARITY_NAME_MAP = {
-    HOURLY_TIME_GRANULARITY: "hourly",
-    DAILY_TIME_GRANULARITY: "daily",
-}
-TIME_GRANULARITIES = list(TIME_GRANULARITY_NAME_MAP.keys())
 
 
 # Plots config
@@ -101,6 +86,7 @@ OUTLIER_SIGN_COL = "outlier_sign"
 pd.plotting.register_matplotlib_converters()
 
 # logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
+logger = logging.getLogger(__name__)
 
 
 def _set_time_locator_interval(fig, ax, time_granularity, plot_conf):
@@ -312,7 +298,7 @@ class ForecastPlotter:
             # s_geo_gran=self.factor_val,
             granularity_val=self.factor_val,
             # forecast_df=forecaster.forecast,
-            forecast_df=forecast_df,
+            forecast_df=forecaster_df,
             end_date=time_range_conf.end_date,
             anomaly_window=time_range_conf.anomaly_window,
             time_granularity=time_range_conf.time_granularity,
