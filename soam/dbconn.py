@@ -1,17 +1,11 @@
 # FIXME: Use muttlib
 """Module to get and use multiple Big Data DB connections."""
 import logging
-import re
-import shutil
 from contextlib import contextmanager
 from functools import wraps
-from os import makedirs
-from time import sleep
-from urllib.parse import urlparse
 
 # import cx_Oracle
 import pandas as pd
-import progressbar
 
 # import pyarrow.parquet as pq
 from sqlalchemy import create_engine
@@ -142,36 +136,6 @@ class PgClient(BaseClient):
         super().__init__(dialect=dialect, port=port, **kwargs)
 
 
-class OracleClient(BaseClient):
-    """Create Oracle DB client."""
-
-    def __init__(self, dialect="oracle", schema=None, **kwargs):
-        super().__init__(dialect=dialect, **kwargs)
-        self.schema = schema
-
-    @property
-    def _db_uri(self):
-        dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.database)
-        db_uri = f"{self.dialect}://{self.username}:{self.password}@{dsn}"
-        return db_uri
-
-    def _connect(self):
-        conn = self.get_engine().connect()
-        if self.schema is not None:
-            conn.connection.current_schema = self.schema
-        return conn
-
-
-class IbisClient:
-    # [REMOVED]
-    pass
-
-
-class HiveDb:
-    # [REMOVED]
-    pass
-
-
 @contextmanager
 def session_scope(engine=None, **session_kw):
     """Provide a transactional scope around a series of operations."""
@@ -196,11 +160,7 @@ POSTGRES_DB_TYPE = "postgres"
 HIVE_DB_TYPE = "hive"
 IMPALA_DB_TYPE = "impala"
 CONNECTORS = {
-    IBIS_DB_TYPE: IbisClient,
-    ORACLE_DB_TYPE: OracleClient,
     POSTGRES_DB_TYPE: PgClient,
-    HIVE_DB_TYPE: HiveDb,
-    IMPALA_DB_TYPE: HiveDb,
 }
 
 

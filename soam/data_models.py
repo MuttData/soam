@@ -6,13 +6,11 @@ from datetime import datetime
 
 import sqlalchemy.types as types
 from sqlalchemy import (
-    Boolean,
     Column,
     DateTime,
     Float,
     ForeignKey,
     Integer,
-    String,
     Text,
     UniqueConstraint,
 )
@@ -327,7 +325,6 @@ class View(ABC):
 
 
 class Timeline(View):
-
     __viewname__ = TIMELINE_TABLE
     columns = [
         "forecast_confs.delver_run_id",

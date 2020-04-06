@@ -1,9 +1,10 @@
 import json
 import logging
 
-from utils import sanitize_arg_empty_dict, sanitize_arg
-
 from helpers import AttributeHelperMixin
+from utils import sanitize_arg_empty_dict
+
+from constants import DS_COL
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +70,6 @@ class FactorManager(AttributeHelperMixin):
 
         # FIXME: Ideally we would want `granularity` to be a list of columns used for factorization.
         self.granularity = [self.factor_col]
-
 
     def process(self, target_series, series):
         """Process factor column and obtain level values + filter query.

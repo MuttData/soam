@@ -88,7 +88,7 @@ def _build_subject_n_msg_body(
     # )
     subject = (
         f"{anomaly_range_stats.get('nr_anomalies')} Anomalías {s_time_gran} "
-        f"en {mail_kpi.title()} - {granularity_val}"
+        f"en {mail_kpi.title()} - {granularity}"
         f"{start_anomaly_window:%d-%b} al {end_date_str} {end_date_hr}"
     )
     logger.debug(f"Mail subject:\n {subject}")
@@ -303,7 +303,9 @@ class MailReport(AttributeHelperMixin):
     def aggregated_forecast_data(self):
         return pd.concat(self.agg_forecast_df)
 
-    def send(self, kpi, time_range_conf, factor_mgr, forecaster_insertion_id):
+    def send(
+        self, kpi, time_range_conf, factor_mgr, forecaster_insertion_id, granularity
+    ):
         try:
             forecast_df = self.aggregated_forecast_data
         except ValueError:
@@ -320,13 +322,11 @@ class MailReport(AttributeHelperMixin):
             self.credentials,
             self.mail_recipients_list,
             kpi,
-            # factor_mgr.geo_granularity,
             granularity,
             time_range_conf.start_date,
             time_range_conf.end_date,
             time_range_conf.anomaly_window,
             outliers_data,
-            # oracle_insertion_id,
             forecaster_insertion_id,
             forecast_df,
             time_granularity=time_range_conf.time_granularity,

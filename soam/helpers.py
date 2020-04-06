@@ -8,14 +8,7 @@ from pathlib import Path
 from pandas.tseries import offsets
 from sklearn.base import BaseEstimator as AttributeHelperMixin
 
-from utils import (
-    hash_str,
-    make_dirs,
-    str_to_datetime,
-    range_datetime,
-    normalize_ds_index,
-    apply_time_bounds,
-)
+from utils import hash_str, make_dirs, str_to_datetime, range_datetime
 from constants import (
     DAILY_TIME_GRANULARITY,
     HOURLY_TIME_GRANULARITY,
@@ -309,7 +302,3 @@ class AbstractAnalisysRun(AttributeHelperMixin, ABC):
                 run_ids[db_name] = run_obj.id
 
         return run_ids
-
-
-# class BaseStrategyBuilder:
-# [REMOVED]

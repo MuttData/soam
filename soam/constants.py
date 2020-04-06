@@ -78,8 +78,6 @@ YESTERDAY = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 # Mail report constants
 MAIL_WORST_FACTOR_VALS_NR = 3
 
-
-
 DEFAULT_PROPHET_ARGS = dict(
     # changepoint_range=0.75,
     # yearly_seasonality=False,

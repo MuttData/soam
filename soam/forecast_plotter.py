@@ -12,75 +12,19 @@ from constants import (
     DAILY_TIME_GRANULARITY,
     DS_COL,
     Y_COL,
-    PRED_COLS,
     HOURLY_TIME_GRANULARITY,
-    NATION_NAME,
-    PARENT_LOGGER,
     PLOT_CONFIG,
     TIME_GRANULARITY_NAME_MAP,
-    TIME_GRANULARITIES,
-    HOURS,
-    END_HOUR,
-    FORECASTER_FUTURE_WINDOW,
-    FORECASTER_FUTURE_WINDOW_CUMSUM_KPI,
-    FORECASTER_TRAIN_WINDOW,
-    ANOMALY_WINDOW,
-    CLF_TRAIN_WINDOW,
-    SAMPLE_SIZE,
-    TOP_K_INFLUENCERS,
 )
-from forecaster import OUTLIER_SIGN_COL, Y_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
-
-
-# Plots config
-PLOT_CONFIG = {
-    "anomaly_plot": {
-        "daily_fig_size": (10, 6),
-        "hourly_fig_size": (13, 9),
-        "colors": {
-            "history": "k",
-            "history_fill": "gray",
-            "anomaly_win": "dodgerblue",
-            "anomaly_win_fill": "lightskyblue",
-            "forecast": "darkviolet",
-            "outliers_history": "black",
-            "outliers_positive": "green",
-            "outliers_negative": "red",
-            "axis_grid": "gray",
-        },
-        "daily_major_interval": 3,
-        "daily_future_window": 15,  # Number of future days posterior to anomaly-win
-        "daily_history_window": 30,  # Number of history days prior to anomaly-win
-        "hourly_major_interval": 2,
-        "hourly_history_window": 14,
-        "hourly_future_window": 5,
-        "hourly_font_size": 7,
-        "hourly_minor_labelrotation": 40,
-        "hourly_major_pad": 25,
-        "hourly_minor_locator_interval": 8,
-        "labels": {
-            "xlabel": "Fechas",
-            "ylabel": "{kpi_plot_name} ({base_10_scale_zeros}s)",
-            "history": "Historia",
-            "anomaly_win": "Últimos {anomaly_window} días",
-            "forecast": "Pronóstico",
-            "outlier": "Outlier: {date}",
-        },
-        "title": "Anomalías en {kpi} - {geo_gran} Argentina {start_date:%d-%b} al {end_date:%d-%b}",
-    }
-}
+from forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
 
 
 FORECAST_DATE_COL = "forecast_date"
 FLOOR_COL = "floor"
 CAP_COL = "cap"
 DAY_NAME = "day_name"
-YHAT_LOWER_COL = "yhat_lower"
-YHAT_UPPER_COL = "yhat_upper"
-YHAT_COL = "yhat"
 TREND_COL = "trend"
 OUTLIER_VALUE_COL = "outlier_value"
-OUTLIER_SIGN_COL = "outlier_sign"
 
 
 pd.plotting.register_matplotlib_converters()
