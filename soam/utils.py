@@ -16,7 +16,7 @@ from soam.constants import PARENT_LOGGER
 
 # from constants import PARENT_LOGGER
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
 def str_to_datetime(datetime_str):
@@ -83,7 +83,7 @@ def hash_str(s, length=8):
 def apply_time_bounds(df, sd, ed, ds_col):
     """Filter time dates in a datetime-type column or index."""
     if ds_col:
-        rv = df.query(f"{ds_col} >= @sd and {ds_col} <= @ed")
+        rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
     else:
         rv = df.loc[sd:ed]
     return rv
@@ -96,7 +96,7 @@ def normalize_ds_index(df, ds_col):
     elif ds_col == df.index.name:
         df = df.reset_index().rename(columns={"index": ds_col})
     else:
-        raise ValueError(f"No column or index found as "{ds_col}".")
+        raise ValueError(f'No column or index found as "{ds_col}".')
     return df
 
 
@@ -163,10 +163,10 @@ def format_in_clause(iterable):
     """
     if not in_clause_requirement(iterable):
         raise BadInClauseException(
-            f"Value passed is not a list or tuple: "{iterable}". "
-            f"Where the query uses the "| inclause"."
+            f'Value passed is not a list or tuple: "{iterable}". '
+            f'Where the query uses the "| inclause".'
         )
-    values = [f"{v}" for v in iterable]
+    values = [f'{v}' for v in iterable]
     clause = ",".join(values)
     clause = "(" + clause + ")"
     return clause

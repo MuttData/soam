@@ -207,10 +207,6 @@ def anomaly_plot(
         )
     )
 
-    # s_geo_gran = "" if s_geo_gran == NATION_NAME.lower() else f"{s_geo_gran.title()} /"
-    # title = PLOT_CONF["title"].format(
-    #    kpi=kpi_name, geo_gran=s_geo_gran, start_date=anomaly_sd, end_date=end_date
-    # )
     title = PLOT_CONF["title"].format(
         kpi=kpi_name,
         granularity_val=granularity_val,

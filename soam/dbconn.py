@@ -12,7 +12,7 @@ from soam.constants import PARENT_LOGGER
 from soam.utils import path_or_string
 
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
 def _parse_sql_statement_decorator(func):
@@ -20,7 +20,7 @@ def _parse_sql_statement_decorator(func):
     def wrapper(self, *args, **kwargs):
         args = list(args)  # type: ignore
         sql = path_or_string(args[0])
-        format_params = kwargs.get("params", None)
+        format_params = kwargs.get('params', None)
         if format_params:
             try:
                 sql = sql.format(**format_params)
@@ -63,13 +63,13 @@ class BaseClient:
     @property
     def _db_uri(self):
         dialect = (
-            f"{self.dialect}{f"+{self.driver}" if self.driver is not None else ""}"
+            f"{self.dialect}{f'+{self.driver}' if self.driver is not None else ''}"
         )
         login = (
-            f"{self.username}{f":{self.password}" if self.password is not None else ""}"
+            f"{self.username}{f':{self.password}' if self.password is not None else ''}"
         )
-        host = f"{self.host}{f":{self.port}" if self.port is not None else ""}"
-        return f"{dialect}://{login}@{host}/{self.database}"
+        host = f"{self.host}{f':{self.port}' if self.port is not None else ''}"
+        return f'{dialect}://{login}@{host}/{self.database}'
 
     def get_engine(self, custom_uri=None, connect_args=None):
         connect_args = connect_args or {}
@@ -83,7 +83,7 @@ class BaseClient:
 
     @staticmethod
     def _cursor_columns(cursor):
-        if hasattr(cursor, "keys"):
+        if hasattr(cursor, 'keys'):
             return cursor.keys()
         else:
             return [c[0] for c in cursor.description]
@@ -107,10 +107,10 @@ class BaseClient:
             df = pd.DataFrame()
         return df
 
-    def insert_from_frame(self, df, table, if_exists="append", index=False, **kwargs):
+    def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
         """Insert data from dataframe into sql table."""
         # TODO: Validate types here?
-        if self.dialect == "oracle":
+        if self.dialect == 'oracle':
             df.columns = [c.upper() for c in df.columns]
 
         connection = self._connect()
@@ -121,21 +121,21 @@ class BaseClient:
 class PgClient(BaseClient):
     """Create Postgres DB client."""
 
-    def __init__(self, dialect="postgresql", port=5433, **kwargs):
+    def __init__(self, dialect='postgresql', port=5433, **kwargs):
         super().__init__(dialect=dialect, port=port, **kwargs)
 
 
 # class OracleClient(BaseClient):
 #     """Create Oracle DB client."""
 
-#     def __init__(self, dialect="oracle", schema=None, **kwargs):
+#     def __init__(self, dialect='oracle', schema=None, **kwargs):
 #         super().__init__(dialect=dialect, **kwargs)
 #         self.schema = schema
 
 #     @property
 #     def _db_uri(self):
 #         dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.database)
-#         db_uri = f"{self.dialect}://{self.username}:{self.password}@{dsn}"
+#         db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
 #         return db_uri
 
 #     def _connect(self):
@@ -173,11 +173,11 @@ def session_scope(engine=None, **session_kw):
         sess.close()
 
 
-IBIS_DB_TYPE = "ibis"
-ORACLE_DB_TYPE = "oracle"
-POSTGRES_DB_TYPE = "postgres"
-HIVE_DB_TYPE = "hive"
-IMPALA_DB_TYPE = "impala"
+IBIS_DB_TYPE = 'ibis'
+ORACLE_DB_TYPE = 'oracle'
+POSTGRES_DB_TYPE = 'postgres'
+HIVE_DB_TYPE = 'hive'
+IMPALA_DB_TYPE = 'impala'
 CONNECTORS = {
     # IBIS_DB_TYPE: IbisClient,
     # ORACLE_DB_TYPE: OracleClient,

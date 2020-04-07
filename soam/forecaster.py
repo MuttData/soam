@@ -85,7 +85,7 @@ def _exp_transform_data(data, cols=None):
         cols = [Y_COL]
     logger.info(f"Exp -1 un-transforming, the following cols: {cols}.")
     data[cols] = pd.np.exp(data[cols]) - 1
-    # Ensure we don"t actually have any value below 0
+    # Ensure we don't actually have any value below 0
     data[cols] = data[cols].clip(lower=0)
     return data
 
@@ -307,7 +307,7 @@ class Forecaster(AbstractAnalisysRun):
         Parameters
         ----------
         df: pd.DataFrame containing the history. Must have columns ds (date
-            type) and y, the time series. If self.growth is "logistic", then
+            type) and y, the time series. If self.growth is 'logistic', then
             df must also have a column cap that specifies the capacity at
             each ds.
         kwargs: Additional arguments passed to the optimizing or sampling
@@ -321,7 +321,7 @@ class Forecaster(AbstractAnalisysRun):
         vals = series.copy()
         if self.metric_non_negative:
             logger.debug(
-                f"Non-negative metric flag is set to "{self.metric_non_negative}". "
+                f"Non-negative metric flag is set to '{self.metric_non_negative}'. "
                 "Will proceed map data into log-space for fitting."
             )
             log_cols = self._check_add_cap_floor_cols()
@@ -354,7 +354,7 @@ class Forecaster(AbstractAnalisysRun):
 
         # To debug fitted model
         # fig = self._fitted_model.plot(fc)
-        # fig.savefig("foo.png")
+        # fig.savefig('foo.png')
 
         # Needs real values of historical data for plots
         fc = pd.merge(fc, series[[DS_COL, Y_COL]], on=DS_COL, how="left")
@@ -402,7 +402,7 @@ class Forecaster(AbstractAnalisysRun):
 
     # def run(self, kpi, time_range_conf, raw_series, regressors_l):
     def run(self, time_range_conf, raw_series, regressors_l):
-        """Compute Metric"s main subroutine."""
+        """Compute Metric's main subroutine."""
         logger.info("Running subroutine to identify outliers....")
         if self.check_series(raw_series):
             logger.info(f"Running forecaster...")
@@ -415,7 +415,7 @@ class Forecaster(AbstractAnalisysRun):
             self.fit(series_with_regs)
             forecast_preds = self.predict(series_with_regs, forecast_with_regs)
             forecast_final = self.calculate_outliers(forecast_preds)
-            # Replace null y"s with -1 to avoid having nulls in dbs
+            # Replace null y's with -1 to avoid having nulls in dbs
             # FIXME: Is better to use `df.where(df.notnull(), None)` but we still have null constraint
             forecast_final[Y_COL].replace(np.nan, -1, inplace=True)
         else:
@@ -423,7 +423,7 @@ class Forecaster(AbstractAnalisysRun):
             forecast_final = None
 
         self.forecast = forecast_final
-        logger.info(f"Final forecast has {len(forecast_final)} rows")
+        logger.info(f'Final forecast has {len(forecast_final)} rows')
         return self.forecast
 
 
