@@ -21,6 +21,7 @@ def main(
     db_creds,
     smtp_creds,
     mail_recipients,
+    df_orig,
 ):
     class KPI:
         def __init__(
@@ -113,7 +114,7 @@ def main(
             time_range_conf,
             factor_mgr,
             ','.join(all_forecaster_run_ids),
-            series_dict['cache_successes'],
+            df_orig,
         )
     else:
         logger.info("Mail report not send")
