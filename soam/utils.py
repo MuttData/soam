@@ -16,22 +16,22 @@ from soam.constants import PARENT_LOGGER
 
 # from constants import PARENT_LOGGER
 
-logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
+logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 def str_to_datetime(datetime_str):
     """Convert possible date-like string to datetime object."""
     formats = (
-        '%Y-%m-%d %H:%M:%S',
-        '%Y-%m-%d',
-        '%Y-%m-%d %H:%M:%S.%f',
-        '%H:%M:%S.%f',
-        '%H:%M:%S',
-        '%Y%m%dT%H:%M:%S',
-        '%Y-%m-%dT%H:%M:%S',
-        '%Y%m%d',
-        '%Y-%m-%dT%H',
-        '%Y%m',
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d",
+        "%Y-%m-%d %H:%M:%S.%f",
+        "%H:%M:%S.%f",
+        "%H:%M:%S",
+        "%Y%m%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y%m%d",
+        "%Y-%m-%dT%H",
+        "%Y%m",
     )
     for ftm in formats:
         try:
@@ -62,7 +62,7 @@ def path_or_string(str_or_path):
     file_path = Path(str_or_path)
     try:
         if file_path.is_file():
-            with file_path.open('r') as f:
+            with file_path.open("r") as f:
                 return f.read()
     except OSError:
         pass
@@ -77,13 +77,13 @@ def make_dirs(dir_path):
 
 def hash_str(s, length=8):
     """Hash a string."""
-    return hashlib.sha256(s.encode('utf8')).hexdigest()[:length]
+    return hashlib.sha256(s.encode("utf8")).hexdigest()[:length]
 
 
 def apply_time_bounds(df, sd, ed, ds_col):
     """Filter time dates in a datetime-type column or index."""
     if ds_col:
-        rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
+        rv = df.query(f"{ds_col} >= @sd and {ds_col} <= @ed")
     else:
         rv = df.loc[sd:ed]
     return rv
@@ -94,9 +94,9 @@ def normalize_ds_index(df, ds_col):
     if ds_col in df.columns:
         return df
     elif ds_col == df.index.name:
-        df = df.reset_index().rename(columns={'index': ds_col})
+        df = df.reset_index().rename(columns={"index": ds_col})
     else:
-        raise ValueError(f"No column or index found as '{ds_col}'.")
+        raise ValueError(f"No column or index found as "{ds_col}".")
     return df
 
 
@@ -163,8 +163,8 @@ def format_in_clause(iterable):
     """
     if not in_clause_requirement(iterable):
         raise BadInClauseException(
-            f"Value passed is not a list or tuple: '{iterable}'. "
-            f"Where the query uses the '| inclause'."
+            f"Value passed is not a list or tuple: "{iterable}". "
+            f"Where the query uses the "| inclause"."
         )
     values = [f"{v}" for v in iterable]
     clause = ",".join(values)
@@ -175,10 +175,10 @@ def format_in_clause(iterable):
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
-        line_statement_prefix=kwargs.pop('line_statement_prefix', '%'),
-        trim_blocks=kwargs.pop('trim_blocks', True),
-        lstrip_blocks=kwargs.pop('lstrip_blocks', True),
+        line_statement_prefix=kwargs.pop("line_statement_prefix", "%"),
+        trim_blocks=kwargs.pop("trim_blocks", True),
+        lstrip_blocks=kwargs.pop("lstrip_blocks", True),
         **kwargs,
     )
-    environment.filters['inclause'] = format_in_clause
+    environment.filters["inclause"] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))

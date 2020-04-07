@@ -8,7 +8,7 @@ from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
 
-from .constants import (
+from soam.constants import (
     DAILY_TIME_GRANULARITY,
     DS_COL,
     HOURLY_TIME_GRANULARITY,
@@ -16,7 +16,7 @@ from .constants import (
     TIME_GRANULARITY_NAME_MAP,
     Y_COL,
 )
-from .forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
+from soam.forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
 
 FORECAST_DATE_COL = "forecast_date"
 FLOOR_COL = "floor"
@@ -28,7 +28,7 @@ OUTLIER_VALUE_COL = "outlier_value"
 
 pd.plotting.register_matplotlib_converters()
 
-# logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
+# logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 logger = logging.getLogger(__name__)
 
 
@@ -120,7 +120,7 @@ def anomaly_plot(
         forecast_df, DS_COL, end_date, future_date
     )
 
-    # FIXME: For some reason sometimes we don't have data for the end date so the last
+    # FIXME: For some reason sometimes we don"t have data for the end date so the last
     # day in the anomaly window is -1 (or null)
     anomaly_win[Y_COL].replace(-1, np.nan, inplace=True)
 
@@ -207,8 +207,8 @@ def anomaly_plot(
         )
     )
 
-    # s_geo_gran = '' if s_geo_gran == NATION_NAME.lower() else f'{s_geo_gran.title()} /'
-    # title = PLOT_CONF['title'].format(
+    # s_geo_gran = "" if s_geo_gran == NATION_NAME.lower() else f"{s_geo_gran.title()} /"
+    # title = PLOT_CONF["title"].format(
     #    kpi=kpi_name, geo_gran=s_geo_gran, start_date=anomaly_sd, end_date=end_date
     # )
     title = PLOT_CONF["title"].format(
@@ -228,7 +228,7 @@ def anomaly_plot(
 
 
 class ForecastPlotter:
-    def __init__(self, factor_val, save_suffix='', save_path=None):
+    def __init__(self, factor_val, save_suffix="", save_path=None):
         self.factor_val = factor_val
         self.save_suffix = save_suffix
         self.save_path = save_path
@@ -246,18 +246,18 @@ class ForecastPlotter:
             anomaly_window=time_range_conf.anomaly_window,
             time_granularity=time_range_conf.time_granularity,
         )
-        fn = '_'.join(
+        fn = "_".join(
             [
-                'forecast',
-                f'{time_range_conf.start_date:%Y%m%d%H}',
-                f'{time_range_conf.end_date:%Y%m%d%H}',
+                "forecast",
+                f"{time_range_conf.start_date:%Y%m%d%H}",
+                f"{time_range_conf.end_date:%Y%m%d%H}",
                 target_col,
                 self.save_suffix,
-                '.png',
+                ".png",
             ]
         )
         fn = self.save_path / fn
         logger.debug(f"Saving forecast figure to {fn}...")
-        fig.savefig(fn, bbox_inches='tight')
+        fig.savefig(fn, bbox_inches="tight")
         print(fn)
         plt.close()

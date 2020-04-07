@@ -70,8 +70,8 @@ class FactorManager(AttributeHelperMixin):
         self.granularity = [self.factor_col]
 
         # assert self.geo_granularity in GEO_GRANULARITIES, logger.error(  # type: ignore
-        #     f'Bad geo granularity passed:{self.geo_granularity}, '
-        #     f'Possible values are: {GEO_GRANULARITIES}\n'
+        #     f"Bad geo granularity passed:{self.geo_granularity}, "
+        #     f"Possible values are: {GEO_GRANULARITIES}\n"
         # )
 
     def process(self, target_series, series):
@@ -87,7 +87,7 @@ class FactorManager(AttributeHelperMixin):
             factor_dtype = series[col].dtype
             factor_levels = series[col].unique()
             logger.debug(
-                f"We have these levels ({factor_levels}) on a '{factor_dtype}'-typed col."
+                f"We have these levels ({factor_levels}) on a "{factor_dtype}"-typed col."
             )
             self.factor_levels = factor_levels
 
@@ -104,7 +104,7 @@ class FactorManager(AttributeHelperMixin):
     def factor_conf_to_pretty_str(self, factor_conf):
         """Format factor configuration to something printable.
         """
-        rv = ';'.join(f'{k}={v}' for k, v in factor_conf.items())
+        rv = ";".join(f"{k}={v}" for k, v in factor_conf.items())
         return rv
 
     def factor_conf_to_str(self, factor_conf):
@@ -128,7 +128,7 @@ class FactorManager(AttributeHelperMixin):
 
         if (self.factor_col in df.columns) and factor_val:
             if factor_val not in self.factor_levels:
-                raise ValueError(f"{factor_val} isn't a valid factor level.")
+                raise ValueError(f"{factor_val} isn"t a valid factor level.")
             df = df.query(
                 self.factor_query,
                 local_dict=dict(factor_val=factor_val),

@@ -19,18 +19,18 @@ from soam.constants import (
 )
 from soam.data_models import ForecasterRuns, ForecasterValues
 
-logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
+logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
-FORECAST_DATE_COL = 'forecast_date'
-FLOOR_COL = 'floor'
-CAP_COL = 'cap'
-DAY_NAME = 'day_name'
-YHAT_LOWER_COL = 'yhat_lower'
-YHAT_UPPER_COL = 'yhat_upper'
-YHAT_COL = 'yhat'
-TREND_COL = 'trend'
-OUTLIER_VALUE_COL = 'outlier_value'
-OUTLIER_SIGN_COL = 'outlier_sign'
+FORECAST_DATE_COL = "forecast_date"
+FLOOR_COL = "floor"
+CAP_COL = "cap"
+DAY_NAME = "day_name"
+YHAT_LOWER_COL = "yhat_lower"
+YHAT_UPPER_COL = "yhat_upper"
+YHAT_COL = "yhat"
+TREND_COL = "trend"
+OUTLIER_VALUE_COL = "outlier_value"
+OUTLIER_SIGN_COL = "outlier_sign"
 
 INPUT_PROPHET_COLS = [DS_COL, Y_COL, DAY_NAME]
 OUTPUT_PROPHET_COLS = [
@@ -53,7 +53,7 @@ OUTPUT_FORECASTER_COLS = [
 ]
 
 # To be deprecated:
-forecasts_fig_path = partial(get_figure_full_path, fig_dir=FIG_DIR, fig_name='forecast')
+forecasts_fig_path = partial(get_figure_full_path, fig_dir=FIG_DIR, fig_name="forecast")
 
 
 def _process_caps(max_cap, min_floor, ratio_correction):
@@ -68,7 +68,7 @@ def _process_caps(max_cap, min_floor, ratio_correction):
 def _log_transform_data(data, cols=None):
     """Transform columns previous to model fitting."""
     if cols:  # only non-empty case
-        logger.info(f'Log transforming + 1, the following cols: {cols}.')
+        logger.info(f"Log transforming + 1, the following cols: {cols}.")
         data[cols] = pd.np.log(data[cols] + 1)
     elif cols is None:
         cols = [Y_COL]
@@ -83,9 +83,9 @@ def _exp_transform_data(data, cols=None):
     """Transform columns after model fit."""
     if cols is None:
         cols = [Y_COL]
-    logger.info(f'Exp -1 un-transforming, the following cols: {cols}.')
+    logger.info(f"Exp -1 un-transforming, the following cols: {cols}.")
     data[cols] = pd.np.exp(data[cols]) - 1
-    # Ensure we don't actually have any value below 0
+    # Ensure we don"t actually have any value below 0
     data[cols] = data[cols].clip(lower=0)
     return data
 
@@ -202,23 +202,23 @@ class Forecaster(AbstractAnalisysRun):
         # This should be here
         if kpi.name == RG_99_DATA_USAGE:
             outlier_dates = [
-                '2019-07-23',
-                '2019-07-24',
-                '2019-07-25',
-                '2019-07-30',
-                '2019-07-31',
-                '2019-08-01',
-                '2019-08-21',
-                '2019-08-22',
-                '2019-08-23',
-                '2019-08-28',
-                '2019-08-29',
-                '2019-08-30',
+                "2019-07-23",
+                "2019-07-24",
+                "2019-07-25",
+                "2019-07-30",
+                "2019-07-31",
+                "2019-08-01",
+                "2019-08-21",
+                "2019-08-22",
+                "2019-08-23",
+                "2019-08-28",
+                "2019-08-29",
+                "2019-08-30",
             ]
-        elif 'data_usage' in kpi.name:
-            outlier_dates = ['2019-11-13', '2019-11-14']
+        elif "data_usage" in kpi.name:
+            outlier_dates = ["2019-11-13", "2019-11-14"]
         if outlier_dates:
-            series.loc[series[DS_COL].isin(outlier_dates), 'y'] = None
+            series.loc[series[DS_COL].isin(outlier_dates), "y"] = None
           """
         return series
 
@@ -232,8 +232,8 @@ class Forecaster(AbstractAnalisysRun):
         reg_df.rename(columns={col: rname}, inplace=True)
 
         # Merge data and fill if necessary when nulls are present
-        series = pd.merge(series, reg_df, on=DS_COL, how='left').fillna(0)
-        fc = pd.merge(fc, reg_df, on=DS_COL, how='left').fillna(0)
+        series = pd.merge(series, reg_df, on=DS_COL, how="left").fillna(0)
+        fc = pd.merge(fc, reg_df, on=DS_COL, how="left").fillna(0)
         return series, fc
 
     def build_model(self, series, fc, regressors_list, time_range_conf):
@@ -244,15 +244,15 @@ class Forecaster(AbstractAnalisysRun):
         model_kws = self.base_model_kws.copy()
 
         interval_width = model_kws.get(
-            'interval_width', DEFAULT_PROPHET_ARGS['interval_width']
+            "interval_width", DEFAULT_PROPHET_ARGS["interval_width"]
         )
         if time_range_conf.time_granularity == HOURLY_TIME_GRANULARITY:
             interval_width /= 0.9
-        model_kws['interval_width'] = interval_width
+        model_kws["interval_width"] = interval_width
 
         monthly_seasonality = False
-        if 'monthly_seasonality' in model_kws:
-            monthly_seasonality = model_kws.pop('monthly_seasonality')
+        if "monthly_seasonality" in model_kws:
+            monthly_seasonality = model_kws.pop("monthly_seasonality")
 
         if holidays_regs:
             # Bump fbprophet model kws with holiday args
@@ -271,7 +271,7 @@ class Forecaster(AbstractAnalisysRun):
         if monthly_seasonality:
             # Note: we use fourier order 10 to allow seasonality to change quickly
             self._fbprophet_model.add_seasonality(
-                name='monthly', period=30.5, fourier_order=10
+                name="monthly", period=30.5, fourier_order=10
             )
 
         for reg in non_holidays_regs:
@@ -307,7 +307,7 @@ class Forecaster(AbstractAnalisysRun):
         Parameters
         ----------
         df: pd.DataFrame containing the history. Must have columns ds (date
-            type) and y, the time series. If self.growth is 'logistic', then
+            type) and y, the time series. If self.growth is "logistic", then
             df must also have a column cap that specifies the capacity at
             each ds.
         kwargs: Additional arguments passed to the optimizing or sampling
@@ -321,7 +321,7 @@ class Forecaster(AbstractAnalisysRun):
         vals = series.copy()
         if self.metric_non_negative:
             logger.debug(
-                f"Non-negative metric flag is set to '{self.metric_non_negative}'. "
+                f"Non-negative metric flag is set to "{self.metric_non_negative}". "
                 "Will proceed map data into log-space for fitting."
             )
             log_cols = self._check_add_cap_floor_cols()
@@ -354,10 +354,10 @@ class Forecaster(AbstractAnalisysRun):
 
         # To debug fitted model
         # fig = self._fitted_model.plot(fc)
-        # fig.savefig('foo.png')
+        # fig.savefig("foo.png")
 
         # Needs real values of historical data for plots
-        fc = pd.merge(fc, series[[DS_COL, Y_COL]], on=DS_COL, how='left')
+        fc = pd.merge(fc, series[[DS_COL, Y_COL]], on=DS_COL, how="left")
         if self.metric_non_negative:
             # exp transform forecasted hat cols, trend
             exp_cols = [v for v in OUTPUT_PROPHET_COLS if v not in [DS_COL, Y_COL]]
@@ -373,8 +373,8 @@ class Forecaster(AbstractAnalisysRun):
         """Calculate outliers from the historical vs. fit differences."""
         if not inplace:
             fc = fc.copy()
-        fc[OUTLIER_SIGN_COL] = fc.eval(f'y > {YHAT_UPPER_COL}').astype(int)  # positive
-        fc[OUTLIER_SIGN_COL] -= fc.eval(f'y < {YHAT_LOWER_COL}').astype(int)  # negative
+        fc[OUTLIER_SIGN_COL] = fc.eval(f"y > {YHAT_UPPER_COL}").astype(int)  # positive
+        fc[OUTLIER_SIGN_COL] -= fc.eval(f"y < {YHAT_LOWER_COL}").astype(int)  # negative
         fx = fc.ds.min()
         # Filter outliers only
         fc = fc.query(f"{DS_COL} >= @fx", global_dict={}, local_dict=dict(fx=fx))
@@ -402,7 +402,7 @@ class Forecaster(AbstractAnalisysRun):
 
     # def run(self, kpi, time_range_conf, raw_series, regressors_l):
     def run(self, time_range_conf, raw_series, regressors_l):
-        """Compute Metric's main subroutine."""
+        """Compute Metric"s main subroutine."""
         logger.info("Running subroutine to identify outliers....")
         if self.check_series(raw_series):
             logger.info(f"Running forecaster...")
@@ -415,11 +415,11 @@ class Forecaster(AbstractAnalisysRun):
             self.fit(series_with_regs)
             forecast_preds = self.predict(series_with_regs, forecast_with_regs)
             forecast_final = self.calculate_outliers(forecast_preds)
-            # Replace null y's with -1 to avoid having nulls in dbs
+            # Replace null y"s with -1 to avoid having nulls in dbs
             # FIXME: Is better to use `df.where(df.notnull(), None)` but we still have null constraint
             forecast_final[Y_COL].replace(np.nan, -1, inplace=True)
         else:
-            logger.error(f'Target series is empty or too small for this')
+            logger.error(f"Target series is empty or too small for this")
             forecast_final = None
 
         self.forecast = forecast_final
