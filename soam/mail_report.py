@@ -19,6 +19,7 @@ from soam.constants import (
 )
 from soam.forecaster import OUTLIER_SIGN_COL, OUTLIER_VALUE_COL, forecasts_fig_path
 from soam.helpers import AttributeHelperMixin
+from soam.forecast_plotter import anomaly_plot
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
