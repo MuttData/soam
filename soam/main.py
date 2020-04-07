@@ -9,6 +9,7 @@ from soam.series import run_series_pipeline, FactorManager
 from soam.utils import make_dirs
 from soam.helpers import TimeRangeConfiguration
 from soam.dbconn import PgClient
+from soam.kpi import KPI
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -17,37 +18,23 @@ def main(
     series_dict,
     factor_col,
     granularity,
+    kpi_dict,
     time_range_dict,
     db_creds,
     smtp_creds,
     mail_recipients,
     df_orig,
 ):
-    class KPI:
-        def __init__(
-            self,
-            target_series,
-            target_col,
-            name,
-            anomaly_plot_ylabel,
-            mail_kpi,
-            name_spanish,
-        ):
-            self.target_series = target_series
-            self.target_col = target_col
-            self.name = name
-            self.anomaly_plot_ylabel = anomaly_plot_ylabel
-            self.mail_kpi = mail_kpi
-            self.name_spanish = name_spanish
 
     kpi = KPI(
-        target_series="cache_successes",
-        target_col="cache_successes",
-        name="cache_success",
-        anomaly_plot_ylabel="cache_success",
-        mail_kpi="cache_success",
-        name_spanish="cache_success",
+        target_series=kpi_dict["target_series"],
+        target_col=kpi_dict["target_col"],
+        name=kpi_dict["name"],
+        anomaly_plot_ylabel=kpi_dict["anomaly_plot_ylabel"],
+        mail_kpi=kpi_dict["anomaly_plot_ylabel"],
+        name_spanish=kpi_dict["anomaly_plot_ylabel"],
     )
+
     time_range_conf = TimeRangeConfiguration(
         end_date=time_range_dict['end_date'],
         forecast_train_window=time_range_dict['train_window'],
