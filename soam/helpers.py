@@ -1,4 +1,4 @@
-# TODO: Remove unused code.
+# helpers.py
 """Project specific helper functions."""
 import logging
 from abc import ABC
@@ -8,18 +8,23 @@ from pathlib import Path
 from pandas.tseries import offsets
 from sklearn.base import BaseEstimator as AttributeHelperMixin
 
-from utils import hash_str, make_dirs, str_to_datetime, range_datetime
-from constants import (
+from soam.utils import (
+    hash_str,
+    make_dirs,
+    str_to_datetime,
+    range_datetime,
+)
+from soam.constants import (
     DAILY_TIME_GRANULARITY,
     HOURLY_TIME_GRANULARITY,
     PARENT_LOGGER,
     TIME_GRANULARITIES,
 )
-from dbconn import session_scope
+from soam.dbconn import session_scope
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
-RUN_ID_COL = "run_id"
+RUN_ID_COL = 'run_id'
 
 
 def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
@@ -27,7 +32,7 @@ def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
     store_dir = base_dir / kpi / prefix
     store_dir /= f"{date:%Y%m%d}{f'-{end_date:%Y%m%d}' if end_date is not None else ''}"
     if sample_size is not None:
-        store_dir /= f"sample-{sample_size}"
+        store_dir /= f'sample-{sample_size}'
     return make_dirs(store_dir)
 
 
@@ -39,7 +44,7 @@ def get_store_file(
     end_date=None,
     prefix=None,
     suffix=None,
-    ft="pkl",
+    ft='pkl',
     extra_dir=None,
     end_date_hour=False,
 ):
@@ -48,19 +53,19 @@ def get_store_file(
     if extra_dir is not None:
         save_dir /= extra_dir
     save_dir = make_dirs(save_dir)
-    outf = f"{date:%Y%m%d}"
+    outf = f'{date:%Y%m%d}'
     if end_date is not None:
-        outf += f"_{end_date:%Y%m%d}"
+        outf += f'_{end_date:%Y%m%d}'
         if end_date_hour:
-            outf += f"T{end_date:%H}"
+            outf += f'T{end_date:%H}'
     if sample_size is not None:
-        outf += f"_sample-{sample_size}"
+        outf += f'_sample-{sample_size}'
     if prefix is not None:
-        outf = f"{prefix}_{outf}"
+        outf = f'{prefix}_{outf}'
     if suffix is not None:
-        outf = f"{outf}_{suffix}"
+        outf = f'{outf}_{suffix}'
     if ft is not None:
-        outf += f".{ft}"
+        outf += f'.{ft}'
     return save_dir / outf
 
 
@@ -80,11 +85,11 @@ def get_figure_full_path(
     save_dir = make_dirs(fig_dir / granularity / time_granularity / fig_name)
     root_name = f"{start_date:%Y%m%d}_{end_date:%Y%m%d}"
     if end_date_hour:
-        root_name += f"T{end_date:%H}"
-    root_name += f"_{target_col}"
+        root_name += f'T{end_date:%H}'
+    root_name += f'_{target_col}'
     if suffix is not None:
-        root_name += f"_{suffix}"
-    fig_path = Path(save_dir, root_name + ".png")
+        root_name += f'_{suffix}'
+    fig_path = Path(save_dir, root_name + '.png')
     if as_posix:
         return fig_path.as_posix()
     return fig_path
@@ -126,11 +131,11 @@ def insert_df_multiple_clients(
     for db_cli in db_clients:
         dialect = db_cli.dialect
         if insertion_ids:
-            df["insertion_id"] = insertion_ids[dialect]
+            df['insertion_id'] = insertion_ids[dialect]
         if coseries_ids:
-            df["coseries_id"] = coseries_ids[dialect]
+            df['coseries_id'] = coseries_ids[dialect]
         logger.debug(f"Writing to {dialect} {table_name} table...")
-        db_cli.insert_from_frame(df, table_name, if_exists="append", **kwargs)
+        db_cli.insert_from_frame(df, table_name, if_exists='append', **kwargs)
         logger.info(f"Inserted {len(df)} records in {dialect} '{table_name}' table.")
     return
 
@@ -178,16 +183,16 @@ class TimeRangeConfiguration(AttributeHelperMixin):
     def validate(self):
         """Validate current configuration."""
         assert self._start_date <= self._end_date, logger.error(  # type: ignore
-            f"Bad dates passed. Start:{self._start_date}, end:{self._end_date}."
+            f'Bad dates passed. Start:{self._start_date}, end:{self._end_date}.'
         )
         assert self._end_date <= self._future_date, logger.error(  # type: ignore
-            f"Bad dates passed. End:{self._end_date}, future:{self._future_date}."
+            f'Bad dates passed. End:{self._end_date}, future:{self._future_date}.'
         )
         assert (
             self._time_granularity in TIME_GRANULARITIES
         ), logger.error(  # type: ignore
-            f"Bad time granularity passed:{self._time_granularity}, "
-            f"Possible values are: {TIME_GRANULARITIES}\n"
+            f'Bad time granularity passed:{self._time_granularity}, '
+            f'Possible values are: {TIME_GRANULARITIES}\n'
         )
 
     @property
@@ -266,7 +271,7 @@ class AbstractAnalisysRun(AttributeHelperMixin, ABC):
         analysis_values_df = self.get_children_data()
         analysis_values_df[self.run_id_col] = run_id
         sess.bulk_insert_mappings(
-            self.db_value_class, analysis_values_df.to_dict(orient="records")
+            self.db_value_class, analysis_values_df.to_dict(orient='records')
         )
 
     def get_run_obj(self):

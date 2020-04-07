@@ -15,29 +15,22 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
-from cfg import (
+
+
+from soam.cfg import (
     COSERIES_DIMENSIONS_TABLE,
     COSERIES_RUNS_TABLE,
     COSERIES_SCORES_TABLE,
     COSERIES_VALUES_TABLE,
-    DELVER_RUN_FACTOR_CONF_TABLE,
-    DELVER_RUN_TABLE,
-    DRILL_DOWN_RUNS_TABLE,
-    DRILL_DOWN_VALUES_TABLE,
-    ENV,
     FORECASTER_RUNS_TABLE,
     FORECASTER_VALUES_TABLE,
-    INFLUENCER_RUNS_TABLE,
-    INFLUENCER_VALUES_TABLE,
-    KPI_TABLE,
     TIMELINE_TABLE,
 )
-from constants import PARENT_LOGGER
 
-from constants import PARENT_LOGGER, VARCHAR_BIG, VARCHAR_SMALL
-from utils import classproperty
+from soam.constants import PARENT_LOGGER
+from soam.utils import classproperty
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
 def now_getter():
@@ -45,7 +38,7 @@ def now_getter():
 
 
 def get_default_run_name():
-    return f"{ENV}-run-{now_getter().isoformat()}"
+    return f'forecast-run-{now_getter().isoformat()}'
 
 
 Base = declarative_base()
@@ -59,7 +52,7 @@ class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
         return int
 
     def get_col_spec(self):
-        return "NUMBER GENERATED ALWAYS AS IDENTITY ORDER"
+        return 'NUMBER GENERATED ALWAYS AS IDENTITY ORDER'
 
 
 class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
@@ -67,7 +60,7 @@ class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
     impl = Integer
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == "oracle":
+        if dialect.name == 'oracle':
             return dialect.type_descriptor(OracleIdentity)
         return dialect.type_descriptor(self.impl)
 
@@ -95,63 +88,6 @@ class AbstractRunBase(AbstractIDBase):  # pylint: disable=too-few-public-methods
     params_hash = Column(Text, nullable=False)
 
 
-"""
-class KpiModel(AbstractIDBase):
-    __tablename__ = KPI_TABLE
-    __table_args__ = (UniqueConstraint('name'),)
-
-    parent_id = Column(Integer, ForeignKey(f'{KPI_TABLE}.id'))
-    name = Column(String(VARCHAR_BIG), nullable=False)
-    name_spanish = Column(Text)
-    description_spanish = Column(Text)
-    daily_status = Column(Text)
-    hourly_status = Column(Text)
-    national_hourly_status = Column(Text)
-    unit = Column(Text)
-    client_type = Column(Text)
-    created_at = Column(DateTime, nullable=False, default=now_getter)
-    updated_at = Column(DateTime, nullable=False, default=now_getter)
-"""
-'''
-class DelverRunModel(AbstractRunBase):
-
-    __tablename__ = DELVER_RUN_TABLE
-    # __table_args__ = (
-    #    UniqueConstraint('kpi_id', 'end_date', 'geo_granularity', 'time_granularity'),
-    # )
-
-    kpi_id = Column(Integer, ForeignKey(f'{KPI_TABLE}.id'))
-    run_name = Column(Text, nullable=False, default=get_default_run_name)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
-    future_date = Column(DateTime, nullable=False)
-    geo_granularity = Column(String(VARCHAR_SMALL), nullable=False)
-    time_granularity = Column(String(VARCHAR_SMALL), nullable=False)
-    is_promoted = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=now_getter)
-
-
-class DelverRunFactorConf(AbstractIDBase):
-    """Run for a particular combination of values that form a factor.
-
-    The column `factor_conf` should contain a JSON map indicating the values of each factor used
-    in the run.
-    """
-
-    __tablename__ = DELVER_RUN_FACTOR_CONF_TABLE
-    __table_args__ = (UniqueConstraint('delver_run_id', 'factor_conf'),)
-
-    factor_conf = Column(String(VARCHAR_BIG), nullable=False)
-    delver_run_id = Column(
-        Integer, ForeignKey(f'{DELVER_RUN_TABLE}.id'), nullable=False
-    )
-    forecaster_run_id = Column(Integer, ForeignKey(f'{FORECASTER_RUNS_TABLE}.id'))
-    influencer_run_id = Column(Integer, ForeignKey(f'{INFLUENCER_RUNS_TABLE}.id'))
-    drill_down_run_id = Column(Integer, ForeignKey(f'{DRILL_DOWN_RUNS_TABLE}.id'))
-    coseries_run_id = Column(Integer, ForeignKey(f'{COSERIES_RUNS_TABLE}.id'))
-'''
-
-
 class ForecasterRuns(AbstractRunBase):
 
     __tablename__ = FORECASTER_RUNS_TABLE
@@ -160,9 +96,9 @@ class ForecasterRuns(AbstractRunBase):
 class ForecasterValues(AbstractIDBase):
 
     __tablename__ = FORECASTER_VALUES_TABLE
-    __table_args__ = (UniqueConstraint("run_id", "forecast_date"),)
+    __table_args__ = (UniqueConstraint('run_id', 'forecast_date'),)
 
-    run_id = Column(Integer, ForeignKey(f"{FORECASTER_RUNS_TABLE}.id"), nullable=False)
+    run_id = Column(Integer, ForeignKey(f'{FORECASTER_RUNS_TABLE}.id'), nullable=False)
     forecast_date = Column(DateTime, nullable=False)
     yhat = Column(Float, nullable=False)
     yhat_lower = Column(Float, nullable=False)
@@ -173,55 +109,6 @@ class ForecasterValues(AbstractIDBase):
     outlier_sign = Column(Float)
 
 
-"""
-class InfluencerRuns(AbstractRunBase):
-
-    __tablename__ = INFLUENCER_RUNS_TABLE
-
-
-class InfluencerValues(AbstractIDBase):
-
-    __tablename__ = INFLUENCER_VALUES_TABLE
-    __table_args__ = (UniqueConstraint('run_id', 'analysis_date', 'influencer'),)
-
-    run_id = Column(Integer, ForeignKey(f'{INFLUENCER_RUNS_TABLE}.id'), nullable=False)
-    analysis_date = Column(DateTime, nullable=False)
-    influencer = Column(String(VARCHAR_SMALL), nullable=False)
-    influencer_spanish = Column(Text, nullable=False)
-    importance = Column(Float, nullable=False)
-
-
-class DrillDownRuns(AbstractRunBase):
-
-    __tablename__ = DRILL_DOWN_RUNS_TABLE
-
-
-class DrillDownValues(AbstractIDBase):
-
-    __tablename__ = DRILL_DOWN_VALUES_TABLE
-    __table_args__ = (
-        UniqueConstraint(
-            'run_id',
-            'analysis_date',
-            'influencer',
-            'influencer_value_range',
-            'kpi_variable',
-            'kpi_variable_value',
-        ),
-    )
-
-    run_id = Column(Integer, ForeignKey(f'{DRILL_DOWN_RUNS_TABLE}.id'), nullable=False)
-    analysis_date = Column(DateTime, nullable=False)
-    influencer = Column(String(VARCHAR_SMALL), nullable=False)
-    influencer_value_range = Column(String(VARCHAR_BIG), nullable=False)
-    kpi_variable = Column(String(VARCHAR_SMALL), nullable=False)
-    kpi_variable_value = Column(Float, nullable=True)
-    kpi_variable_overall_avg = Column(Float, nullable=True)
-    user_share = Column(Float, nullable=True)
-    insight = Column(Text, nullable=True)
-"""
-
-
 class CoseriesRuns(AbstractRunBase):
 
     __tablename__ = COSERIES_RUNS_TABLE
@@ -230,7 +117,7 @@ class CoseriesRuns(AbstractRunBase):
 class CoseriesDimensions(AbstractIDBase):
 
     __tablename__ = COSERIES_DIMENSIONS_TABLE
-    run_id = Column(Integer, ForeignKey(f"{COSERIES_RUNS_TABLE}.id"), nullable=False)
+    run_id = Column(Integer, ForeignKey(f'{COSERIES_RUNS_TABLE}.id'), nullable=False)
     dimension = Column(Text, nullable=False)
     y_col = Column(Text, nullable=False)
 
@@ -242,10 +129,10 @@ class CoseriesValues(AbstractIDBase):
     """
 
     __tablename__ = COSERIES_VALUES_TABLE
-    __table_args__ = (UniqueConstraint("dimension_id", "value_datetime"),)
+    __table_args__ = (UniqueConstraint('dimension_id', 'value_datetime'),)
 
     dimension_id = Column(
-        Integer, ForeignKey(f"{COSERIES_DIMENSIONS_TABLE}.id"), nullable=False
+        Integer, ForeignKey(f'{COSERIES_DIMENSIONS_TABLE}.id'), nullable=False
     )
     value_datetime = Column(DateTime, nullable=False)
     y = Column(Float, nullable=False)
@@ -254,11 +141,11 @@ class CoseriesValues(AbstractIDBase):
 class CoseriesScores(AbstractIDBase):
 
     __tablename__ = COSERIES_SCORES_TABLE
-    __table_args__ = (UniqueConstraint("run_id", "dimension_id", "analysis_datetime"),)
+    __table_args__ = (UniqueConstraint('run_id', 'dimension_id', 'analysis_datetime'),)
 
-    run_id = Column(Integer, ForeignKey(f"{COSERIES_RUNS_TABLE}.id"), nullable=False)
+    run_id = Column(Integer, ForeignKey(f'{COSERIES_RUNS_TABLE}.id'), nullable=False)
     dimension_id = Column(
-        Integer, ForeignKey(f"{COSERIES_DIMENSIONS_TABLE}.id"), nullable=False
+        Integer, ForeignKey(f'{COSERIES_DIMENSIONS_TABLE}.id'), nullable=False
     )
     analysis_datetime = Column(DateTime, nullable=False)
     score_value = Column(Float, nullable=False)
@@ -270,7 +157,7 @@ class CoseriesScores(AbstractIDBase):
 # TODO: Move this to muttlib
 class View(ABC):
 
-    __schema__ = ""
+    __schema__ = ''
 
     @property
     @classmethod
@@ -284,7 +171,7 @@ class View(ABC):
         """Convenience getter that adds schema if provided."""
         rv = cls.__viewname__
         if cls.__schema__:
-            rv = f"{cls.__schema__}.{rv}"
+            rv = f'{cls.__schema__}.{rv}'
         return rv
 
     @property
@@ -325,19 +212,20 @@ class View(ABC):
 
 
 class Timeline(View):
+
     __viewname__ = TIMELINE_TABLE
     columns = [
-        "forecast_confs.delver_run_id",
-        "forecast_confs.factor_conf_id",
-        "forecast_confs.forecaster_value_id",
-        "forecast_confs.forecast_date",
-        "influencer_ids.influencer_run_id",
+        'forecast_confs.delver_run_id',
+        'forecast_confs.factor_conf_id',
+        'forecast_confs.forecaster_value_id',
+        'forecast_confs.forecast_date',
+        'influencer_ids.influencer_run_id',
     ]
 
     @classmethod
     def get_create_sql(cls, engine_name=None):
-        true_bool = 1 if engine_name == "oracle" else True
-        select_expr = ",\n".join(cls.columns)
+        true_bool = 1 if engine_name == 'oracle' else True
+        select_expr = ',\n'.join(cls.columns)
         sql = f"""
     CREATE OR REPLACE VIEW {cls.viewname} AS
         WITH fv_sel AS (

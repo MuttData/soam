@@ -1,10 +1,9 @@
 import json
 import logging
 
-from helpers import AttributeHelperMixin
-from utils import sanitize_arg_empty_dict
-
-from constants import DS_COL
+from soam.constants import DS_COL
+from soam.helpers import AttributeHelperMixin
+from soam.utils import sanitize_arg_empty_dict
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +28,7 @@ class SeriesManager(AttributeHelperMixin):
         return self.series_dict.items()
 
     def build_regressors(self):
-        # self.regressors_l = create_regressors_pipeline(self.series_dict)
-        pass
+        self.regressors_l = create_regressors_pipeline(self.series_dict)
 
     def validate(self, time_granularity, ds_col=DS_COL, accept_empty=True):
         # TODO: This check is also present in coseries. Factor it out.
@@ -71,8 +69,15 @@ class FactorManager(AttributeHelperMixin):
         # FIXME: Ideally we would want `granularity` to be a list of columns used for factorization.
         self.granularity = [self.factor_col]
 
+        # assert self.geo_granularity in GEO_GRANULARITIES, logger.error(  # type: ignore
+        #     f'Bad geo granularity passed:{self.geo_granularity}, '
+        #     f'Possible values are: {GEO_GRANULARITIES}\n'
+        # )
+
     def process(self, target_series, series):
         """Process factor column and obtain level values + filter query.
+
+        If factor-col = provincial then filter for a pre-coded list.
         """
         self.target_series = target_series
         col = self.factor_col
@@ -90,10 +95,16 @@ class FactorManager(AttributeHelperMixin):
         # will be have to be removed in a future refactor.
         self.factor_query = f"{col} == @factor_val"
 
+    # def is_national(self):
+    #     return self.geo_granularity == NATIONAL_GEO_GRANULARITY
+
+    # def is_provincial(self):
+    #     return self.geo_granularity == PROVINCIAL_GEO_GRANULARITY
+
     def factor_conf_to_pretty_str(self, factor_conf):
         """Format factor configuration to something printable.
         """
-        rv = ";".join(f"{k}={v}" for k, v in factor_conf.items())
+        rv = ';'.join(f'{k}={v}' for k, v in factor_conf.items())
         return rv
 
     def factor_conf_to_str(self, factor_conf):
@@ -135,9 +146,8 @@ class FactorManager(AttributeHelperMixin):
             yield factor_conf, rv
 
 
-'''
 # def run_series_pipeline(kpi, time_range_conf, extractor, factor_mgr):
-def run_series_pipeline(series_dict, time_range_conf, factor_mgr):
+def run_series_pipeline(kpi, series_dict, time_range_conf, factor_mgr):
     """Extract and transform a given series."""
     # series_dict = extractor.extract(time_range_conf, kpi.client_type)
     # series_dict = KPISeriesPreprocBase.build_from_kpi(kpi).preproc(series_dict)
@@ -146,4 +156,3 @@ def run_series_pipeline(series_dict, time_range_conf, factor_mgr):
     # series_mgr.build_regressors()
     factor_mgr.process(kpi.target_series, series_mgr)
     return series_mgr, factor_mgr
-'''

@@ -1,23 +1,22 @@
 """Plotting module for Delver."""
-import logging
 from datetime import timedelta
+import logging
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
-from matplotlib.ticker import FuncFormatter
 
-from constants import (
+from .constants import (
     DAILY_TIME_GRANULARITY,
     DS_COL,
-    Y_COL,
     HOURLY_TIME_GRANULARITY,
     PLOT_CONFIG,
     TIME_GRANULARITY_NAME_MAP,
+    Y_COL,
 )
-from forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
-
+from .forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
 
 FORECAST_DATE_COL = "forecast_date"
 FLOOR_COL = "floor"
@@ -229,36 +228,36 @@ def anomaly_plot(
 
 
 class ForecastPlotter:
-    def __init__(self, factor_val, save_suffix="", save_path=None):
+    def __init__(self, factor_val, save_suffix='', save_path=None):
         self.factor_val = factor_val
         self.save_suffix = save_suffix
         self.save_path = save_path
 
-    # def plot(self, forecaster, time_range_conf, target_col, kpi_plot_name, kpi_name):
-    def plot(self, forecaster_df, time_range_conf, target_col, kpi_plot_name, kpi_name):
+    def plot(self, forecaster, time_range_conf, target_col, kpi_plot_name, kpi_name):
+        # def plot(self, forecaster, time_range_conf, target_col, kpi_plot_name, kpi_name):
         fig = anomaly_plot(
             kpi_plot_name=kpi_plot_name,
             kpi_name=kpi_name,
             # s_geo_gran=self.factor_val,
             granularity_val=self.factor_val,
-            # forecast_df=forecaster.forecast,
-            forecast_df=forecaster_df,
+            forecast_df=forecaster.forecast,
+            # forecast_df=forecaster_df,
             end_date=time_range_conf.end_date,
             anomaly_window=time_range_conf.anomaly_window,
             time_granularity=time_range_conf.time_granularity,
         )
-        fn = "_".join(
+        fn = '_'.join(
             [
-                "forecast",
-                f"{time_range_conf.start_date:%Y%m%d%H}",
-                f"{time_range_conf.end_date:%Y%m%d%H}",
+                'forecast',
+                f'{time_range_conf.start_date:%Y%m%d%H}',
+                f'{time_range_conf.end_date:%Y%m%d%H}',
                 target_col,
                 self.save_suffix,
-                ".png",
+                '.png',
             ]
         )
         fn = self.save_path / fn
         logger.debug(f"Saving forecast figure to {fn}...")
-        fig.savefig(fn, bbox_inches="tight")
+        fig.savefig(fn, bbox_inches='tight')
         print(fn)
         plt.close()

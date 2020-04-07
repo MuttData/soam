@@ -1,6 +1,7 @@
 """SOAM setup file"""
 
 import setuptools
+
 import soam
 
 with open('README.md', 'r', encoding='utf8') as fh:
@@ -17,7 +18,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    packages=setuptools.find_packages(),
+    packages=['soam'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
