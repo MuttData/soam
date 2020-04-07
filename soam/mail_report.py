@@ -7,6 +7,7 @@ from datetime import timedelta
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import matplotlib.pyplot as plt
 
 import pandas as pd
 
