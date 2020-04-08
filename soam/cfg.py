@@ -4,8 +4,8 @@ from pathlib import Path
 from soam.utils import template, make_dirs
 
 KPI_TABLE_BASENAME = "kpis"
-DELVER_RUN_TABLE_BASENAME = "delver_runs"
-DELVER_RUN_FACTOR_CONF_TABLE_BASENAME = "delver_run_factor_conf"
+SOAM_RUN_TABLE_BASENAME = "soam_runs"
+SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_run_factor_conf"
 FORECASTER_RUNS_TABLE_BASENAME = "forecaster_runs"
 FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
 INFLUENCER_RUNS_TABLE_BASENAME = "influencer_runs"
@@ -40,9 +40,9 @@ table_name_preffix = ""
 table_name_preffix = ""
 
 KPI_TABLE = f"{table_name_preffix}{KPI_TABLE_BASENAME}"
-DELVER_RUN_TABLE = f"{table_name_preffix}{DELVER_RUN_TABLE_BASENAME}"
-DELVER_RUN_FACTOR_CONF_TABLE = (
-    f"{table_name_preffix}{DELVER_RUN_FACTOR_CONF_TABLE_BASENAME}"
+SOAM_RUN_TABLE = f"{table_name_preffix}{SOAM_RUN_TABLE_BASENAME}"
+SOAM_RUN_FACTOR_CONF_TABLE = (
+    f"{table_name_preffix}{SOAM_RUN_FACTOR_CONF_TABLE_BASENAME}"
 )
 FORECASTER_RUNS_TABLE = f"{table_name_preffix}{FORECASTER_RUNS_TABLE_BASENAME}"
 FORECASTER_VALUES_TABLE = f"{table_name_preffix}{FORECASTER_VALUES_TABLE_BASENAME}"
