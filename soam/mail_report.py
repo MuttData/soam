@@ -134,15 +134,6 @@ def _get_mime_images(
             anomaly_window=anomaly_window,
             time_granularity=time_granularity,
         )
-        # Extra plot
-        if orig_df is not None:
-            pdf = orig_df[orig_df["game"] == factor_val]
-            pdf = pdf.groupby(['date', 'provider']).sum().reset_index()
-            pdf['date'] = pd.to_datetime(pdf['date'])
-            ex_fig = plot_provider_area_metrics(
-                pdf,
-                ['cache_requests', 'cache_successes', 'view_requests', 'view_starts'],
-            )
 
         out_fval = factor_val
         end_date_hour = True if time_granularity == HOURLY_TIME_GRANULARITY else False
@@ -156,23 +147,35 @@ def _get_mime_images(
             as_posix=False,
             end_date_hour=end_date_hour,
         )
-        ex_fig_p = forecasts_fig_path(
-            target_col=kpi.name,
-            start_date=start_date,
-            end_date=end_date,
-            time_granularity=time_granularity,
-            granularity=granularity,
-            suffix=f"{out_fval}_extra",
-            as_posix=False,
-            end_date_hour=end_date_hour,
-        )
 
         logger.info(f"Saving figure to {fig_p}...")
         fig.savefig(fig_p, bbox_inches='tight')
-        logger.info(f"Saving extra figure to {ex_fig_p}...")
-        ex_fig.savefig(ex_fig_p, bbox_inches='tight')
         outliers_imgs[factor_val] = fig_p
-        extra_imgs[factor_val] = ex_fig_p
+
+        # Extra plot
+        if orig_df is not None:
+            pdf = orig_df[orig_df["game"] == factor_val]
+            pdf = pdf.groupby(['date', 'provider']).sum().reset_index()
+            pdf['date'] = pd.to_datetime(pdf['date'])
+            ex_fig = plot_provider_area_metrics(
+                pdf,
+                ['cache_requests', 'cache_successes', 'view_requests', 'view_starts'],
+            )
+
+            ex_fig_p = forecasts_fig_path(
+                target_col=kpi.name,
+                start_date=start_date,
+                end_date=end_date,
+                time_granularity=time_granularity,
+                granularity=granularity,
+                suffix=f"{out_fval}_extra",
+                as_posix=False,
+                end_date_hour=end_date_hour,
+            )
+
+            logger.info(f"Saving extra figure to {ex_fig_p}...")
+            ex_fig.savefig(ex_fig_p, bbox_inches='tight')
+            extra_imgs[factor_val] = ex_fig_p
 
     for factor_val, outliers_img in outliers_imgs.items():
         if outliers_img.is_file():
@@ -185,7 +188,7 @@ def _get_mime_images(
             img_name = f'{kpi.name_spanish}_{outliers_img.stem}'
             msg_image.add_header('Content-Id', f'<{img_name}>')
             mime_img_dict['outliers'][factor_val] = img_name
-            if extra_imgs[factor_val]:
+            if extra_imgs.get(factor_val, None) is not None:
                 extra_img = extra_imgs[factor_val]
                 with extra_img.open('rb') as img_file:
                     msg_image = MIMEImage(img_file.read())

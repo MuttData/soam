@@ -139,11 +139,13 @@
             <span class='subtitle'>Analysis for {{ granularity_val }}</span>
             <div class='underline'></div>
             <div>
-                <img src='cid:{{ img_dict['outliers'][granularity_val] }}' />
+                <img src='cid:{{ img_dict["outliers"][granularity_val] }}' />
             </div>
+            {% if granularity_val in img_dict["extra"] %}
             <div>
-                <img src='cid:{{ img_dict['extra'][granularity_val] }}' />
+                <img src='cid:{{ img_dict["extra"][granularity_val] }}' />
             </div>
+            {% endif %}
         {% endfor %}
     </p>
     {% endif %}

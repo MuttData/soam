@@ -23,7 +23,7 @@ def main(
     db_creds,
     smtp_creds,
     mail_recipients,
-    df_orig,
+    df_orig=None,
 ):
 
     kpi = KPI(
