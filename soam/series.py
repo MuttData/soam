@@ -28,7 +28,7 @@ class SeriesManager(AttributeHelperMixin):
         return self.series_dict.items()
 
     def build_regressors(self):
-        self.regressors_l = create_regressors_pipeline(self.series_dict)
+        raise NotImplementedError("Subclasses should implement this.")
 
     def validate(self, time_granularity, ds_col=DS_COL, accept_empty=True):
         # TODO: This check is also present in coseries. Factor it out.
