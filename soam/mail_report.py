@@ -135,12 +135,14 @@ def _get_mime_images(
             time_granularity=time_granularity,
         )
         # Extra plot
-        pdf = orig_df[orig_df["game"] == factor_val]
-        pdf = pdf.groupby(['date', 'provider']).sum().reset_index()
-        pdf['date'] = pd.to_datetime(pdf['date'])
-        ex_fig = plot_provider_area_metrics(
-            pdf, ['cache_requests', 'cache_successes', 'view_requests', 'view_starts']
-        )
+        if orig_df is not None:
+            pdf = orig_df[orig_df["game"] == factor_val]
+            pdf = pdf.groupby(['date', 'provider']).sum().reset_index()
+            pdf['date'] = pd.to_datetime(pdf['date'])
+            ex_fig = plot_provider_area_metrics(
+                pdf,
+                ['cache_requests', 'cache_successes', 'view_requests', 'view_starts'],
+            )
 
         out_fval = factor_val
         end_date_hour = True if time_granularity == HOURLY_TIME_GRANULARITY else False

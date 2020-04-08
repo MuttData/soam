@@ -5,6 +5,9 @@ from functools import wraps
 
 import pandas as pd
 from sqlalchemy import create_engine
+from contextlib import contextmanager
+
+from sqlalchemy.orm import sessionmaker
 
 from soam.constants import PARENT_LOGGER
 from soam.utils import path_or_string
@@ -121,6 +124,24 @@ class PgClient(BaseClient):
 
     def __init__(self, dialect='postgresql', port=5433, **kwargs):
         super().__init__(dialect=dialect, port=port, **kwargs)
+
+
+@contextmanager
+def session_scope(engine=None, **session_kw):
+    """Provide a transactional scope around a series of operations."""
+
+    Session = sessionmaker(bind=engine)
+    sess = Session(**session_kw)
+    # bring_table_group_metadata(sess.connection())
+    try:
+        yield sess
+        sess.commit()
+    except Exception as err:
+        logger.exception(err)
+        sess.rollback()
+        raise
+    finally:
+        sess.close()
 
 
 POSTGRES_DB_TYPE = 'postgres'
