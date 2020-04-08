@@ -120,7 +120,7 @@ def anomaly_plot(
         forecast_df, DS_COL, end_date, future_date
     )
 
-    # FIXME: For some reason sometimes we don"t have data for the end date so the last
+    # FIXME: For some reason sometimes we don't have data for the end date so the last
     # day in the anomaly window is -1 (or null)
     anomaly_win[Y_COL].replace(-1, np.nan, inplace=True)
 
