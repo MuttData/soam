@@ -48,13 +48,8 @@ class SeriesManager(AttributeHelperMixin):
 
 class FactorManager(AttributeHelperMixin):
     def __init__(
-        self,
-        factor_col,
-        # geo_granularity=NATIONAL_GEO_GRANULARITY,
-        # max_levels_num=MAX_FACTOR_LEVELS,
+        self, factor_col,
     ):
-        # self.geo_granularity = geo_granularity
-        # self.max_levels_num = max_levels_num
         self.target_series = None
 
         # The default case is to have an empty factor_col thus return no query or levels
@@ -68,11 +63,6 @@ class FactorManager(AttributeHelperMixin):
 
         # FIXME: Ideally we would want `granularity` to be a list of columns used for factorization.
         self.granularity = [self.factor_col]
-
-        # assert self.geo_granularity in GEO_GRANULARITIES, logger.error(  # type: ignore
-        #     f"Bad geo granularity passed:{self.geo_granularity}, "
-        #     f"Possible values are: {GEO_GRANULARITIES}\n"
-        # )
 
     def process(self, target_series, series):
         """Process factor column and obtain level values + filter query.
@@ -95,12 +85,6 @@ class FactorManager(AttributeHelperMixin):
         # will be have to be removed in a future refactor.
         self.factor_query = f"{col} == @factor_val"
 
-    # def is_national(self):
-    #     return self.geo_granularity == NATIONAL_GEO_GRANULARITY
-
-    # def is_provincial(self):
-    #     return self.geo_granularity == PROVINCIAL_GEO_GRANULARITY
-
     def factor_conf_to_pretty_str(self, factor_conf):
         """Format factor configuration to something printable.
         """
@@ -122,9 +106,6 @@ class FactorManager(AttributeHelperMixin):
 
         If factor_val is no filtering is performed.
         """
-        # if self.is_national() and self.factor_col not in df.columns and factor_val:
-        #    # To allow trivial factorization
-        #    df[self.factor_col] = factor_val
 
         if (self.factor_col in df.columns) and factor_val:
             if factor_val not in self.factor_levels:
@@ -149,8 +130,6 @@ class FactorManager(AttributeHelperMixin):
 # def run_series_pipeline(kpi, time_range_conf, extractor, factor_mgr):
 def run_series_pipeline(kpi, series_dict, time_range_conf, factor_mgr):
     """Extract and transform a given series."""
-    # series_dict = extractor.extract(time_range_conf, kpi.client_type)
-    # series_dict = KPISeriesPreprocBase.build_from_kpi(kpi).preproc(series_dict)
     series_mgr = SeriesManager(series_dict)
     # series_mgr.transform(kpi, time_range_conf.time_granularity, factor_mgr)
     # series_mgr.build_regressors()

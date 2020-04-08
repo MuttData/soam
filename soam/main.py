@@ -31,8 +31,8 @@ def main(
         target_col=kpi_dict["target_col"],
         name=kpi_dict["name"],
         anomaly_plot_ylabel=kpi_dict["anomaly_plot_ylabel"],
-        mail_kpi=kpi_dict["anomaly_plot_ylabel"],
-        name_spanish=kpi_dict["anomaly_plot_ylabel"],
+        mail_kpi=kpi_dict["mail_kpi"],
+        name_spanish=kpi_dict["name_spanish"],
     )
 
     time_range_conf = TimeRangeConfiguration(

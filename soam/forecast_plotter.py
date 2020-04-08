@@ -15,6 +15,7 @@ from soam.constants import (
     PLOT_CONFIG,
     TIME_GRANULARITY_NAME_MAP,
     Y_COL,
+    PARENT_LOGGER,
 )
 from soam.forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
 
@@ -28,8 +29,7 @@ OUTLIER_VALUE_COL = "outlier_value"
 
 pd.plotting.register_matplotlib_converters()
 
-# logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 def _set_time_locator_interval(fig, ax, time_granularity, plot_conf):

@@ -194,32 +194,9 @@ class Forecaster(AbstractAnalisysRun):
         )
         series = series[self.input_cols]
 
-        # FIXME: Remove this and solve the fact that outliers corrupt model fit in a
+        # FIXME: solve the fact that outliers corrupt model fit in a
         # general manner (for instance adding changepoints for values greater than 5%
         # the median value)
-        outlier_dates = []  # type: ignore
-        """
-        # This should be here
-        if kpi.name == RG_99_DATA_USAGE:
-            outlier_dates = [
-                "2019-07-23",
-                "2019-07-24",
-                "2019-07-25",
-                "2019-07-30",
-                "2019-07-31",
-                "2019-08-01",
-                "2019-08-21",
-                "2019-08-22",
-                "2019-08-23",
-                "2019-08-28",
-                "2019-08-29",
-                "2019-08-30",
-            ]
-        elif "data_usage" in kpi.name:
-            outlier_dates = ["2019-11-13", "2019-11-14"]
-        if outlier_dates:
-            series.loc[series[DS_COL].isin(outlier_dates), "y"] = None
-          """
         return series
 
     def add_regressor(self, series, fc, reg_df, rname, col):
