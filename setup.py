@@ -14,7 +14,7 @@ setuptools.setup(
     home_page="https://gitlab.com/mutt_data/soam/",
     keywords="anomalies forecasting reporting",
     author_email='info@muttdata.ai',
-    description='Tools for anomaly prediction, plotting and reporting.',
+    description='Tools for time series analysis, plotting and reporting.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     include_package_data=True,
