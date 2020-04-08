@@ -249,21 +249,6 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
         d['pos_anomalies_news'] = len(df_news[df_news[f'{OUTLIER_SIGN_COL}'] == 1])
         d['neg_anomalies_news'] = len(df_news[df_news[f'{OUTLIER_SIGN_COL}'] == -1])
 
-        if (
-            False
-        ):  # This part should be it's a trivial factorization: len(factor_levels) > 1
-            worst_anomaly_prov = df[
-                df[OUTLIER_VALUE_COL] == df[OUTLIER_VALUE_COL].max()
-            ]['factor_val']
-            d['worst_anomaly_factor_val'] = worst_anomaly_prov.squeeze()
-            df_prov = (
-                df['factor_val']
-                .value_counts()
-                .head(MAIL_WORST_PROVINCES_NR)
-                .reset_index()
-            )
-            d['most_anom_factor '] = df_prov['index'].tolist()
-
         # Build summary table
         pd.set_option('display.max_colwidth', -1)
         df = (

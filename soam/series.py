@@ -65,10 +65,7 @@ class FactorManager(AttributeHelperMixin):
         self.granularity = [self.factor_col]
 
     def process(self, target_series, series):
-        """Process factor column and obtain level values + filter query.
-
-        If factor-col = provincial then filter for a pre-coded list.
-        """
+        """Process factor column and obtain level values + filter query."""
         self.target_series = target_series
         col = self.factor_col
         series = series[target_series]
