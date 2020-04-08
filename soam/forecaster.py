@@ -417,8 +417,7 @@ def run_forecaster_pipeline(
         raw_series=series_mgr[kpi.target_series].rename(
             columns={kpi.target_col: Y_COL}
         ),
-        # regressors_l=series_mgr.regressors_l, # We could use placements here or other metrics here.
-        regressors_l=[],
+        regressors_l=series_mgr.regressors_l,  # We could use placements here or other metrics here.
     )
     run_ids = forecaster.save(db_cli_d)
     if forecaster_plotter:
