@@ -1,12 +1,10 @@
 # dbconn.py
 """Database clients."""
 import logging
-from contextlib import contextmanager
 from functools import wraps
 
 import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from soam.constants import PARENT_LOGGER
 from soam.utils import path_or_string
@@ -125,65 +123,9 @@ class PgClient(BaseClient):
         super().__init__(dialect=dialect, port=port, **kwargs)
 
 
-# class OracleClient(BaseClient):
-#     """Create Oracle DB client."""
-
-#     def __init__(self, dialect='oracle', schema=None, **kwargs):
-#         super().__init__(dialect=dialect, **kwargs)
-#         self.schema = schema
-
-#     @property
-#     def _db_uri(self):
-#         dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.database)
-#         db_uri = f'{self.dialect}://{self.username}:{self.password}@{dsn}'
-#         return db_uri
-
-#     def _connect(self):
-#         conn = self.get_engine().connect()
-#         if self.schema is not None:
-#             conn.connection.current_schema = self.schema
-#         return conn
-
-
-# class IbisClient:
-#     # [REMOVED]
-#     pass
-
-
-# class HiveDb:
-#     # [REMOVED]
-#     pass
-
-
-@contextmanager
-def session_scope(engine=None, **session_kw):
-    """Provide a transactional scope around a series of operations."""
-
-    Session = sessionmaker(bind=engine)
-    sess = Session(**session_kw)
-    # bring_table_group_metadata(sess.connection())
-    try:
-        yield sess
-        sess.commit()
-    except Exception as err:
-        logger.exception(err)
-        sess.rollback()
-        raise
-    finally:
-        sess.close()
-
-
-IBIS_DB_TYPE = 'ibis'
-ORACLE_DB_TYPE = 'oracle'
 POSTGRES_DB_TYPE = 'postgres'
-HIVE_DB_TYPE = 'hive'
-IMPALA_DB_TYPE = 'impala'
 CONNECTORS = {
-    # IBIS_DB_TYPE: IbisClient,
-    # ORACLE_DB_TYPE: OracleClient,
     POSTGRES_DB_TYPE: PgClient,
-    # HIVE_DB_TYPE: HiveDb,
-    # IMPALA_DB_TYPE: HiveDb,
 }
 
 
