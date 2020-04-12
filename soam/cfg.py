@@ -1,7 +1,9 @@
 
-# cfg.py
 from pathlib import Path
-from soam.utils import template, make_dirs
+
+from pkg_resources import resource_string
+
+from soam.utils import make_dirs, template
 
 KPI_TABLE_BASENAME = "kpis"
 SOAM_RUN_TABLE_BASENAME = "soam_runs"
@@ -58,5 +60,5 @@ TIMELINE_TABLE = f"{table_name_preffix}{TIMELINE_TABLE_BASENAME}"
 
 # Mail report
 MAIL_TEMPLATE = template(
-    str((_project_dir / 'mail_report.html').resolve())
+    resource_string(__name__, 'mail_report.html').decode('utf-8')
 ).module

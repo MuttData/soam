@@ -18,8 +18,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    package_data={"": ["*.html"]},
     packages=['soam'],
+    package_data={'soam': ['resources/*.html']},
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
