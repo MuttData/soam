@@ -129,6 +129,13 @@
     
     {% if anomaly_range_stats.get('nr_anomalies') > 0 %}
     <p>
+      Index: <br />
+      <ol>
+      {% for granularity_val in img_dict
+        ['outliers'] %}
+          <li> <a href="#{{ granularity_val }}">{{ granularity_val }}</a></li> <br />
+        {% endfor %}
+      </ol>
       Details for the days with anomalies:<br />
         <center>
         {{ anomaly_range_stats.get('anomaly_summary') }}
@@ -136,7 +143,7 @@
         <br />
         {% for granularity_val in img_dict
         ['outliers'] %}
-            <span class='subtitle'>Analysis for {{ granularity_val }}</span>
+            <span class='subtitle' id="{{ granularity_val }}">Analysis for {{ granularity_val }}</span>
             <div class='underline'></div>
             <div>
                 <img src='cid:{{ img_dict["outliers"][granularity_val] }}' />
