@@ -149,9 +149,11 @@
                 <img src='cid:{{ img_dict["outliers"][granularity_val] }}' />
             </div>
             {% if granularity_val in img_dict["extra"] %}
-            <div>
-                <img src='cid:{{ img_dict["extra"][granularity_val] }}' />
-            </div>
+            {% for extra_plot in img_dict["extra"][granularity_val] %}
+              <div>
+                  <img src='cid:{{ extra_plot }}' />
+              </div>
+            {% endfor %}
             {% endif %}
         {% endfor %}
     </p>

@@ -255,5 +255,4 @@ class ForecastPlotter:
         fn = self.save_path / fn
         logger.debug(f"Saving forecast figure to {fn}...")
         fig.savefig(fn, bbox_inches="tight")
-        print(fn)
         plt.close()

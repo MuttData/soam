@@ -1,12 +1,12 @@
 # mail_report.py
 """Mail creator and sender."""
+import io
+import logging
+import smtplib
 from datetime import timedelta
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import io
-import logging
-import smtplib
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -108,13 +108,14 @@ def _build_subject_n_msg_body(
 def _get_mime_images(
     kpi,
     granularity,
+    factor_mgr,
     start_date,
     end_date,
     anomaly_range_stats,
     anomaly_window,
     forecast_df,
     time_granularity,
-    orig_df,
+    extra_info,
 ):
     """Extract images from local dir paths."""
     mime_img_dict = {}  # type: ignore
@@ -162,26 +163,28 @@ def _get_mime_images(
         outliers_imgs[factor_val] = fig_p
 
         # Extra plot
-        if orig_df is not None:
-            pdf = orig_df[orig_df["game"] == factor_val]
-            pdf = pdf.groupby(['date', 'provider']).sum().reset_index()
-            pdf['date'] = pd.to_datetime(pdf['date'])
-            ex_fig = plot_provider_area_metrics(pdf)
+        if extra_info is not None:
+            if extra_imgs.get(factor_val, None) is None:
+                extra_imgs[factor_val] = []
+            for key in extra_info.keys():
+                ex_fig = plot_area_metrics(
+                    extra_info[key], factor_mgr.factor_col, factor_val
+                )
 
-            ex_fig_p = forecasts_fig_path(
-                target_col=kpi.name,
-                start_date=start_date,
-                end_date=end_date,
-                time_granularity=time_granularity,
-                granularity=granularity,
-                suffix=f"{out_fval}_extra",
-                as_posix=False,
-                end_date_hour=end_date_hour,
-            )
+                ex_fig_p = forecasts_fig_path(
+                    target_col=kpi.name,
+                    start_date=start_date,
+                    end_date=end_date,
+                    time_granularity=time_granularity,
+                    granularity=granularity,
+                    suffix=f"{out_fval}_{key}_extra",
+                    as_posix=False,
+                    end_date_hour=end_date_hour,
+                )
 
-            logger.info(f"Saving extra figure to {ex_fig_p}...")
-            ex_fig.savefig(ex_fig_p, bbox_inches='tight')
-            extra_imgs[factor_val] = ex_fig_p
+                logger.info(f"Saving extra figure to {ex_fig_p}...")
+                ex_fig.savefig(ex_fig_p, bbox_inches='tight')
+                extra_imgs[factor_val].append(ex_fig_p)
 
     for factor_val, outliers_img in outliers_imgs.items():
         if outliers_img.is_file():
@@ -195,28 +198,34 @@ def _get_mime_images(
             msg_image.add_header('Content-Id', f'<{img_name}>')
             mime_img_dict['outliers'][factor_val] = img_name
             if extra_imgs.get(factor_val, None) is not None:
-                extra_img = extra_imgs[factor_val]
-                with extra_img.open('rb') as img_file:
-                    msg_image = MIMEImage(img_file.read())
-                    mime_img_list.append(msg_image)
-                img_name = f'{kpi.name_spanish}_{extra_img.stem}'
-                msg_image.add_header('Content-Id', f'<{img_name}>')
-                mime_img_dict['extra'][factor_val] = img_name
+                mime_img_dict['extra'][factor_val] = []
+                for extra_img in extra_imgs[factor_val]:
+                    with extra_img.open('rb') as img_file:
+                        msg_image = MIMEImage(img_file.read())
+                        mime_img_list.append(msg_image)
+                    img_name = f'{kpi.name_spanish}_{extra_img.stem}'
+                    msg_image.add_header('Content-Id', f'<{img_name}>')
+                    mime_img_dict['extra'][factor_val].append(img_name)
 
     return mime_img_dict, mime_img_list
 
 
-def plot_provider_area_metrics(
-    pdf, metrics=['cache_requests', 'cache_successes', 'view_requests', 'view_starts']
-):
+def plot_area_metrics(extra_plot_config, factor_col, factor_val):
+    data = extra_plot_config['data']
+    main_col = extra_plot_config['main_col']
+    ds_col = extra_plot_config['ds_col']
+    metrics = extra_plot_config['metrics']
+
+    pdf = data[data[factor_col] == factor_val]
+    pdf = pdf.groupby([ds_col, main_col]).sum().reset_index()
 
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(50, 25))
     pos = [[0, 0], [0, 1], [1, 0], [1, 1]]
     for i, m in enumerate(metrics):
         df = pdf.copy()
         fig_bar = (
-            df.sort_values(['date', 'provider'])
-            .set_index(['date', 'provider'])[m]
+            df.sort_values([ds_col, main_col])
+            .set_index([ds_col, main_col])[m]
             .unstack()
             .plot(
                 kind='area',
@@ -229,7 +238,7 @@ def plot_provider_area_metrics(
             )
         )
         fig_bar.legend(loc='upper left', bbox_to_anchor=(1, 1), prop={'size': 6})
-        fig_bar.set_title(f'{m} by provider')
+        fig_bar.set_title(f'{m} by {main_col}')
     fig.tight_layout(pad=2.0)
     return fig
 
@@ -297,13 +306,14 @@ def send_mail_report(
     mail_recipients,
     kpi,
     granularity,
+    factor_mgr,
     start_date,
     end_date,
     anomaly_window,
     outliers_data,
     forecast_df,
     time_granularity,
-    orig_df=None,
+    extra_info=None,
 ):
     """Send mail report."""
     logger.info(f"Sending email report to: {mail_recipients}")
@@ -317,13 +327,14 @@ def send_mail_report(
     mime_img_dict, mime_img_list = _get_mime_images(
         kpi,
         granularity,
+        factor_mgr,
         start_date,
         end_date,
         anomaly_range_stats=anomaly_range_stats,
         anomaly_window=anomaly_window,
         forecast_df=forecast_df,
         time_granularity=time_granularity,
-        orig_df=orig_df,
+        extra_info=extra_info,
     )
     subject, msg_body = _build_subject_n_msg_body(
         kpi,
@@ -357,10 +368,10 @@ class MailReport(AttributeHelperMixin):
         self,
         kpi,
         granularity,
-        time_range_conf,
         factor_mgr,
+        time_range_conf,
         forecaster_insertion_id,
-        orig_df,
+        extra_info,
     ):
         try:
             forecast_df = self.aggregated_forecast_data
@@ -377,11 +388,12 @@ class MailReport(AttributeHelperMixin):
             self.mail_recipients_list,
             kpi,
             granularity,
+            factor_mgr,
             time_range_conf.start_date,
             time_range_conf.end_date,
             time_range_conf.anomaly_window,
             outliers_data,
             forecast_df,
             time_granularity=time_range_conf.time_granularity,
-            orig_df=orig_df,
+            extra_info=extra_info,
         )

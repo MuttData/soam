@@ -23,7 +23,7 @@ def main(
     db_creds,
     smtp_creds,
     mail_recipients,
-    df_orig=None,
+    extra_info=None,
 ):
 
     kpi = KPI(
@@ -97,10 +97,10 @@ def main(
         mail_reporter.send(
             kpi,
             granularity,
-            time_range_conf,
             factor_mgr,
+            time_range_conf,
             ','.join(all_forecaster_run_ids),
-            df_orig,
+            extra_info,
         )
     else:
         logger.info("Mail report not send")
