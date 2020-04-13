@@ -234,6 +234,10 @@ def plot_provider_area_metrics(
     return fig
 
 
+def _format_link(factor):
+    return f'<a href=#{factor}>{factor}</a>'
+
+
 def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granularity):
     """Compute ouptut statistics string from anomalies data."""
     df = outliers_data
@@ -264,7 +268,7 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
         pd.set_option('display.max_colwidth', -1)
         df = (
             df.groupby([DS_COL, f'{OUTLIER_SIGN_COL}'])
-            .agg({'factor_val': lambda x: ', '.join(filter(None, x))})
+            .agg({'factor_val': lambda x: ', '.join(x.apply(_format_link))})
             .reset_index()
         )
         df = df.rename(
@@ -277,7 +281,11 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
 
         str_io = io.StringIO()
         df.to_html(
-            buf=str_io, classes='table table-striped', index=False, justify='center'
+            buf=str_io,
+            classes='table table-striped',
+            index=False,
+            justify='center',
+            escape=False,
         )
         d['anomaly_summary'] = str_io.getvalue()  # type: ignore
 
