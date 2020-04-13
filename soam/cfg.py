@@ -21,7 +21,6 @@ COSERIES_SCORES_TABLE_BASENAME = "coseries_scores"
 TIMELINE_TABLE_BASENAME = "timeline"
 
 # Setup paths
-_project_dir = Path(__file__).resolve().parent
 _p = Path("/tmp/anomalies/")
 SQL_DIR = make_dirs(Path(_p, "resources"))
 LOG_DIR = make_dirs(Path(_p, "tmp", "logs"))
@@ -29,6 +28,10 @@ DATA_DIR = make_dirs(Path(_p, "tmp", "data"))
 DATA_DIR_TABULAR = make_dirs(Path(_p, "tmp", "data", "tabular"))
 FIG_DIR = make_dirs(Path(_p, "tmp", "figures"))
 RES_DIR = make_dirs(Path(_p, "tmp", "results"))
+
+# Report paths and configs
+MAIL_REPORT = 'resources/mail_report.html'
+UTF_ENCODING = 'utf-8'
 
 #SQL_TEMPLATE = utils.template(
 #    str((_p / "resources" / "templates.sql").resolve())
@@ -60,5 +63,5 @@ TIMELINE_TABLE = f"{table_name_preffix}{TIMELINE_TABLE_BASENAME}"
 
 # Mail report
 MAIL_TEMPLATE = template(
-    resource_string(__name__, 'resources/mail_report.html').decode('utf-8')
+    resource_string(__name__, MAIL_REPORT).decode(UTF_ENCODING)
 ).module
