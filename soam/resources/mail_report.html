@@ -143,7 +143,7 @@
         <br />
         {% for granularity_val in img_dict
         ['outliers'] %}
-            <span class='subtitle' id="{{ granularity_val }}">Analysis for {{ granularity_val }}</span>
+            <span class='subtitle'><a name="{{ granularity_val }}">Analysis for {{ granularity_val }}</a></span>
             <div class='underline'></div>
             <div>
                 <img src='cid:{{ img_dict["outliers"][granularity_val] }}' />
