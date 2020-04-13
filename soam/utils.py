@@ -14,8 +14,6 @@ from pandas.tseries import offsets
 
 from soam.constants import PARENT_LOGGER
 
-# from constants import PARENT_LOGGER
-
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
@@ -154,24 +152,6 @@ class BadInClauseException(JinjaTemplateException):
     """Dummy doc."""
 
 
-def format_in_clause(iterable):
-    """
-    Create a Jinja2 filter to format list-like values passed.
-
-    Idea originally from
-    https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
-    """
-    if not in_clause_requirement(iterable):
-        raise BadInClauseException(
-            f'Value passed is not a list or tuple: "{iterable}". '
-            f'Where the query uses the "| inclause".'
-        )
-    values = [f'{v}' for v in iterable]
-    clause = ",".join(values)
-    clause = "(" + clause + ")"
-    return clause
-
-
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
@@ -180,5 +160,4 @@ def template(path_or_str, **kwargs):
         lstrip_blocks=kwargs.pop("lstrip_blocks", True),
         **kwargs,
     )
-    environment.filters["inclause"] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))
