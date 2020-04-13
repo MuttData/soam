@@ -52,7 +52,6 @@ def main(
             host=db_creds['host'],
             dialect='postgres',
             port=5432,
-            # driver=,
             password=db_creds['password'],
         ),
     }
