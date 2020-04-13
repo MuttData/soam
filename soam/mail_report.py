@@ -1,14 +1,14 @@
 # mail_report.py
 """Mail creator and sender."""
-import io
-import logging
-import smtplib
 from datetime import timedelta
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import matplotlib.pyplot as plt
+import io
+import logging
+import smtplib
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 from soam.cfg import MAIL_TEMPLATE
@@ -18,9 +18,9 @@ from soam.constants import (
     HOURLY_TIME_GRANULARITY,
     PARENT_LOGGER,
 )
+from soam.forecast_plotter import anomaly_plot
 from soam.forecaster import OUTLIER_SIGN_COL, OUTLIER_VALUE_COL, forecasts_fig_path
 from soam.helpers import AttributeHelperMixin
-from soam.forecast_plotter import anomaly_plot
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
@@ -30,6 +30,17 @@ def send_mail(smtp_credentials, mail_recipients, subject, mail_body, mime_image_
     user = smtp_credentials.get('user_address')
     password = smtp_credentials.get('password')
     from_address = smtp_credentials['mail_from']
+    host = smtp_credentials['host']
+    port = smtp_credentials['port']
+    logger.info(
+        f"""About to send the following email:
+                'From: ' {from_address}
+                'To: ' {mail_recipients}
+                'Subject: ' {subject}
+                'Using host': {host} and port: {port}"""
+    )
+    logger.error(f'With the following body: \n {mail_body}')
+
     msg_root = MIMEMultipart('related')
     msg_root['From'] = from_address
     msg_root['Subject'] = subject
@@ -44,9 +55,7 @@ def send_mail(smtp_credentials, mail_recipients, subject, mail_body, mime_image_
     for mim_img in mime_image_list:
         msg_root.attach(mim_img)
 
-    user = smtp_credentials.get('user_address')
-    password = smtp_credentials.get('password')
-    with smtplib.SMTP(smtp_credentials['host'], smtp_credentials['port']) as server:
+    with smtplib.SMTP(host, port) as server:
         server.ehlo()
         if user is not None and password is not None:
             server.starttls()
