@@ -166,10 +166,7 @@ def _get_mime_images(
             pdf = orig_df[orig_df["game"] == factor_val]
             pdf = pdf.groupby(['date', 'provider']).sum().reset_index()
             pdf['date'] = pd.to_datetime(pdf['date'])
-            ex_fig = plot_provider_area_metrics(
-                pdf,
-                ['cache_requests', 'cache_successes', 'view_requests', 'view_starts'],
-            )
+            ex_fig = plot_provider_area_metrics(pdf)
 
             ex_fig_p = forecasts_fig_path(
                 target_col=kpi.name,
@@ -209,32 +206,32 @@ def _get_mime_images(
     return mime_img_dict, mime_img_list
 
 
-def plot_provider_area_metrics(pdf, metrics):
-    if len(pdf) == 0:
-        print('Empty dataframe')
-    else:
-        fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(50, 25))
-        pos = [[0, 0], [0, 1], [1, 0], [1, 1]]
-        for i, m in enumerate(metrics):
-            df = pdf.copy()
-            fig_bar = (
-                df.sort_values(['date', 'provider'])
-                .set_index(['date', 'provider'])[m]
-                .unstack()
-                .plot(
-                    kind='area',
-                    stacked=True,
-                    figsize=(12, 7),
-                    colormap='Spectral',
-                    rot=45,
-                    fontsize=6,
-                    ax=axes[pos[i][0], pos[i][1]],
-                )
+def plot_provider_area_metrics(
+    pdf, metrics=['cache_requests', 'cache_successes', 'view_requests', 'view_starts']
+):
+
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(50, 25))
+    pos = [[0, 0], [0, 1], [1, 0], [1, 1]]
+    for i, m in enumerate(metrics):
+        df = pdf.copy()
+        fig_bar = (
+            df.sort_values(['date', 'provider'])
+            .set_index(['date', 'provider'])[m]
+            .unstack()
+            .plot(
+                kind='area',
+                stacked=True,
+                figsize=(12, 7),
+                colormap='Spectral',
+                rot=45,
+                fontsize=6,
+                ax=axes[pos[i][0], pos[i][1]],
             )
-            fig_bar.legend(loc='upper left', bbox_to_anchor=(1, 1), prop={'size': 6})
-            fig_bar.set_title(f'{m} by provider')
-        fig.tight_layout(pad=2.0)
-        return fig
+        )
+        fig_bar.legend(loc='upper left', bbox_to_anchor=(1, 1), prop={'size': 6})
+        fig_bar.set_title(f'{m} by provider')
+    fig.tight_layout(pad=2.0)
+    return fig
 
 
 def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granularity):

@@ -1,11 +1,11 @@
 # utils.py
 
 """Utility functions."""
+from copy import deepcopy
+from datetime import datetime
 import hashlib
 import logging
 import logging.config
-from copy import deepcopy
-from datetime import datetime
 from pathlib import Path
 
 import jinja2
