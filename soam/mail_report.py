@@ -167,6 +167,7 @@ def _get_mime_images(
             if extra_imgs.get(factor_val, None) is None:
                 extra_imgs[factor_val] = []
             for key in extra_info.keys():
+                logger.info(f'Creating extra plot for {key}')
                 ex_fig = plot_area_metrics(
                     extra_info[key], factor_mgr.factor_col, factor_val
                 )
