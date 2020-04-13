@@ -13,10 +13,8 @@ class SeriesManager(AttributeHelperMixin):
         self.series_dict = sanitize_arg_empty_dict(series_dict)
         self.regressors_l = []  # type: ignore
 
-    # def transform(self, kpi, time_granularity, factor_mgr):
-    #     self.series_dict = transform_pipeline(
-    #         self.series_dict, kpi, time_granularity, factor_mgr
-    #     )
+    def transform(self, kpi, time_granularity, factor_mgr):
+        raise NotImplementedError("Pipeline transformation is not implemented.")
 
     def __getitem__(self, k):
         return self.series_dict[k]
