@@ -1,12 +1,12 @@
 # mail_report.py
 """Mail creator and sender."""
-import io
-import logging
-import smtplib
 from datetime import timedelta
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import io
+import logging
+import smtplib
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -218,13 +218,13 @@ def _get_mime_images(
 
 def plot_area_metrics(extra_plot_config, factor_col, factor_val):
     data = extra_plot_config['data']
-    if len(data) == 0:
-        return None
     main_col = extra_plot_config['main_col']
     ds_col = extra_plot_config['ds_col']
     metrics = extra_plot_config['metrics']
 
     pdf = data[data[factor_col] == factor_val]
+    if pdf.empty:
+        return None
     pdf = pdf.groupby([ds_col, main_col]).sum().reset_index()
 
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(50, 25))
