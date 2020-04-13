@@ -11,7 +11,7 @@ SAMPLE_SIZE = 2
 TOP_K_INFLUENCERS = 12
 
 # Global
-PROJECT_NAME = "Wildlife Anomaly Detector"
+PROJECT_NAME = "SoaM Anomaly Detector"
 ENV_DEV = "dev"
 ENV_STG = "stg"
 ENV_PRD = "prd"
