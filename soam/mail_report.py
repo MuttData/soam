@@ -171,6 +171,11 @@ def _get_mime_images(
                 ex_fig = plot_area_metrics(
                     extra_info[key], factor_mgr.factor_col, factor_val
                 )
+                if ex_fig is None:
+                    logger.warning(
+                        f'Skipping {factor_val} for {key} because it has no data'
+                    )
+                    continue
 
                 ex_fig_p = forecasts_fig_path(
                     target_col=kpi.name,
@@ -213,6 +218,8 @@ def _get_mime_images(
 
 def plot_area_metrics(extra_plot_config, factor_col, factor_val):
     data = extra_plot_config['data']
+    if len(data) == 0:
+        return None
     main_col = extra_plot_config['main_col']
     ds_col = extra_plot_config['ds_col']
     metrics = extra_plot_config['metrics']
