@@ -1,14 +1,12 @@
 # forecaster.py
 """Analyze time series data based on company KPIs."""
-import logging
 from functools import partial
+import logging
 
+from fbprophet import Prophet
 import numpy as np
 import pandas as pd
-from fbprophet import Prophet
 
-from soam.utils import normalize_ds_index, apply_time_bounds
-from soam.helpers import get_figure_full_path, AbstractAnalisysRun
 from soam.cfg import FIG_DIR
 from soam.constants import (
     DEFAULT_PROPHET_ARGS,
@@ -18,6 +16,8 @@ from soam.constants import (
     Y_COL,
 )
 from soam.data_models import ForecasterRuns, ForecasterValues
+from soam.helpers import AbstractAnalisysRun, get_figure_full_path
+from soam.utils import apply_time_bounds, normalize_ds_index
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 

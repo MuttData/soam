@@ -2,14 +2,14 @@ import logging
 
 from soam.cfg import FIG_DIR
 from soam.constants import PARENT_LOGGER
+from soam.dbconn import PgClient
 from soam.forecast_plotter import ForecastPlotter
 from soam.forecaster import Forecaster, run_forecaster_pipeline
-from soam.mail_report import MailReport
-from soam.series import run_series_pipeline, FactorManager
-from soam.utils import make_dirs
 from soam.helpers import TimeRangeConfiguration
-from soam.dbconn import PgClient
 from soam.kpi import KPI
+from soam.mail_report import MailReport
+from soam.series import FactorManager, run_series_pipeline
+from soam.utils import make_dirs
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 

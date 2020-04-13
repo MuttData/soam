@@ -1,7 +1,6 @@
 # constants.py
 from datetime import datetime, timedelta
 
-
 # CLI defaults
 FORECASTER_FUTURE_WINDOW = 15
 FORECASTER_FUTURE_WINDOW_CUMSUM_KPI = 30

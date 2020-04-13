@@ -1,17 +1,15 @@
 # dbconn.py
 """Database clients."""
 import logging
+from contextlib import contextmanager
 from functools import wraps
 
 import pandas as pd
 from sqlalchemy import create_engine
-from contextlib import contextmanager
-
 from sqlalchemy.orm import sessionmaker
 
 from soam.constants import PARENT_LOGGER
 from soam.utils import path_or_string
-
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 

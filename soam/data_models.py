@@ -16,7 +16,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 
-
 from soam.cfg import (
     COSERIES_DIMENSIONS_TABLE,
     COSERIES_RUNS_TABLE,
@@ -26,7 +25,6 @@ from soam.cfg import (
     FORECASTER_VALUES_TABLE,
     TIMELINE_TABLE,
 )
-
 from soam.constants import PARENT_LOGGER
 from soam.utils import classproperty
 
