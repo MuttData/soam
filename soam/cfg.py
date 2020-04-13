@@ -60,5 +60,5 @@ TIMELINE_TABLE = f"{table_name_preffix}{TIMELINE_TABLE_BASENAME}"
 
 # Mail report
 MAIL_TEMPLATE = template(
-    resource_string(__name__, 'mail_report.html').decode('utf-8')
+    resource_string(__name__, 'resources/mail_report.html').decode('utf-8')
 ).module
