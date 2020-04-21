@@ -1,9 +1,9 @@
 import json
 import logging
 
-from utils import sanitize_arg_empty_dict, sanitize_arg
-
-from helpers import AttributeHelperMixin
+from soam.constants import DS_COL
+from soam.helpers import AttributeHelperMixin
+from soam.utils import sanitize_arg_empty_dict
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +13,8 @@ class SeriesManager(AttributeHelperMixin):
         self.series_dict = sanitize_arg_empty_dict(series_dict)
         self.regressors_l = []  # type: ignore
 
-    # def transform(self, kpi, time_granularity, factor_mgr):
-    #     self.series_dict = transform_pipeline(
-    #         self.series_dict, kpi, time_granularity, factor_mgr
-    #     )
+    def transform(self, kpi, time_granularity, factor_mgr):
+        raise NotImplementedError("Pipeline transformation is not implemented.")
 
     def __getitem__(self, k):
         return self.series_dict[k]
@@ -28,8 +26,7 @@ class SeriesManager(AttributeHelperMixin):
         return self.series_dict.items()
 
     def build_regressors(self):
-        # self.regressors_l = create_regressors_pipeline(self.series_dict)
-        pass
+        raise NotImplementedError("Subclasses should implement this.")
 
     def validate(self, time_granularity, ds_col=DS_COL, accept_empty=True):
         # TODO: This check is also present in coseries. Factor it out.
@@ -49,13 +46,8 @@ class SeriesManager(AttributeHelperMixin):
 
 class FactorManager(AttributeHelperMixin):
     def __init__(
-        self,
-        factor_col,
-        # geo_granularity=NATIONAL_GEO_GRANULARITY,
-        # max_levels_num=MAX_FACTOR_LEVELS,
+        self, factor_col,
     ):
-        # self.geo_granularity = geo_granularity
-        # self.max_levels_num = max_levels_num
         self.target_series = None
 
         # The default case is to have an empty factor_col thus return no query or levels
@@ -70,10 +62,8 @@ class FactorManager(AttributeHelperMixin):
         # FIXME: Ideally we would want `granularity` to be a list of columns used for factorization.
         self.granularity = [self.factor_col]
 
-
     def process(self, target_series, series):
-        """Process factor column and obtain level values + filter query.
-        """
+        """Process factor column and obtain level values + filter query."""
         self.target_series = target_series
         col = self.factor_col
         series = series[target_series]
@@ -82,7 +72,7 @@ class FactorManager(AttributeHelperMixin):
             factor_dtype = series[col].dtype
             factor_levels = series[col].unique()
             logger.debug(
-                f"We have these levels ({factor_levels}) on a '{factor_dtype}'-typed col."
+                f'We have these levels ({factor_levels}) on a "{factor_dtype}"-typed col.'
             )
             self.factor_levels = factor_levels
 
@@ -111,9 +101,6 @@ class FactorManager(AttributeHelperMixin):
 
         If factor_val is no filtering is performed.
         """
-        # if self.is_national() and self.factor_col not in df.columns and factor_val:
-        #    # To allow trivial factorization
-        #    df[self.factor_col] = factor_val
 
         if (self.factor_col in df.columns) and factor_val:
             if factor_val not in self.factor_levels:
@@ -135,15 +122,11 @@ class FactorManager(AttributeHelperMixin):
             yield factor_conf, rv
 
 
-'''
 # def run_series_pipeline(kpi, time_range_conf, extractor, factor_mgr):
-def run_series_pipeline(series_dict, time_range_conf, factor_mgr):
+def run_series_pipeline(kpi, series_dict, time_range_conf, factor_mgr):
     """Extract and transform a given series."""
-    # series_dict = extractor.extract(time_range_conf, kpi.client_type)
-    # series_dict = KPISeriesPreprocBase.build_from_kpi(kpi).preproc(series_dict)
     series_mgr = SeriesManager(series_dict)
     # series_mgr.transform(kpi, time_range_conf.time_granularity, factor_mgr)
     # series_mgr.build_regressors()
     factor_mgr.process(kpi.target_series, series_mgr)
     return series_mgr, factor_mgr
-'''

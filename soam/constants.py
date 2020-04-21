@@ -1,10 +1,5 @@
-"""Constants and configurations setup for Delver project."""
+# constants.py
 from datetime import datetime, timedelta
-
-# from sql_clauses import (  # NOQA:F401
-#     GEO_GRAN_TO_COL_NAME_MAP,
-#     MOVIMIENTOS_PP_GEO_GRAN_TO_CLAUSE_MAP,
-# )
 
 # CLI defaults
 FORECASTER_FUTURE_WINDOW = 15
@@ -16,7 +11,7 @@ SAMPLE_SIZE = 2
 TOP_K_INFLUENCERS = 12
 
 # Global
-PROJECT_NAME = "TFG Anomaly Detector"
+PROJECT_NAME = "SoaM Anomaly Detector"
 ENV_DEV = "dev"
 ENV_STG = "stg"
 ENV_PRD = "prd"
@@ -25,11 +20,6 @@ DS_COL = "ds"
 Y_COL = "y"
 PRED_COLS = ["ds", "yhat", "yhat_lower", "yhat_upper", Y_COL]
 SEED = 42
-# GEO_GRANULARITIES = list(GEO_GRAN_TO_COL_NAME_MAP.keys())
-# ALL_GEO_GRAN_COLS = list(GEO_GRAN_TO_COL_NAME_MAP.values())
-# MOVI_PP_GEO_GRAN_COLS = list(
-#     (GEO_GRAN_TO_COL_NAME_MAP[k] for k in MOVIMIENTOS_PP_GEO_GRAN_TO_CLAUSE_MAP)
-# )
 
 # Status
 STATUS_ACTIVE = "active"
@@ -52,32 +42,10 @@ MAX_FACTOR_LEVELS = 25
 MIN_FACTOR_LEVEL_DATAPOINTS = 10
 
 REGRESSOR_PREFIX = "regr_"
-# VALUE based on historical 2018 histogram of commercial ratio triplica offers
-# TRIPLICA_OFFER_THRESHOLD_VALUE = 100
+
 
 # TIME values
 YESTERDAY = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-
-# SQL consts
-# [REMOVED]
-
-# Maps dimensions to corresponding sql filenames
-# [REMOVED]
-
-
-# Rating Groups
-# [REMOVED]
-
-
-# Copa Libertadores
-# [REMOVED]
-
-# Influencers Drill Down
-# [REMOVED]
-
-# Mail report constants
-MAIL_WORST_FACTOR_VALS_NR = 3
-
 
 
 DEFAULT_PROPHET_ARGS = dict(
@@ -112,7 +80,7 @@ PLOT_CONFIG = {
         },
         "daily_major_interval": 3,
         "daily_future_window": 15,  # Number of future days posterior to anomaly-win
-        "daily_history_window": 30,  # Number of history days prior to anomaly-win
+        "daily_history_window": 60,  # Number of history days prior to anomaly-win
         "hourly_major_interval": 2,
         "hourly_history_window": 14,
         "hourly_future_window": 5,
@@ -121,17 +89,16 @@ PLOT_CONFIG = {
         "hourly_major_pad": 25,
         "hourly_minor_locator_interval": 8,
         "labels": {
-            "xlabel": "Fechas",
+            "xlabel": "Date",
             "ylabel": "{kpi_plot_name} ({base_10_scale_zeros}s)",
-            "history": "Historia",
-            "anomaly_win": "Últimos {anomaly_window} días",
-            "forecast": "Pronóstico",
+            "history": "History",
+            "anomaly_win": "Last {anomaly_window} days",
+            "forecast": "Forecast",
             "outlier": "Outlier: {date}",
         },
-        # 'title': 'Anomalías en {kpi} - {geo_gran} Argentina {start_date:%d-%b} al {end_date:%d-%b}',
-        "title": "Anomalías en {kpi} - {granularity_val} {start_date:%d-%b} al {end_date:%d-%b}",
+        "title": "Anomalies for {kpi} - {granularity_val} {start_date:%d-%b} to {end_date:%d-%b}",
     }
 }
 
 # Logger config
-PARENT_LOGGER = "SOAM"
+PARENT_LOGGER = PROJECT_NAME

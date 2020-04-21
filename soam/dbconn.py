@@ -1,35 +1,17 @@
-# FIXME: Use muttlib
-"""Module to get and use multiple Big Data DB connections."""
+# dbconn.py
+"""Database clients."""
 import logging
-import re
-import shutil
 from contextlib import contextmanager
 from functools import wraps
-from os import makedirs
-from time import sleep
-from urllib.parse import urlparse
 
-# import cx_Oracle
 import pandas as pd
-import progressbar
-
-# import pyarrow.parquet as pq
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# import utils
-from utils import path_or_string
-from constants import PARENT_LOGGER
+from soam.constants import PARENT_LOGGER
+from soam.utils import path_or_string
 
-"""
-if True:
-    # We seem to need this order to avoid TCLI import errors
-    from pyhive import hive
-    import ibis
-    import ibis.config as cf
-"""
-
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
 def _parse_sql_statement_decorator(func):
@@ -37,7 +19,7 @@ def _parse_sql_statement_decorator(func):
     def wrapper(self, *args, **kwargs):
         args = list(args)  # type: ignore
         sql = path_or_string(args[0])
-        format_params = kwargs.get("params", None)
+        format_params = kwargs.get('params', None)
         if format_params:
             try:
                 sql = sql.format(**format_params)
@@ -86,7 +68,7 @@ class BaseClient:
             f"{self.username}{f':{self.password}' if self.password is not None else ''}"
         )
         host = f"{self.host}{f':{self.port}' if self.port is not None else ''}"
-        return f"{dialect}://{login}@{host}/{self.database}"
+        return f'{dialect}://{login}@{host}/{self.database}'
 
     def get_engine(self, custom_uri=None, connect_args=None):
         connect_args = connect_args or {}
@@ -100,7 +82,7 @@ class BaseClient:
 
     @staticmethod
     def _cursor_columns(cursor):
-        if hasattr(cursor, "keys"):
+        if hasattr(cursor, 'keys'):
             return cursor.keys()
         else:
             return [c[0] for c in cursor.description]
@@ -124,10 +106,10 @@ class BaseClient:
             df = pd.DataFrame()
         return df
 
-    def insert_from_frame(self, df, table, if_exists="append", index=False, **kwargs):
+    def insert_from_frame(self, df, table, if_exists='append', index=False, **kwargs):
         """Insert data from dataframe into sql table."""
         # TODO: Validate types here?
-        if self.dialect == "oracle":
+        if self.dialect == 'oracle':
             df.columns = [c.upper() for c in df.columns]
 
         connection = self._connect()
@@ -138,38 +120,8 @@ class BaseClient:
 class PgClient(BaseClient):
     """Create Postgres DB client."""
 
-    def __init__(self, dialect="postgresql", port=5433, **kwargs):
+    def __init__(self, dialect='postgresql', port=5433, **kwargs):
         super().__init__(dialect=dialect, port=port, **kwargs)
-
-
-class OracleClient(BaseClient):
-    """Create Oracle DB client."""
-
-    def __init__(self, dialect="oracle", schema=None, **kwargs):
-        super().__init__(dialect=dialect, **kwargs)
-        self.schema = schema
-
-    @property
-    def _db_uri(self):
-        dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.database)
-        db_uri = f"{self.dialect}://{self.username}:{self.password}@{dsn}"
-        return db_uri
-
-    def _connect(self):
-        conn = self.get_engine().connect()
-        if self.schema is not None:
-            conn.connection.current_schema = self.schema
-        return conn
-
-
-class IbisClient:
-    # [REMOVED]
-    pass
-
-
-class HiveDb:
-    # [REMOVED]
-    pass
 
 
 @contextmanager
@@ -190,23 +142,15 @@ def session_scope(engine=None, **session_kw):
         sess.close()
 
 
-IBIS_DB_TYPE = "ibis"
-ORACLE_DB_TYPE = "oracle"
-POSTGRES_DB_TYPE = "postgres"
-HIVE_DB_TYPE = "hive"
-IMPALA_DB_TYPE = "impala"
+POSTGRES_DB_TYPE = 'postgres'
 CONNECTORS = {
-    IBIS_DB_TYPE: IbisClient,
-    ORACLE_DB_TYPE: OracleClient,
     POSTGRES_DB_TYPE: PgClient,
-    HIVE_DB_TYPE: HiveDb,
-    IMPALA_DB_TYPE: HiveDb,
 }
 
 
 def get_db_client(creds):
     """Do the same get_client but use OracleClientEx."""
-    # TODO: Implement some king of regitration logic for this.
+    # TODO: Implement some kind of regitration logic for this.
     db_type = creds["db_type"]
     if db_type not in CONNECTORS:
         raise ValueError(f"Bad DB selection: {db_type}")
