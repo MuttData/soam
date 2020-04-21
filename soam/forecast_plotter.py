@@ -8,85 +8,28 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
 
-from constants import (
+from soam.constants import (
     DAILY_TIME_GRANULARITY,
     DS_COL,
-    Y_COL,
-    PRED_COLS,
     HOURLY_TIME_GRANULARITY,
-    NATION_NAME,
     PARENT_LOGGER,
     PLOT_CONFIG,
     TIME_GRANULARITY_NAME_MAP,
-    TIME_GRANULARITIES,
-    HOURS,
-    END_HOUR,
-    FORECASTER_FUTURE_WINDOW,
-    FORECASTER_FUTURE_WINDOW_CUMSUM_KPI,
-    FORECASTER_TRAIN_WINDOW,
-    ANOMALY_WINDOW,
-    CLF_TRAIN_WINDOW,
-    SAMPLE_SIZE,
-    TOP_K_INFLUENCERS,
+    Y_COL,
 )
-from forecaster import OUTLIER_SIGN_COL, Y_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
-
-
-# Plots config
-PLOT_CONFIG = {
-    "anomaly_plot": {
-        "daily_fig_size": (10, 6),
-        "hourly_fig_size": (13, 9),
-        "colors": {
-            "history": "k",
-            "history_fill": "gray",
-            "anomaly_win": "dodgerblue",
-            "anomaly_win_fill": "lightskyblue",
-            "forecast": "darkviolet",
-            "outliers_history": "black",
-            "outliers_positive": "green",
-            "outliers_negative": "red",
-            "axis_grid": "gray",
-        },
-        "daily_major_interval": 3,
-        "daily_future_window": 15,  # Number of future days posterior to anomaly-win
-        "daily_history_window": 30,  # Number of history days prior to anomaly-win
-        "hourly_major_interval": 2,
-        "hourly_history_window": 14,
-        "hourly_future_window": 5,
-        "hourly_font_size": 7,
-        "hourly_minor_labelrotation": 40,
-        "hourly_major_pad": 25,
-        "hourly_minor_locator_interval": 8,
-        "labels": {
-            "xlabel": "Fechas",
-            "ylabel": "{kpi_plot_name} ({base_10_scale_zeros}s)",
-            "history": "Historia",
-            "anomaly_win": "Últimos {anomaly_window} días",
-            "forecast": "Pronóstico",
-            "outlier": "Outlier: {date}",
-        },
-        "title": "Anomalías en {kpi} - {geo_gran} Argentina {start_date:%d-%b} al {end_date:%d-%b}",
-    }
-}
-
+from soam.forecaster import OUTLIER_SIGN_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL
 
 FORECAST_DATE_COL = "forecast_date"
 FLOOR_COL = "floor"
 CAP_COL = "cap"
 DAY_NAME = "day_name"
-YHAT_LOWER_COL = "yhat_lower"
-YHAT_UPPER_COL = "yhat_upper"
-YHAT_COL = "yhat"
 TREND_COL = "trend"
 OUTLIER_VALUE_COL = "outlier_value"
-OUTLIER_SIGN_COL = "outlier_sign"
 
 
 pd.plotting.register_matplotlib_converters()
 
-# logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 def _set_time_locator_interval(fig, ax, time_granularity, plot_conf):
@@ -264,10 +207,6 @@ def anomaly_plot(
         )
     )
 
-    # s_geo_gran = '' if s_geo_gran == NATION_NAME.lower() else f'{s_geo_gran.title()} /'
-    # title = PLOT_CONF['title'].format(
-    #    kpi=kpi_name, geo_gran=s_geo_gran, start_date=anomaly_sd, end_date=end_date
-    # )
     title = PLOT_CONF["title"].format(
         kpi=kpi_name,
         granularity_val=granularity_val,
@@ -284,21 +223,56 @@ def anomaly_plot(
     return fig
 
 
+def plot_area_metrics(extra_plot_config, factor_col, factor_val):
+    """Plot area metrics to accompany forecasting plots"""
+    data = extra_plot_config['data']
+    main_col = extra_plot_config['main_col']
+    ds_col = extra_plot_config['ds_col']
+    metrics = extra_plot_config['metrics']
+    title = extra_plot_config['title']
+
+    pdf = data[data[factor_col] == factor_val]
+    if pdf.empty:
+        return None
+    pdf = pdf.groupby([ds_col, main_col]).sum().reset_index()
+
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(50, 25))
+    pos = [[0, 0], [0, 1], [1, 0], [1, 1]]
+    for i, m in enumerate(metrics):
+        df = pdf.copy()
+        fig_bar = (
+            df.sort_values([ds_col, main_col])
+            .set_index([ds_col, main_col])[m]
+            .unstack()
+            .plot(
+                kind='area',
+                stacked=True,
+                figsize=(12, 7),
+                colormap='Spectral',
+                rot=45,
+                fontsize=6,
+                ax=axes[pos[i][0], pos[i][1]],
+            )
+        )
+        fig_bar.legend(loc='upper left', bbox_to_anchor=(1, 1), prop={'size': 6})
+        fig_bar.set_title(f'{m} by {main_col}')
+    fig.tight_layout(pad=2.0)
+    fig.suptitle(title, fontsize=15)
+    return fig
+
+
 class ForecastPlotter:
     def __init__(self, factor_val, save_suffix="", save_path=None):
         self.factor_val = factor_val
         self.save_suffix = save_suffix
         self.save_path = save_path
 
-    # def plot(self, forecaster, time_range_conf, target_col, kpi_plot_name, kpi_name):
-    def plot(self, forecaster_df, time_range_conf, target_col, kpi_plot_name, kpi_name):
+    def plot(self, forecaster, time_range_conf, target_col, kpi_plot_name, kpi_name):
         fig = anomaly_plot(
             kpi_plot_name=kpi_plot_name,
             kpi_name=kpi_name,
-            # s_geo_gran=self.factor_val,
             granularity_val=self.factor_val,
-            # forecast_df=forecaster.forecast,
-            forecast_df=forecaster_df,
+            forecast_df=forecaster.forecast,
             end_date=time_range_conf.end_date,
             anomaly_window=time_range_conf.anomaly_window,
             time_granularity=time_range_conf.time_granularity,
@@ -316,5 +290,4 @@ class ForecastPlotter:
         fn = self.save_path / fn
         logger.debug(f"Saving forecast figure to {fn}...")
         fig.savefig(fn, bbox_inches="tight")
-        print(fn)
         plt.close()

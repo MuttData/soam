@@ -1,10 +1,13 @@
+
 from pathlib import Path
 
-from utils import template, make_dirs
+from pkg_resources import resource_string
+
+from soam.utils import make_dirs, template
 
 KPI_TABLE_BASENAME = "kpis"
-DELVER_RUN_TABLE_BASENAME = "delver_runs"
-DELVER_RUN_FACTOR_CONF_TABLE_BASENAME = "delver_run_factor_conf"
+SOAM_RUN_TABLE_BASENAME = "soam_runs"
+SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_run_factor_conf"
 FORECASTER_RUNS_TABLE_BASENAME = "forecaster_runs"
 FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
 INFLUENCER_RUNS_TABLE_BASENAME = "influencer_runs"
@@ -18,7 +21,6 @@ COSERIES_SCORES_TABLE_BASENAME = "coseries_scores"
 TIMELINE_TABLE_BASENAME = "timeline"
 
 # Setup paths
-# _p = Path(__file__).resolve().parent
 _p = Path("/tmp/anomalies/")
 SQL_DIR = make_dirs(Path(_p, "resources"))
 LOG_DIR = make_dirs(Path(_p, "tmp", "logs"))
@@ -27,21 +29,17 @@ DATA_DIR_TABULAR = make_dirs(Path(_p, "tmp", "data", "tabular"))
 FIG_DIR = make_dirs(Path(_p, "tmp", "figures"))
 RES_DIR = make_dirs(Path(_p, "tmp", "results"))
 
-# SQL_TEMPLATE = utils.template(
-#    str((_p / 'resources' / 'templates.sql').resolve())
-# ).module
+# Report paths and configs
+MAIL_REPORT = 'resources/mail_report.html'
+UTF_ENCODING = 'utf-8'
 
 # Table name setup
 table_name_preffix = ""
 
-# if ENV is not None:
-#     table_name_preffix = f'{ENV}_'
-table_name_preffix = ""
-
 KPI_TABLE = f"{table_name_preffix}{KPI_TABLE_BASENAME}"
-DELVER_RUN_TABLE = f"{table_name_preffix}{DELVER_RUN_TABLE_BASENAME}"
-DELVER_RUN_FACTOR_CONF_TABLE = (
-    f"{table_name_preffix}{DELVER_RUN_FACTOR_CONF_TABLE_BASENAME}"
+SOAM_RUN_TABLE = f"{table_name_preffix}{SOAM_RUN_TABLE_BASENAME}"
+SOAM_RUN_FACTOR_CONF_TABLE = (
+    f"{table_name_preffix}{SOAM_RUN_FACTOR_CONF_TABLE_BASENAME}"
 )
 FORECASTER_RUNS_TABLE = f"{table_name_preffix}{FORECASTER_RUNS_TABLE_BASENAME}"
 FORECASTER_VALUES_TABLE = f"{table_name_preffix}{FORECASTER_VALUES_TABLE_BASENAME}"
@@ -56,8 +54,6 @@ COSERIES_SCORES_TABLE = f"{table_name_preffix}{COSERIES_SCORES_TABLE_BASENAME}"
 TIMELINE_TABLE = f"{table_name_preffix}{TIMELINE_TABLE_BASENAME}"
 
 # Mail report
-
 MAIL_TEMPLATE = template(
-    # str((_p / 'resources' / 'mail_report.html').resolve())
-    str((_p / "mail_report.html").resolve())
+    resource_string(__name__, MAIL_REPORT).decode(UTF_ENCODING)
 ).module

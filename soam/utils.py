@@ -1,41 +1,20 @@
-# TODO: Some of this are already in pmuttlib.
-"""
-from muttlib import (
-  apply_time_bounds,
-  hash_str,
-  make_dirs,
-  normalize_ds_index,
-  path_or_string,
-  range_datetime,
-  str_to_datetime
-)
-"""
+# utils.py
 
-"""Project agnostic utility functions."""
-import csv
-import hashlib
-import io
-import logging
-import logging.config
-import os
-import re
-import sys
-import uuid
-from collections import OrderedDict, deque, namedtuple
+"""Utility functions."""
 from copy import deepcopy
 from datetime import datetime
-from functools import wraps
+import hashlib
+import logging
+import logging.config
 from pathlib import Path
 
 import jinja2
 import pandas as pd
-import yaml
 from pandas.tseries import offsets
-from sklearn.preprocessing import RobustScaler
 
-# from constants import PARENT_LOGGER
+from soam.constants import PARENT_LOGGER
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
 def str_to_datetime(datetime_str):
@@ -102,7 +81,7 @@ def hash_str(s, length=8):
 def apply_time_bounds(df, sd, ed, ds_col):
     """Filter time dates in a datetime-type column or index."""
     if ds_col:
-        rv = df.query(f"{ds_col} >= @sd and {ds_col} <= @ed")
+        rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
     else:
         rv = df.loc[sd:ed]
     return rv
@@ -115,7 +94,7 @@ def normalize_ds_index(df, ds_col):
     elif ds_col == df.index.name:
         df = df.reset_index().rename(columns={"index": ds_col})
     else:
-        raise ValueError(f"No column or index found as '{ds_col}'.")
+        raise ValueError(f'No column or index found as "{ds_col}".')
     return df
 
 
@@ -173,24 +152,6 @@ class BadInClauseException(JinjaTemplateException):
     """Dummy doc."""
 
 
-def format_in_clause(iterable):
-    """
-    Create a Jinja2 filter to format list-like values passed.
-
-    Idea originally from
-    https://github.com/hashedin/jinjasql/blob/master/jinjasql/core.py
-    """
-    if not in_clause_requirement(iterable):
-        raise BadInClauseException(
-            f"Value passed is not a list or tuple: '{iterable}'. "
-            f"Where the query uses the '| inclause'."
-        )
-    values = [f"{v}" for v in iterable]
-    clause = ",".join(values)
-    clause = "(" + clause + ")"
-    return clause
-
-
 def template(path_or_str, **kwargs):
     """Create jinja specific template.."""
     environment = jinja2.Environment(
@@ -199,5 +160,4 @@ def template(path_or_str, **kwargs):
         lstrip_blocks=kwargs.pop("lstrip_blocks", True),
         **kwargs,
     )
-    environment.filters["inclause"] = format_in_clause
     return environment.from_string(path_or_string(path_or_str))

@@ -1,28 +1,21 @@
-# TODO: Remove unused code.
+# helpers.py
 """Project specific helper functions."""
-import logging
 from abc import ABC
 from datetime import timedelta
+import logging
 from pathlib import Path
 
 from pandas.tseries import offsets
-from sklearn.base import BaseEstimator as AttributeHelperMixin
 
-from utils import (
-    hash_str,
-    make_dirs,
-    str_to_datetime,
-    range_datetime,
-    normalize_ds_index,
-    apply_time_bounds,
-)
-from constants import (
+from sklearn.base import BaseEstimator as AttributeHelperMixin
+from soam.constants import (
     DAILY_TIME_GRANULARITY,
     HOURLY_TIME_GRANULARITY,
     PARENT_LOGGER,
     TIME_GRANULARITIES,
 )
-from dbconn import session_scope
+from soam.dbconn import session_scope
+from soam.utils import hash_str, make_dirs, range_datetime, str_to_datetime
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -32,7 +25,7 @@ RUN_ID_COL = "run_id"
 def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
     """Get parquet cache storage directory."""
     store_dir = base_dir / kpi / prefix
-    store_dir /= f"{date:%Y%m%d}{f'-{end_date:%Y%m%d}' if end_date is not None else ''}"
+    store_dir /= f'{date:%Y%m%d}{f"-{end_date:%Y%m%d}" if end_date is not None else ""}'
     if sample_size is not None:
         store_dir /= f"sample-{sample_size}"
     return make_dirs(store_dir)
@@ -104,7 +97,7 @@ def create_forecaster_dates(
     # Check not both future and end date as nulls, assert order
     train_w = forecaster_train_window
     future_w = forecaster_future_window
-    m = f"Future ('{future_w}') or train ('{train_w}') windows are not geq 0."
+    m = f'Future ("{future_w}") or train ("{train_w}") windows are not geq 0.'
     assert all([future_w > 0, train_w >= 0]), m
     end_date = str_to_datetime(end_date) if isinstance(end_date, str) else end_date
     start_date = end_date - offsets.Day(train_w)
@@ -138,7 +131,7 @@ def insert_df_multiple_clients(
             df["coseries_id"] = coseries_ids[dialect]
         logger.debug(f"Writing to {dialect} {table_name} table...")
         db_cli.insert_from_frame(df, table_name, if_exists="append", **kwargs)
-        logger.info(f"Inserted {len(df)} records in {dialect} '{table_name}' table.")
+        logger.info(f'Inserted {len(df)} records in {dialect} "{table_name}" table.')
     return
 
 
@@ -309,7 +302,3 @@ class AbstractAnalisysRun(AttributeHelperMixin, ABC):
                 run_ids[db_name] = run_obj.id
 
         return run_ids
-
-
-# class BaseStrategyBuilder:
-# [REMOVED]

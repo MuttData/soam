@@ -1,25 +1,23 @@
+# forecaster.py
 """Analyze time series data based on company KPIs."""
-import logging
 from functools import partial
+import logging
 
+from fbprophet import Prophet
 import numpy as np
 import pandas as pd
-from fbprophet import Prophet
 
-import helpers
-from helpers import get_figure_full_path, AbstractAnalisysRun
-from utils import normalize_ds_index, apply_time_bounds
-
-from cfg import FIG_DIR
-
-from constants import (
+from soam.cfg import FIG_DIR
+from soam.constants import (
     DEFAULT_PROPHET_ARGS,
     DS_COL,
     HOURLY_TIME_GRANULARITY,
     PARENT_LOGGER,
     Y_COL,
 )
-from data_models import ForecasterRuns, ForecasterValues
+from soam.data_models import ForecasterRuns, ForecasterValues
+from soam.helpers import AbstractAnalisysRun, get_figure_full_path
+from soam.utils import apply_time_bounds, normalize_ds_index
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -112,7 +110,6 @@ class Forecaster(AbstractAnalisysRun):
         time_multiplier=1,
         base_model_kws=None,
         metric_non_negative=False,
-        known_outlier_dates=None,
     ):
         """Initialize MetricSeries object.
 
@@ -144,10 +141,6 @@ class Forecaster(AbstractAnalisysRun):
             self.input_cols.append(FLOOR_COL)
         if self.max_cap:
             self.input_cols.append(CAP_COL)
-
-        if known_outlier_dates is None:
-            known_outlier_dates = []
-        self.known_outlier_dates = known_outlier_dates
 
     def get_children_data(self):
         return self.forecast.rename(columns={DS_COL: FORECAST_DATE_COL})[
@@ -201,8 +194,9 @@ class Forecaster(AbstractAnalisysRun):
         )
         series = series[self.input_cols]
 
-        if self.known_outlier_dates:
-            series.loc[series[DS_COL].isin(self.known_outlier_dates), "y"] = None
+        # FIXME: solve the fact that outliers corrupt model fit in a
+        # general manner (for instance adding changepoints for values greater than 5%
+        # the median value)
         return series
 
     def add_regressor(self, series, fc, reg_df, rname, col):
@@ -252,7 +246,6 @@ class Forecaster(AbstractAnalisysRun):
         self._fbprophet_model = Prophet(**{**DEFAULT_PROPHET_ARGS, **model_kws})
 
         if monthly_seasonality:
-            # TODO: This should be an external conf instead of a hardcoded value.
             # Note: we use fourier order 10 to allow seasonality to change quickly
             self._fbprophet_model.add_seasonality(
                 name="monthly", period=30.5, fourier_order=10
@@ -407,6 +400,7 @@ class Forecaster(AbstractAnalisysRun):
             forecast_final = None
 
         self.forecast = forecast_final
+        logger.info(f'Final forecast has {len(forecast_final)} rows')
         return self.forecast
 
 
