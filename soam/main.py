@@ -47,6 +47,7 @@ def main(
     )
 
     # DB client setup
+    db_cli_d = dict()
     if store_results:
         db_cli_d = {
             'postgres': PgClient(
