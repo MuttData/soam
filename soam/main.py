@@ -25,6 +25,7 @@ def main(
     mail_recipients,
     extra_info=None,
     email_attachments=None,
+    store_results=False,
 ):
 
     kpi = KPI(
@@ -46,16 +47,17 @@ def main(
     )
 
     # DB client setup
-    db_cli_d = {
-        'postgres': PgClient(
-            username=db_creds['user'],
-            database=db_creds['dbname'],
-            host=db_creds['host'],
-            dialect='postgres',
-            port=5432,
-            password=db_creds['password'],
-        ),
-    }
+    if store_results:
+        db_cli_d = {
+            'postgres': PgClient(
+                username=db_creds['user'],
+                database=db_creds['dbname'],
+                host=db_creds['host'],
+                dialect='postgres',
+                port=5432,
+                password=db_creds['password'],
+            ),
+        }
 
     factor_mgr = FactorManager(factor_col=factor_col)
     forecaster = Forecaster(min_floor=None, max_cap=None)
