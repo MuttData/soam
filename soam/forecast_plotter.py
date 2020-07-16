@@ -1,12 +1,12 @@
 """Plotting module for Delver."""
-import logging
 from datetime import timedelta
+import logging
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
-from matplotlib.ticker import FuncFormatter
 
 from soam.constants import (
     DAILY_TIME_GRANULARITY,
@@ -254,7 +254,7 @@ def plot_area_metrics(extra_plot_config, factor_col, factor_val):
                 ax=axes[pos[i][0], pos[i][1]],
             )
         )
-        fig_bar.legend(loc='upper left', bbox_to_anchor=(1, 1), prop={'size': 6})
+        fig_bar.legend(loc='upper left', bbox_to_anchor=(1, 1), prop={'size': 10})
         fig_bar.set_title(f'{m} by {main_col}')
     fig.tight_layout(pad=2.0)
     fig.suptitle(title, fontsize=15)
