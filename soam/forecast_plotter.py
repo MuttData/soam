@@ -39,7 +39,11 @@ def _set_time_locator_interval(fig, ax, time_granularity, plot_conf):
         if time_granularity == DAILY_TIME_GRANULARITY
         else plot_conf["hourly_major_interval"]
     )
-    date_format = "%Y-%b-%d"
+    date_format = "%b-%d %A"
+
+    if time_granularity == DAILY_TIME_GRANULARITY:
+        minor_locator_interval = plot_conf["daily_minor_locator_interval"]
+        ax.xaxis.set_minor_locator(mdates.DayLocator(interval=minor_locator_interval))
 
     if time_granularity == HOURLY_TIME_GRANULARITY:
         date_format = "%b %a %d"
@@ -217,7 +221,7 @@ def anomaly_plot(
     if time_granularity == HOURLY_TIME_GRANULARITY:
         title += f" {end_date:%H}hs"
     ax.set_title(title)
-    ax.grid(True, which="major", c=COLORS["axis_grid"], ls="-", lw=1, alpha=0.2)
+    ax.grid(True, which="both", c=COLORS["axis_grid"], ls="-", lw=1, alpha=0.2)
     ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
     plt.tight_layout()
     return fig

@@ -65,7 +65,7 @@ AGGREGATED_MAIL_IMAGES = ["aggregated_summary"]
 # Plots config
 PLOT_CONFIG = {
     "anomaly_plot": {
-        "daily_fig_size": (10, 6),
+        "daily_fig_size": (11, 7),
         "hourly_fig_size": (13, 9),
         "colors": {
             "history": "k",
@@ -78,9 +78,10 @@ PLOT_CONFIG = {
             "outliers_negative": "red",
             "axis_grid": "gray",
         },
-        "daily_major_interval": 3,
+        "daily_major_interval": 1,
         "daily_future_window": 15,  # Number of future days posterior to anomaly-win
         "daily_history_window": 60,  # Number of history days prior to anomaly-win
+        "daily_minor_locator_interval": 1,
         "hourly_major_interval": 2,
         "hourly_history_window": 14,
         "hourly_future_window": 5,
