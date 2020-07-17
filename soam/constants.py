@@ -97,7 +97,7 @@ PLOT_CONFIG = {
             "forecast": "Forecast",
             "outlier": "Outlier: {date}",
         },
-        "title": "Anomalies for {kpi} - {granularity_val} {start_date:%d-%b} to {end_date:%d-%b}",
+        "[TEST] title": "Anomalies for {kpi} - {granularity_val} {start_date:%d-%b} to {end_date:%d-%b}",
     }
 }
 
