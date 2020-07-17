@@ -1,14 +1,14 @@
 # mail_report.py
 """Mail creator and sender."""
-import io
-import logging
-import smtplib
 from datetime import timedelta
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import io
+import logging
 from os.path import basename
+import smtplib
 
 import pandas as pd
 
@@ -20,7 +20,14 @@ from soam.constants import (
     PARENT_LOGGER,
 )
 from soam.forecast_plotter import anomaly_plot, plot_area_metrics
-from soam.forecaster import OUTLIER_SIGN_COL, OUTLIER_VALUE_COL, forecasts_fig_path
+from soam.forecaster import (
+    OUTLIER_SIGN_COL,
+    OUTLIER_VALUE_COL,
+    Y_COL,
+    YHAT_LOWER_COL,
+    YHAT_UPPER_COL,
+    forecasts_fig_path,
+)
 from soam.helpers import AttributeHelperMixin
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
@@ -227,6 +234,14 @@ def _format_link(factor):
     return f'<a href=#{factor}>{factor}</a>'
 
 
+def _format_factor_val(row):
+    if row[OUTLIER_SIGN_COL] == 1:
+        relative_gap = (row[Y_COL] - row[YHAT_UPPER_COL]) / row[YHAT_UPPER_COL] * 100
+    else:
+        relative_gap = -(row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
+    return f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> by {round(relative_gap)}%'
+
+
 def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granularity):
     """Compute ouptut statistics string from anomalies data."""
     df = outliers_data
@@ -255,9 +270,10 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
 
         # Build summary table
         pd.set_option('display.max_colwidth', -1)
+        df['factor_val'] = df.apply(_format_factor_val, axis=1)
         df = (
             df.groupby([DS_COL, f'{OUTLIER_SIGN_COL}'])
-            .agg({'factor_val': lambda x: ', '.join(x.apply(_format_link))})
+            .agg({'factor_val': lambda x: ', '.join(x)})
             .reset_index()
         )
         df = df.rename(
