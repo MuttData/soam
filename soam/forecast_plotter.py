@@ -221,7 +221,7 @@ def anomaly_plot(
     if time_granularity == HOURLY_TIME_GRANULARITY:
         title += f" {end_date:%H}hs"
     ax.set_title(title)
-    ax.grid(True, which="both", c=COLORS["axis_grid"], ls="-", lw=1, alpha=0.2)
+    ax.grid(True, which="both", c=COLORS["axis_grid"], ls="-", lw=2, alpha=0.2)
     ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
     plt.tight_layout()
     return fig
