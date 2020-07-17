@@ -237,9 +237,10 @@ def _format_link(factor):
 def _format_factor_val(row):
     if row[OUTLIER_SIGN_COL] == 1:
         relative_gap = (row[Y_COL] - row[YHAT_UPPER_COL]) / row[YHAT_UPPER_COL] * 100
+        return f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> was {round(relative_gap, 2)}% higher'
     else:
         relative_gap = -(row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
-    return f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> by {round(relative_gap)}%'
+        return f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> by {round(relative_gap, 2)}% lower'
 
 
 def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granularity):
