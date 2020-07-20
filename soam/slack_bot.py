@@ -34,7 +34,7 @@ class IssueReporter:
         # Send summary
         summary_message = "\n".join(summary_entries)
         response = self.slack_client.chat_postMessage(
-            channel='G010E2ZRC91', text=summary_message
+            channel=channel_id, text=summary_message
         )
 
         message_timestamp = response.get('ts')
@@ -46,7 +46,7 @@ class IssueReporter:
             logger.info(picture)
             print(picture)
             response = self.slack_client.files_upload(
-                channels='G010E2ZRC91',
+                channels=channel_id,
                 file=picture['filename'],
                 initial_comment=f"Anomalies chart for *{picture['factor']}*",
                 title=f"{picture['factor']} Anomalies",
