@@ -29,6 +29,7 @@ from soam.forecaster import (
     forecasts_fig_path,
 )
 from soam.helpers import AttributeHelperMixin
+from soam.slack_bot import IssueReporter
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
@@ -236,11 +237,15 @@ def _format_link(factor):
 
 def _format_factor_val(row):
     if row[OUTLIER_SIGN_COL] == 1:
-        relative_gap = (row[Y_COL] - row[YHAT_UPPER_COL]) / row[YHAT_UPPER_COL] * 100
-        return f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> was {round(relative_gap, 2)}% higher'
+        relative_gap = _relative_gap(row)
+        return (
+            f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> was {relative_gap}'
+        )
     else:
-        relative_gap = -(row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
-        return f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> by {round(relative_gap, 2)}% lower'
+        relative_gap = _relative_gap(row)
+        return (
+            f'<a href=#{row["factor_val"]}>{row["factor_val"]}</a> was {relative_gap}'
+        )
 
 
 def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granularity):
@@ -271,6 +276,7 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
 
         # Build summary table
         pd.set_option('display.max_colwidth', -1)
+        df['factor_val_original'] = df['factor_val']
         df['factor_val'] = df.apply(_format_factor_val, axis=1)
         df = (
             df.groupby([DS_COL, f'{OUTLIER_SIGN_COL}'])
@@ -298,6 +304,15 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
     return d
 
 
+def _relative_gap(row):
+    if row[OUTLIER_SIGN_COL] == 1:
+        relative_gap = (row[Y_COL] - row[YHAT_UPPER_COL]) / row[YHAT_UPPER_COL] * 100
+        return f"{round(relative_gap,2)}% higher"
+    else:
+        relative_gap - (row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
+        return f"{round(relative_gap,2)}% lower"
+
+
 def send_mail_report(
     smtp_credentials,
     mail_recipients,
@@ -312,6 +327,7 @@ def send_mail_report(
     time_granularity,
     extra_info=None,
     email_attachments=None,
+    slack_settings=None,
 ):
     """Send mail report."""
     logger.info(f"Sending email report to: {mail_recipients}")
@@ -343,6 +359,35 @@ def send_mail_report(
         granularity,
         time_granularity,
     )
+
+    if slack_settings:
+        slack_reporter = IssueReporter(slack_settings['token'])
+        slack_anomalies = []
+        for index, row in outliers_data.iterrows():
+            print(row)
+            slack_anomalies.append(
+                {
+                    'factor_val': row['factor_val_original'],
+                    'kpi': kpi.name,
+                    'metric': _relative_gap(row),
+                    'date': row[DS_COL].strftime("%B %d"),
+                    'picture': str(
+                        forecasts_fig_path(
+                            target_col=kpi.name,
+                            start_date=start_date,
+                            end_date=end_date,
+                            time_granularity=time_granularity,
+                            granularity=granularity,
+                            suffix=row['factor_val_original'],
+                            as_posix=False,
+                            end_date_hour=False,
+                        )
+                    ),
+                }
+            )
+
+        if len(slack_anomalies) > 0:
+            slack_reporter.send_report(slack_anomalies, slack_settings['channel'])
 
     send_mail(
         smtp_credentials,
@@ -378,6 +423,7 @@ class MailReport(AttributeHelperMixin):
         forecaster_insertion_id,
         extra_info,
         email_attachments,
+        slack_settings,
     ):
         try:
             forecast_df = self.aggregated_forecast_data
@@ -403,4 +449,5 @@ class MailReport(AttributeHelperMixin):
             time_granularity=time_range_conf.time_granularity,
             extra_info=extra_info,
             email_attachments=email_attachments,
+            slack_settings=slack_settings,
         )

@@ -26,6 +26,7 @@ def main(
     extra_info=None,
     email_attachments=None,
     store_results=False,
+    slack_settings=None,
 ):
 
     kpi = KPI(
@@ -106,6 +107,7 @@ def main(
             ','.join(all_forecaster_run_ids),
             extra_info,
             email_attachments,
+            slack_settings,
         )
     else:
         logger.info("Mail report not send")

@@ -32,5 +32,6 @@ setuptools.setup(
         'progressbar2',
         'sqlalchemy',
         'fbprophet',
+        'slackclient>=^2.5.0',
     ],
 )
