@@ -309,7 +309,7 @@ def _relative_gap(row):
         relative_gap = (row[Y_COL] - row[YHAT_UPPER_COL]) / row[YHAT_UPPER_COL] * 100
         return f"{round(relative_gap,2)}% higher"
     else:
-        relative_gap - (row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
+        relative_gap = -(row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
         return f"{round(relative_gap,2)}% lower"
 
 
