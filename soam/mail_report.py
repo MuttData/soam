@@ -366,7 +366,7 @@ def send_mail_report(
         slack_dates = outliers_data[DS_COL].unique()
         max_date = max(slack_dates)
         print(f"Max Date: {max_date}")
-        for date in outliers_data[DS_COL]:
+        for date in outliers_data[DS_COL].unique():
             outliers = outliers_data[outliers_data[DS_COL] == date]
             for index, row in outliers.iterrows():
                 if date == max_date:
