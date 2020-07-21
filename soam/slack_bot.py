@@ -18,7 +18,7 @@ class IssueReporter:
         summary_entries = []
 
         summary_entries.append(
-            f"Hello Everyone! There have been {len(anomalies.keys())} anomalies for the *{kpi}* metric for the last two days:"
+            f"Hello Everyone! There have been {len(anomalies.keys())} anomalies for the *{kpi}* metric for the last two days:\n"
         )
 
         # Build anomaly summary
@@ -36,6 +36,7 @@ class IssueReporter:
 
                 if picture_file:
                     pictures.append({'factor': factor, 'filename': picture_file})
+            summary_entries.append("\n")
 
         summary_entries.append("Cheers!\n")
 
