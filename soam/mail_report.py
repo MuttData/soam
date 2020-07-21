@@ -362,16 +362,15 @@ def send_mail_report(
 
     if slack_settings:
         slack_reporter = IssueReporter(slack_settings['token'])
-        slack_anomalies = []
-        for index, row in outliers_data.iterrows():
-            print(row)
-            slack_anomalies.append(
-                {
-                    'factor_val': row['factor_val_original'],
-                    'kpi': kpi.name,
-                    'metric': _relative_gap(row),
-                    'date': row[DS_COL].strftime("%B %d"),
-                    'picture': str(
+        slack_anomalies = {}
+        slack_dates = outliers_data[DS_COL]
+        max_date = max(slack_dates)
+        print(f"Max Date: {max_date}")
+        for date in outliers_data[DS_COL]:
+            outliers = outliers_data[outliers_data[DS_COL] == date]
+            for index, row in outliers.iterrows():
+                if date == max_date:
+                    picture = str(
                         forecasts_fig_path(
                             target_col=kpi.name,
                             start_date=start_date,
@@ -382,12 +381,27 @@ def send_mail_report(
                             as_posix=False,
                             end_date_hour=False,
                         )
-                    ),
-                }
-            )
+                    )
+                else:
+                    picture = None
+
+                if date not in slack_anomalies:
+                    slack_anomalies[date] = []
+                slack_anomalies[date].append(
+                    {
+                        'factor_val': row['factor_val_original'],
+                        'kpi': kpi.name,
+                        'metric': _relative_gap(row),
+                        'date': row[DS_COL].strftime("%B %d"),
+                        'picture': picture,
+                    }
+                )
 
         if len(slack_anomalies) > 0:
-            slack_reporter.send_report(slack_anomalies, slack_settings['channel'])
+            print(slack_anomalies)
+            slack_reporter.send_report(
+                slack_anomalies, slack_settings['channel'], email_attachments, kpi.name
+            )
 
     send_mail(
         smtp_credentials,
