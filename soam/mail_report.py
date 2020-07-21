@@ -363,7 +363,7 @@ def send_mail_report(
     if slack_settings:
         slack_reporter = IssueReporter(slack_settings['token'])
         slack_anomalies = {}
-        slack_dates = outliers_data[DS_COL]
+        slack_dates = outliers_data[DS_COL].unique()
         max_date = max(slack_dates)
         print(f"Max Date: {max_date}")
         for date in outliers_data[DS_COL]:
