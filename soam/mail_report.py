@@ -365,11 +365,12 @@ def send_mail_report(
         slack_anomalies = {}
         slack_dates = outliers_data[DS_COL].unique()
         max_date = max(slack_dates)
-        print(f"Max Date: {max_date}")
+        added_games = {}
         for date in outliers_data[DS_COL].unique():
             outliers = outliers_data[outliers_data[DS_COL] == date]
             for index, row in outliers.iterrows():
-                if date == max_date:
+                if row['factor_val_original'] not in added_games:
+                    added_games[row['factor_val_original']] = True
                     picture = str(
                         forecasts_fig_path(
                             target_col=kpi.name,
