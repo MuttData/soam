@@ -1,5 +1,7 @@
 import logging
 
+import pandas as pd
+
 import slack
 from soam.constants import PARENT_LOGGER
 
@@ -23,7 +25,8 @@ class IssueReporter:
 
         # Build anomaly summary
         for anomaly_date in anomalies.keys():
-            summary_entries.append(f"{anomaly_date.strftime('%B %d')}\n\n")
+            date = pd.to_datetime(str(anomaly_date))
+            summary_entries.append(f"{date.strftime('%B %d')}\n\n")
             for anomaly in anomalies[anomaly_date]:
                 factor = anomaly['factor_val']
                 kpi = anomaly['kpi']
