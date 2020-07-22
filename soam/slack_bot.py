@@ -35,24 +35,17 @@ class IssueReporter:
                 kpi = anomaly['kpi']
                 metric = anomaly['metric']
                 expected_metric = anomaly['expected_metric']
-                upper_boundary = anomaly['upper_boundary']
                 lower_boundary = anomaly['lower_boundary']
 
                 relative_gap = _relative_gap_expected(metric, expected_metric)
-                upper_boundary_gap = _relative_gap_expected(
-                    upper_boundary, expected_metric
-                )
                 lower_boundary_gap = -_relative_gap_expected(
                     lower_boundary, expected_metric
                 )
 
-                print(f"UPPER: {upper_boundary_gap}")
-                print(f"LOWER: {lower_boundary_gap}")
-
                 picture_file = anomaly['picture']
 
                 summary_entries.append(
-                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with an upper boundary of {upper_boundary_gap}% and a lower boundary of {lower_boundary_gap}%) and we got *${round(metric,2)}* ({relative_gap}%)]"
+                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with a lower boundary of {lower_boundary_gap}%) and we got *${round(metric,2)}* ({relative_gap}%)]"
                 )
 
                 if picture_file:
@@ -72,7 +65,6 @@ class IssueReporter:
         # Send pictures to the thread
         for picture in pictures:
             logger.info(picture)
-            print(picture)
             response = self.slack_client.files_upload(
                 channels=channel_id,
                 file=picture['filename'],
