@@ -395,6 +395,7 @@ def send_mail_report(
                     'picture': picture,
                 }
             )
+        print(f"SLACK ANOMALIES: {slack_anomalies}")
 
         if len(slack_anomalies[max_date]) > 0:
             slack_reporter.send_report(

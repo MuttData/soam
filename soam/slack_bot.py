@@ -52,7 +52,7 @@ class IssueReporter:
                 picture_file = anomaly['picture']
 
                 summary_entries.append(
-                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with an upper boundary of {-upper_boundary_gap}% and a lower boundary of {lower_boundary_gap}) and we got *${round(metric,2)}* ({relative_gap}%)]"
+                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with an upper boundary of {upper_boundary_gap}% and a lower boundary of {lower_boundary_gap}%) and we got *${round(metric,2)}* ({relative_gap}%)]"
                 )
 
                 if picture_file:
