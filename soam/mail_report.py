@@ -101,7 +101,7 @@ def _build_subject_n_msg_body(
         f'{end_date:%H} hs' if time_granularity == HOURLY_TIME_GRANULARITY else ''
     )
     subject = (
-        f"TEST - {anomaly_range_stats.get('nr_anomalies')} {s_time_gran} Anomalies "
+        f"{anomaly_range_stats.get('nr_anomalies')} {s_time_gran} Anomalies "
         f"detected in {mail_kpi} "
         f"{end_date_str} {end_date_hr}"
     )
