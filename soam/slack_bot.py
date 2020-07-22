@@ -39,11 +39,11 @@ class IssueReporter:
                 lower_boundary = anomaly['lower_boundary']
 
                 relative_gap = _relative_gap_expected(metric, expected_metric)
-                upper_boundary_gap = -_relative_gap_expected(
-                    expected_metric, upper_boundary
+                upper_boundary_gap = _relative_gap_expected(
+                    upper_boundary, expected_metric
                 )
-                lower_boundary_gap = _relative_gap_expected(
-                    expected_metric, lower_boundary
+                lower_boundary_gap = -_relative_gap_expected(
+                    lower_boundary, expected_metric
                 )
 
                 print(f"UPPER: {upper_boundary_gap}")
