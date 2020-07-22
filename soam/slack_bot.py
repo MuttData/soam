@@ -8,6 +8,11 @@ from soam.constants import PARENT_LOGGER
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
 
+def _relative_gap_expected(value, expected_value):
+    relative_gap = (value - expected_value) / expected_value * 100
+    return round(relative_gap, 2)
+
+
 class IssueReporter:
     """Class in charge of sending the issue report."""
 
@@ -20,21 +25,34 @@ class IssueReporter:
         summary_entries = []
 
         summary_entries.append(
-            f"Hello Everyone! There have been {len(anomalies.keys())} anomalies for the *{kpi}* metric for the last two days:\n"
+            f"Hello everyone! {len(anomalies.keys())} anomalies have been detected for the *{kpi}* metric:\n"
         )
 
         # Build anomaly summary
         for anomaly_date in anomalies.keys():
-            date = pd.to_datetime(str(anomaly_date))
-            summary_entries.append(f"{date.strftime('%B %d')}\n\n")
             for anomaly in anomalies[anomaly_date]:
                 factor = anomaly['factor_val']
                 kpi = anomaly['kpi']
                 metric = anomaly['metric']
+                expected_metric = anomaly['expected_metric']
+                upper_boundary = anomaly['upper_boundary']
+                lower_boundary = anomaly['lower_boundary']
+
+                relative_gap = _relative_gap_expected(metric, expected_metric)
+                upper_boundary_gap = -_relative_gap_expected(
+                    expected_metric, upper_boundary
+                )
+                lower_boundary_gap = _relative_gap_expected(
+                    expected_metric, lower_boundary
+                )
+
+                print(f"UPPER: {upper_boundary_gap}")
+                print(f"LOWER: {lower_boundary_gap}")
+
                 picture_file = anomaly['picture']
 
                 summary_entries.append(
-                    f"• *{factor}*'s {kpi} was *{metric}* than expected"
+                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with an upper boundary of {-upper_boundary_gap}% and a lower boundary of {lower_boundary_gap}) and we got *${round(metric,2)}* ({relative_gap}%)]"
                 )
 
                 if picture_file:

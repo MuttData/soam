@@ -24,6 +24,7 @@ from soam.forecaster import (
     OUTLIER_SIGN_COL,
     OUTLIER_VALUE_COL,
     Y_COL,
+    YHAT_COL,
     YHAT_LOWER_COL,
     YHAT_UPPER_COL,
     forecasts_fig_path,
@@ -363,43 +364,39 @@ def send_mail_report(
     if slack_settings:
         slack_reporter = IssueReporter(slack_settings['token'])
         slack_anomalies = {}
-        slack_dates = outliers_data[DS_COL].unique()
-        max_date = max(slack_dates)
-        added_games = {}
-        for date in outliers_data[DS_COL].unique():
-            outliers = outliers_data[outliers_data[DS_COL] == date]
-            for index, row in outliers.iterrows():
-                if row['factor_val_original'] not in added_games:
-                    added_games[row['factor_val_original']] = True
-                    picture = str(
-                        forecasts_fig_path(
-                            target_col=kpi.name,
-                            start_date=start_date,
-                            end_date=end_date,
-                            time_granularity=time_granularity,
-                            granularity=granularity,
-                            suffix=row['factor_val_original'],
-                            as_posix=False,
-                            end_date_hour=False,
-                        )
-                    )
-                else:
-                    picture = None
-
-                if date not in slack_anomalies:
-                    slack_anomalies[date] = []
-                slack_anomalies[date].append(
-                    {
-                        'factor_val': row['factor_val_original'],
-                        'kpi': kpi.name,
-                        'metric': _relative_gap(row),
-                        'date': row[DS_COL].strftime("%B %d"),
-                        'picture': picture,
-                    }
+        max_date = max(outliers_data[DS_COL])
+        slack_anomalies[max_date] = []
+        last_date_outliers = outliers_data[outliers_data[DS_COL] == max_date]
+        negative_last_date_outliers = last_date_outliers[
+            last_date_outliers[Y_COL] < last_date_outliers[YHAT_COL]
+        ]
+        for index, row in negative_last_date_outliers.iterrows():
+            picture = str(
+                forecasts_fig_path(
+                    target_col=kpi.name,
+                    start_date=start_date,
+                    end_date=end_date,
+                    time_granularity=time_granularity,
+                    granularity=granularity,
+                    suffix=row['factor_val_original'],
+                    as_posix=False,
+                    end_date_hour=False,
                 )
+            )
+            slack_anomalies[max_date].append(
+                {
+                    'factor_val': row['factor_val_original'],
+                    'kpi': kpi.name,
+                    'metric': row[Y_COL],
+                    'expected_metric': row[YHAT_COL],
+                    'upper_boundary': row[YHAT_UPPER_COL],
+                    'lower_boundary': row[YHAT_LOWER_COL],
+                    'date': row[DS_COL].strftime("%B %d"),
+                    'picture': picture,
+                }
+            )
 
-        if len(slack_anomalies) > 0:
-            print(slack_anomalies)
+        if len(slack_anomalies[max_date]) > 0:
             slack_reporter.send_report(
                 slack_anomalies, slack_settings['channel'], email_attachments, kpi.name
             )
