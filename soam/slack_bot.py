@@ -24,12 +24,11 @@ class IssueReporter:
         pictures = []
         summary_entries = []
 
-        summary_entries.append(
-            f"Hello everyone! {len(anomalies.keys())} anomalies have been detected for the *{kpi}* metric:\n"
-        )
-
         # Build anomaly summary
         for anomaly_date in anomalies.keys():
+            summary_entries.append(
+                f"Hello everyone! {len(anomalies[anomaly_date])} anomalies have been detected for the *{kpi}* metric:\n"
+            )
             for anomaly in anomalies[anomaly_date]:
                 factor = anomaly['factor_val']
                 kpi = anomaly['kpi']
@@ -45,7 +44,7 @@ class IssueReporter:
                 picture_file = anomaly['picture']
 
                 summary_entries.append(
-                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with a lower bound of {lower_boundary_gap}% total revenue decrease) and we got *${round(metric,2)}* ({relative_gap}%)]"
+                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with a lower bound *{lower_boundary_gap}% lower* than the expected revenue) and we got *${round(metric,2)}* ({-relative_gap}% lower than the expected revenue)]"
                 )
 
                 if picture_file:
