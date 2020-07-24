@@ -363,6 +363,7 @@ def send_mail_report(
 
     if slack_settings:
         slack_reporter = IssueReporter(slack_settings['token'])
+        run_date = slack_settings['run_date']
         slack_anomalies = {}
         max_date = max(outliers_data[DS_COL])
         slack_anomalies[max_date] = []
@@ -398,7 +399,11 @@ def send_mail_report(
 
         if len(slack_anomalies[max_date]) > 0:
             slack_reporter.send_report(
-                slack_anomalies, slack_settings['channel'], email_attachments, kpi.name
+                slack_anomalies,
+                slack_settings['channel'],
+                email_attachments,
+                kpi.name,
+                run_date,
             )
 
     send_mail(

@@ -20,12 +20,20 @@ class IssueReporter:
         """Construct IssueReporter with necessary clients."""
         self.slack_client = slack.WebClient(slack_token)
 
-    def send_report(self, anomalies, channel_id, email_attachments, kpi):
+    def send_report(self, anomalies, channel_id, email_attachments, kpi, run_date):
         pictures = []
         summary_entries = []
-
+        run_date = pd.to_datetime(run_date, format='%Y-%m-%d %H:%M')
         # Build anomaly summary
         for anomaly_date in anomalies.keys():
+            if run_date.hour > 12:
+                summary_entries.append(
+                    f"*[Afternoon Check for {run_date.year}-{run_date.month:02}-{run_date.day}]*"
+                )
+            else:
+                summary_entries.append(
+                    f"*[Morning Check for {run_date.year}-{run_date.month:02}-{run_date.day}]* - please note that this may contain incomplete {kpi} data"
+                )
             summary_entries.append(
                 f"Hello everyone! {len(anomalies[anomaly_date])} anomalies have been detected for the *{kpi}* metric:\n"
             )
