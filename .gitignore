@@ -131,5 +131,8 @@ Pipfile*
 ### Python Patch ###
 .venv/
 
+### Darts Patch ###
+.darts/
+
 # End of https://www.gitignore.io/api/python
 
