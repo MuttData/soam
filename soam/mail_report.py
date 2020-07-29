@@ -307,10 +307,10 @@ def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granula
 
 def _relative_gap(row):
     if row[OUTLIER_SIGN_COL] == 1:
-        relative_gap = (row[Y_COL] - row[YHAT_UPPER_COL]) / row[YHAT_UPPER_COL] * 100
+        relative_gap = (row[Y_COL] - row[YHAT_COL]) / row[YHAT_COL] * 100
         return f"{round(relative_gap,2)}% higher"
     else:
-        relative_gap = -(row[Y_COL] - row[YHAT_LOWER_COL]) / row[YHAT_LOWER_COL] * 100
+        relative_gap = -(row[Y_COL] - row[YHAT_COL]) / row[YHAT_COL] * 100
         return f"{round(relative_gap,2)}% lower"
 
 
