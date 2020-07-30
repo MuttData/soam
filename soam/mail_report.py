@@ -365,39 +365,43 @@ def send_mail_report(
         slack_reporter = IssueReporter(slack_settings['token'])
         run_date = slack_settings['run_date']
         slack_anomalies = {}
-        max_date = max(outliers_data[DS_COL])
-        slack_anomalies[max_date] = []
-        last_date_outliers = outliers_data[outliers_data[DS_COL] == max_date]
-        negative_last_date_outliers = last_date_outliers[
-            last_date_outliers[Y_COL] < last_date_outliers[YHAT_COL]
-        ]
-        for index, row in negative_last_date_outliers.iterrows():
-            picture = str(
-                forecasts_fig_path(
-                    target_col=kpi.name,
-                    start_date=start_date,
-                    end_date=end_date,
-                    time_granularity=time_granularity,
-                    granularity=granularity,
-                    suffix=row['factor_val_original'],
-                    as_posix=False,
-                    end_date_hour=False,
+        if len(outliers_data[DS_COL]) == 0:
+            slack_reporter.send_report(
+                slack_anomalies, slack_settings['channel'], [], kpi.name, run_date,
+            )
+        else:
+            max_date = max(outliers_data[DS_COL])
+            slack_anomalies[max_date] = []
+            last_date_outliers = outliers_data[outliers_data[DS_COL] == max_date]
+            negative_last_date_outliers = last_date_outliers[
+                last_date_outliers[Y_COL] < last_date_outliers[YHAT_COL]
+            ]
+            for index, row in negative_last_date_outliers.iterrows():
+                picture = str(
+                    forecasts_fig_path(
+                        target_col=kpi.name,
+                        start_date=start_date,
+                        end_date=end_date,
+                        time_granularity=time_granularity,
+                        granularity=granularity,
+                        suffix=row['factor_val_original'],
+                        as_posix=False,
+                        end_date_hour=False,
+                    )
                 )
-            )
-            slack_anomalies[max_date].append(
-                {
-                    'factor_val': row['factor_val_original'],
-                    'kpi': kpi.name,
-                    'metric': row[Y_COL],
-                    'expected_metric': row[YHAT_COL],
-                    'upper_boundary': row[YHAT_UPPER_COL],
-                    'lower_boundary': row[YHAT_LOWER_COL],
-                    'date': row[DS_COL].strftime("%B %d"),
-                    'picture': picture,
-                }
-            )
+                slack_anomalies[max_date].append(
+                    {
+                        'factor_val': row['factor_val_original'],
+                        'kpi': kpi.name,
+                        'metric': row[Y_COL],
+                        'expected_metric': row[YHAT_COL],
+                        'upper_boundary': row[YHAT_UPPER_COL],
+                        'lower_boundary': row[YHAT_LOWER_COL],
+                        'date': row[DS_COL].strftime("%B %d"),
+                        'picture': picture,
+                    }
+                )
 
-        if len(slack_anomalies[max_date]) > 0:
             slack_reporter.send_report(
                 slack_anomalies,
                 slack_settings['channel'],

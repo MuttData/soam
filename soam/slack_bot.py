@@ -25,39 +25,50 @@ class IssueReporter:
         summary_entries = []
         run_date = pd.to_datetime(run_date, format='%Y-%m-%d %H:%M')
         # Build anomaly summary
-        for anomaly_date in anomalies.keys():
-            if run_date.hour > 12:
+        if run_date.hour > 12:
+            summary_entries.append(
+                f"*[Afternoon Check for {run_date.year}-{run_date.month:02}-{run_date.day}]*"
+            )
+        else:
+            if kpi == 'ARPDAU':
                 summary_entries.append(
-                    f"*[Afternoon Check for {run_date.year}-{run_date.month:02}-{run_date.day}]*"
+                    f"*[Daily Check for {run_date.year}-{run_date.month:02}-{run_date.day}]*"
                 )
             else:
                 summary_entries.append(
                     f"*[Morning Check for {run_date.year}-{run_date.month:02}-{run_date.day}]* - please note that this may contain incomplete {kpi} data"
                 )
+
+        if len(anomalies) == 0:
             summary_entries.append(
-                f"Hello everyone! {len(anomalies[anomaly_date])} anomalies have been detected for the *{kpi}* metric:\n"
+                f"Hello everyone! No anomalies have been detected for the *{kpi}* metric.\n"
             )
-            for anomaly in anomalies[anomaly_date]:
-                factor = anomaly['factor_val']
-                kpi = anomaly['kpi']
-                metric = anomaly['metric']
-                expected_metric = anomaly['expected_metric']
-                lower_boundary = anomaly['lower_boundary']
-
-                relative_gap = _relative_gap_expected(metric, expected_metric)
-                lower_boundary_gap = -_relative_gap_expected(
-                    lower_boundary, expected_metric
-                )
-
-                picture_file = anomaly['picture']
-
+        else:
+            for anomaly_date in anomalies.keys():
                 summary_entries.append(
-                    f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with a lower bound *{lower_boundary_gap}% lower* than the expected {kpi}) and we got *${round(metric,2)}* ({-relative_gap}% lower than the expected {kpi})]"
+                    f"Hello everyone! {len(anomalies[anomaly_date])} anomalies have been detected for the *{kpi}* metric:\n"
                 )
+                for anomaly in anomalies[anomaly_date]:
+                    factor = anomaly['factor_val']
+                    kpi = anomaly['kpi']
+                    metric = anomaly['metric']
+                    expected_metric = anomaly['expected_metric']
+                    lower_boundary = anomaly['lower_boundary']
 
-                if picture_file:
-                    pictures.append({'factor': factor, 'filename': picture_file})
-            summary_entries.append("\n")
+                    relative_gap = _relative_gap_expected(metric, expected_metric)
+                    lower_boundary_gap = -_relative_gap_expected(
+                        lower_boundary, expected_metric
+                    )
+
+                    picture_file = anomaly['picture']
+
+                    summary_entries.append(
+                        f"• *{factor}*'s {kpi} was *{-relative_gap}% lower* than expected [we expected *${round(expected_metric,2)}* (with a lower bound *{lower_boundary_gap}% lower* than the expected {kpi}) and we got *${round(metric,2)}* ({-relative_gap}% lower than the expected {kpi})]"
+                    )
+
+                    if picture_file:
+                        pictures.append({'factor': factor, 'filename': picture_file})
+        summary_entries.append("\n")
 
         summary_entries.append("Cheers!\n")
 
