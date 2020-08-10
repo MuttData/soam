@@ -1,6 +1,6 @@
-
 from pathlib import Path
 
+from decouple import AutoConfig
 from pkg_resources import resource_string
 
 from soam.utils import make_dirs, template
@@ -30,8 +30,8 @@ FIG_DIR = make_dirs(Path(_p, "tmp", "figures"))
 RES_DIR = make_dirs(Path(_p, "tmp", "results"))
 
 # Report paths and configs
-MAIL_REPORT = 'resources/mail_report.html'
-UTF_ENCODING = 'utf-8'
+MAIL_REPORT = "resources/mail_report.html"
+UTF_ENCODING = "utf-8"
 
 # Table name setup
 table_name_preffix = ""
@@ -57,3 +57,26 @@ TIMELINE_TABLE = f"{table_name_preffix}{TIMELINE_TABLE_BASENAME}"
 MAIL_TEMPLATE = template(
     resource_string(__name__, MAIL_REPORT).decode(UTF_ENCODING)
 ).module
+
+
+def get_db_cred(setting_path: str) -> dict:
+    """
+    Read the setting.ini file and retrieve the database credentials
+    """
+    config = AutoConfig(search_path=setting_path)
+    db_cred = {}
+
+    db_cred["username"] = config("DB_USER")
+    db_cred["dialect"] = config("DB_DIALECT")
+    db_cred["password"] = config("DB_PASSWORD")
+    db_cred["database"] = config("DB_NAME")
+    db_cred["port"] = config("DB_PORT")
+    db_cred["host"] = config("DB_IP")
+
+    return db_cred
+
+
+def get_db_uri(setting_path: str) -> str:
+    db_cred = get_db_cred(setting_path)
+
+    return f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/{db_cred['database']}"

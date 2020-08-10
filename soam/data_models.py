@@ -1,10 +1,9 @@
 # data_models.py
 
-import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
+import logging
 
-import sqlalchemy.types as types
 from sqlalchemy import (
     Column,
     DateTime,
@@ -15,6 +14,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
+import sqlalchemy.types as types
 
 from soam.cfg import (
     COSERIES_DIMENSIONS_TABLE,
@@ -91,7 +91,7 @@ class ForecasterRuns(AbstractRunBase):
     __tablename__ = FORECASTER_RUNS_TABLE
 
 
-class ForecasterValues(AbstractIDBase):
+class ForecastValues(AbstractIDBase):
 
     __tablename__ = FORECASTER_VALUES_TABLE
     __table_args__ = (UniqueConstraint("run_id", "forecast_date"),)
@@ -99,10 +99,10 @@ class ForecasterValues(AbstractIDBase):
     run_id = Column(Integer, ForeignKey(f"{FORECASTER_RUNS_TABLE}.id"), nullable=False)
     forecast_date = Column(DateTime, nullable=False)
     yhat = Column(Float, nullable=False)
-    yhat_lower = Column(Float, nullable=False)
-    yhat_upper = Column(Float, nullable=False)
-    y = Column(Float, nullable=False)
-    trend = Column(Float, nullable=False)
+    yhat_lower = Column(Float)
+    yhat_upper = Column(Float)
+    y = Column(Float, nullable=True)
+    trend = Column(Float)
     outlier_value = Column(Float)
     outlier_sign = Column(Float)
 
