@@ -37,23 +37,23 @@ def main(
     )
 
     time_range_conf = TimeRangeConfiguration(
-        end_date=time_range_dict['end_date'],
-        forecast_train_window=time_range_dict['train_window'],
-        forecast_future_window=time_range_dict['future_window'],
-        time_granularity=time_range_dict['time_granularity'],
-        anomaly_window=time_range_dict['anomaly_window'],
-        end_hour=time_range_dict['end_hour'],
+        end_date=time_range_dict["end_date"],
+        forecast_train_window=time_range_dict["train_window"],
+        forecast_future_window=time_range_dict["future_window"],
+        time_granularity=time_range_dict["time_granularity"],
+        anomaly_window=time_range_dict["anomaly_window"],
+        end_hour=time_range_dict["end_hour"],
     )
 
     # DB client setup
     db_cli_d = {
-        'postgres': PgClient(
-            username=db_creds['user'],
-            database=db_creds['dbname'],
-            host=db_creds['host'],
-            dialect='postgres',
+        "postgres": PgClient(
+            username=db_creds["user"],
+            database=db_creds["dbname"],
+            host=db_creds["host"],
+            dialect="postgres",
             port=5432,
-            password=db_creds['password'],
+            password=db_creds["password"],
         ),
     }
 
@@ -100,7 +100,7 @@ def main(
             granularity,
             factor_mgr,
             time_range_conf,
-            ','.join(all_forecaster_run_ids),
+            ",".join(all_forecaster_run_ids),
             extra_info,
             email_attachments,
         )

@@ -1,10 +1,9 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-
 from soam.cfg import get_db_uri
 from soam.data_models import Base
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -15,7 +14,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 # Get the sql uri from the settings file
-config.set_main_option("sqlalchemy.url", get_db_uri())
+config.set_main_option("sqlalchemy.url", get_db_uri("settings.ini"))
 
 
 # add your model's MetaData object here

@@ -3,40 +3,16 @@
 """Utility functions."""
 from copy import deepcopy
 from datetime import datetime
-import hashlib
 import logging
 import logging.config
-from pathlib import Path
 
 import jinja2
+from muttlib.utils import path_or_string
 import pandas as pd
 from pandas.tseries import offsets
-
 from soam.constants import PARENT_LOGGER
 
-logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
-
-
-def str_to_datetime(datetime_str):
-    """Convert possible date-like string to datetime object."""
-    formats = (
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d",
-        "%Y-%m-%d %H:%M:%S.%f",
-        "%H:%M:%S.%f",
-        "%H:%M:%S",
-        "%Y%m%dT%H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y%m%d",
-        "%Y-%m-%dT%H",
-        "%Y%m",
-    )
-    for ftm in formats:
-        try:
-            return datetime.strptime(datetime_str, ftm)
-        except ValueError:
-            if ftm is formats[-1]:
-                raise
+logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 def range_datetime(
@@ -53,49 +29,6 @@ def range_datetime(
         else:
             yield datetime_start
         datetime_start += timeskip
-
-
-def path_or_string(str_or_path):
-    """Load file contents as string or return input str."""
-    file_path = Path(str_or_path)
-    try:
-        if file_path.is_file():
-            with file_path.open("r") as f:
-                return f.read()
-    except OSError:
-        pass
-    return str_or_path
-
-
-def make_dirs(dir_path):
-    """Add a return value to mkdir."""
-    Path.mkdir(Path(dir_path), exist_ok=True, parents=True)
-    return dir_path
-
-
-def hash_str(s, length=8):
-    """Hash a string."""
-    return hashlib.sha256(s.encode("utf8")).hexdigest()[:length]
-
-
-def apply_time_bounds(df, sd, ed, ds_col):
-    """Filter time dates in a datetime-type column or index."""
-    if ds_col:
-        rv = df.query(f'{ds_col} >= @sd and {ds_col} <= @ed')
-    else:
-        rv = df.loc[sd:ed]
-    return rv
-
-
-def normalize_ds_index(df, ds_col):
-    """Normalize usage of ds_col as column in df."""
-    if ds_col in df.columns:
-        return df
-    elif ds_col == df.index.name:
-        df = df.reset_index().rename(columns={"index": ds_col})
-    else:
-        raise ValueError(f'No column or index found as "{ds_col}".')
-    return df
 
 
 def sanitize_arg(v, default=None):
@@ -134,30 +67,3 @@ def sanitize_arg(v, default=None):
 def sanitize_arg_empty_dict(v):
     """Convenience function for `sanitize_arg(v, {})`"""
     return sanitize_arg(v, {})
-
-
-class classproperty:
-    def __init__(self, getter):
-        self.getter = getter
-
-    def __get__(self, instance, owner):
-        return self.getter(owner)
-
-
-class JinjaTemplateException(Exception):
-    """Dummy doc."""
-
-
-class BadInClauseException(JinjaTemplateException):
-    """Dummy doc."""
-
-
-def template(path_or_str, **kwargs):
-    """Create jinja specific template.."""
-    environment = jinja2.Environment(
-        line_statement_prefix=kwargs.pop("line_statement_prefix", "%"),
-        trim_blocks=kwargs.pop("trim_blocks", True),
-        lstrip_blocks=kwargs.pop("lstrip_blocks", True),
-        **kwargs,
-    )
-    return environment.from_string(path_or_string(path_or_str))
