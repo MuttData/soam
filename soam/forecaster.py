@@ -13,11 +13,12 @@ from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
 
 from .savers import Saver
+from .step import Step
 
 # logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-class Forecaster:
+class Forecaster(Step):
     def __init__(self, model: ForecastingModel):
         """
         A Forecaster is an object that is meant to handle models, data and storages.

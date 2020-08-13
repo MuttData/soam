@@ -1,12 +1,14 @@
 # data_models.py
 
 from datetime import datetime
+import enum
 import logging
 
-from soam.cfg import FORECASTER_RUNS_TABLE, FORECASTER_VALUES_TABLE
+from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_RUN_TABLE, STEP_RUNS_TABLE
 from sqlalchemy import (
     Column,
     DateTime,
+    Enum,
     Float,
     ForeignKey,
     Integer,
@@ -15,7 +17,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
-
 
 
 def now_getter():
@@ -70,17 +71,36 @@ class AbstractRunBase(AbstractIDBase):  # pylint: disable=too-few-public-methods
     params_hash = Column(Text, nullable=False)
 
 
-class ForecasterRuns(AbstractRunBase):
+class SoaMRuns(AbstractIDBase):
 
-    __tablename__ = FORECASTER_RUNS_TABLE
+    __tablename__ = SOAM_RUN_TABLE
+
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+
+
+class StepTypeEnum(enum.Enum):
+    e = "exctract"
+    pre = "preprocess"
+    f = "forecast"
+    post = "postprocess"
+
+
+class StepsRuns(AbstractRunBase):
+
+    __tablename__ = STEP_RUNS_TABLE
+    __table_args__ = (UniqueConstraint("run_id"),)
+
+    run_id = Column(Integer, ForeignKey(f"{SOAM_RUN_TABLE}.id"), nullable=False)
+    step_type = Column(Enum(StepTypeEnum))
 
 
 class ForecastValues(AbstractIDBase):
 
     __tablename__ = FORECASTER_VALUES_TABLE
-    __table_args__ = (UniqueConstraint("run_id", "forecast_date"),)
+    __table_args__ = (UniqueConstraint("step_run_id", "forecast_date"),)
 
-    run_id = Column(Integer, ForeignKey(f"{FORECASTER_RUNS_TABLE}.id"), nullable=False)
+    step_run_id = Column(Integer, ForeignKey(f"{STEP_RUNS_TABLE}.id"), nullable=False)
     forecast_date = Column(DateTime, nullable=False)
     yhat = Column(Float, nullable=False)
     yhat_lower = Column(Float)
