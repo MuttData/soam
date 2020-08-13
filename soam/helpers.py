@@ -5,8 +5,10 @@ from datetime import timedelta
 import logging
 from pathlib import Path
 
+# TODO change range_datetime import, from muttlib.utils
+from muttlib.dbconn import session_scope
+from muttlib.utils import hash_str, make_dirs, str_to_datetime
 from pandas.tseries import offsets
-
 from sklearn.base import BaseEstimator as AttributeHelperMixin
 from soam.constants import (
     DAILY_TIME_GRANULARITY,
@@ -14,8 +16,7 @@ from soam.constants import (
     PARENT_LOGGER,
     TIME_GRANULARITIES,
 )
-from soam.dbconn import session_scope
-from soam.utils import hash_str, make_dirs, range_datetime, str_to_datetime
+from soam.utils import range_datetime
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 

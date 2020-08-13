@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Union
 
 from muttlib.dbconn import BaseClient
-from muttlib.utils import hash_str
+from muttlib.utils import hash_str, make_dirs
 import pandas as pd
 from soam.constants import PARENT_LOGGER
 from soam.data_models import AbstractIDBase, ForecasterRuns, ForecastValues
@@ -82,7 +82,7 @@ class CSVSaver(Saver):
         PREDICTION_CSV = "_prediction.csv"
         max_index = 0
 
-        self.path.mkdir(parents=True, exist_ok=True)
+        _ = make_dirs(self.path)
         prediction.set_index
 
         if not (self.path / ("0" + PREDICTION_CSV)).is_file():

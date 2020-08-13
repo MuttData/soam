@@ -5,17 +5,13 @@ from datetime import datetime, timedelta
 FORECASTER_FUTURE_WINDOW = 15
 FORECASTER_FUTURE_WINDOW_CUMSUM_KPI = 30
 FORECASTER_TRAIN_WINDOW = 90
-ANOMALY_WINDOW = 7
+# ANOMALY_WINDOW = 7
 CLF_TRAIN_WINDOW = 7
 SAMPLE_SIZE = 2
 TOP_K_INFLUENCERS = 12
 
 # Global
 PROJECT_NAME = "SoaM"
-ENV_DEV = "dev"
-ENV_STG = "stg"
-ENV_PRD = "prd"
-POSSIBLE_ENVS = [ENV_DEV, ENV_STG, ENV_PRD]
 DS_COL = "ds"
 Y_COL = "y"
 PRED_COLS = ["ds", "yhat", "yhat_lower", "yhat_upper", Y_COL]
@@ -43,21 +39,8 @@ MIN_FACTOR_LEVEL_DATAPOINTS = 10
 
 REGRESSOR_PREFIX = "regr_"
 
-
 # TIME values
 YESTERDAY = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-
-
-DEFAULT_PROPHET_ARGS = dict(
-    # changepoint_range=0.75,
-    # yearly_seasonality=False,
-    # changepoint_prior_scale=0.04,
-    # daily_seasonality=30,
-    # weekly_seasonality=20,
-    # holidays_prior_scale=10,
-    interval_width=0.8
-    #            seasonality_prior_scale=5,
-)
 
 # Aggregated mail report constants
 AGGREGATED_MAIL_IMAGES = ["aggregated_summary"]
