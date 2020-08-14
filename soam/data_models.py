@@ -75,8 +75,8 @@ class SoaMRuns(AbstractIDBase):
 
     __tablename__ = SOAM_RUN_TABLE
 
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    start_datetime = Column(DateTime, nullable=True)
+    end_datetime = Column(DateTime, nullable=True)
 
 
 class StepTypeEnum(enum.Enum):
@@ -84,6 +84,7 @@ class StepTypeEnum(enum.Enum):
     pre = "preprocess"
     f = "forecast"
     post = "postprocess"
+    c = "custom"
 
 
 class StepsRuns(AbstractRunBase):
@@ -92,7 +93,7 @@ class StepsRuns(AbstractRunBase):
     __table_args__ = (UniqueConstraint("run_id"),)
 
     run_id = Column(Integer, ForeignKey(f"{SOAM_RUN_TABLE}.id"), nullable=False)
-    step_type = Column(Enum(StepTypeEnum))
+    step_type = Column(Enum(StepTypeEnum), nullable=False)
 
 
 class ForecastValues(AbstractIDBase):

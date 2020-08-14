@@ -13,11 +13,19 @@ from typing import Union
 from muttlib.dbconn import BaseClient
 from muttlib.utils import hash_str, make_dirs
 import pandas as pd
-from soam.constants import PARENT_LOGGER
-from soam.data_models import AbstractIDBase, ForecasterRuns, ForecastValues
-from soam.forecaster import Forecaster
 from sqlalchemy import engine
 from sqlalchemy.orm import sessionmaker
+
+from .constants import PARENT_LOGGER
+from .data_models import (
+    AbstractIDBase,
+    ForecastValues,
+    SoaMRuns,
+    StepsRuns,
+    StepTypeEnum,
+)
+from .forecaster import Forecaster
+from .runner import PipelineRun, StepRun
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -86,7 +94,6 @@ class CSVSaver(Saver):
 
         _ = make_dirs(self.path)
 
-
         if not (self.path / ("0" + PREDICTION_CSV)).is_file():
             prediction_path = self.path / ("0" + PREDICTION_CSV)
 
@@ -123,7 +130,7 @@ class DBSaver(Saver):
                     "alembic upgrade head"
                 )
 
-    def save_forecaster(self, forecaster: Forecaster) -> int:
+    def save_forecaster(self, forecaster: Forecaster, step_run_id: int) -> int:
         """
         Store the forecaster data in the database with the defined schema
         in data_models. The database migrations use alembic
@@ -132,24 +139,43 @@ class DBSaver(Saver):
         ----------
         forecaster
             A Forecaster object to store its data and model config.
+        run_id
+            The id of the run
         Returns
         -------
         int
             The id number
         """
         save_prediction = forecaster.prediction.copy()
-        run_id = self.save_fr_run(forecaster)
-        save_prediction["run_id"] = run_id
+
+        save_prediction["step_run_id"] = step_run_id
         self.db_client.insert_from_frame(save_prediction, ForecastValues.__tablename__)
 
-        return run_id
+        return step_run_id
 
-    def save_fr_run(self, forecaster: Forecaster) -> int:
+    def save_step_run(self, step_run: StepRun) -> int:
         """
         Save the forecaster run configuration
         """
-        insert_fr = ForecasterRuns(
-            params=str(forecaster.model), params_hash=hash_str(str(forecaster.model))
+        if isinstance(step_run.step, Forecaster):
+            step_type = StepTypeEnum.f
+        else:
+            step_type = StepTypeEnum.c
+
+        insert_fr = StepsRuns(
+            params=repr(step_run),
+            params_hash=hash_str(repr(step_run)),
+            step_type=step_type,
+            run_id=step_run.run_id,
+        )
+        return self._insert_single(insert_fr)
+
+    def save_pipeline_run(self, run: PipelineRun) -> int:
+        """
+        Save the forecaster run configuration
+        """
+        insert_fr = SoaMRuns(
+            start_datetime=run.start_datetime, end_datetime=run.end_datetime,
         )
         return self._insert_single(insert_fr)
 

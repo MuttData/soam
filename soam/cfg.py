@@ -6,7 +6,7 @@ from pkg_resources import resource_string
 
 SOAM_RUN_TABLE_BASENAME = "soam_runs"
 SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_run_factor_conf"
-STEP_RUNS_TABLE_BASENAME = "forecaster_runs"
+STEP_RUNS_TABLE_BASENAME = "steps_runs"
 FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
 EXTRACT_VALUES_TABLE_BASENAME = "extract_values"
 

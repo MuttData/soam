@@ -33,3 +33,8 @@ class Step(ABC):
         pandas.DataFrame
             pandas DataFrame containing the output values.
         """
+        pass
+
+    @abstractmethod
+    def __repr__(self) -> str:
+        pass

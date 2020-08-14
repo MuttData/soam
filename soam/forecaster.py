@@ -31,13 +31,17 @@ class Forecaster(Step):
         self.prediction = pd.DataFrame
         self.model = model
 
+    def __repr__(self):
+
+        return f"{self.model}"
+
     def run(
         self,
         raw_series: pd.DataFrame = None,
         input_length: Optional[int] = 1,
         output_length: int = 1,
         *args,
-        **kwargs
+        **kwargs,
     ) -> pd.DataFrame:
         """
         Execute fit and predict with Darts models,
