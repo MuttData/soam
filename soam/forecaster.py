@@ -12,8 +12,6 @@ from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
 
-from .savers import Saver
-
 # logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
@@ -84,19 +82,3 @@ class Forecaster:
         )
 
         return self.prediction
-
-    def save(self, saver: Saver) -> int:
-        """
-        Store the predicted values with a Saver object
-        
-        Parameters
-        ----------
-        saver
-            A Saver object that allow to save
-            the data in the way described in the object.
-        Returns
-        -------
-        int
-            The id number
-        """
-        return saver.save(self.prediction, str(self.model))
