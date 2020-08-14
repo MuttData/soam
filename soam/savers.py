@@ -15,6 +15,7 @@ from muttlib.utils import hash_str, make_dirs
 import pandas as pd
 from soam.constants import PARENT_LOGGER
 from soam.data_models import AbstractIDBase, ForecasterRuns, ForecastValues
+from soam.forecaster import Forecaster
 from sqlalchemy import engine
 from sqlalchemy.orm import sessionmaker
 
@@ -32,16 +33,19 @@ class Saver(ABC):
         pass
 
     @abstractmethod
-    def save(self, prediction: pd.DataFrame, model_data: str) -> int:
+    def save_forecaster(self, forecaster: Forecaster) -> int:
         """
-        This function will store the given data and the model parameters
+        This function will store the given data and the model from the forecaster
         
         Parameters
         ----------
-        prediction
-            A pandas DataFrame with the predicted values.
-        model_data
-            A string with the model name and it's parameters.
+        forecaster
+            A Forecaster object to store its data and model config.
+        
+        Returns
+        -------
+        int
+            stored id number
         """
         pass
 
@@ -60,19 +64,17 @@ class CSVSaver(Saver):
         """
         self.path = Path(path)
 
-    def save(self, prediction: pd.DataFrame, model_data: str) -> int:
+    def save_forecaster(self, forecaster: Forecaster) -> int:
         """
-        Store the given data in the constructed path
+        Store the forecaster data in the constructed path
         with the `prediction.csv`.
 
         If the path does not exist, it will be created.
 
         Parameters
         ----------
-        prediction
-            A pandas DataFrame with the predicted values.
-        model_data
-            A string with the model name and it's parameters.
+        forecaster
+            A Forecaster object to store its data and model config.
         Returns
         -------
         int
@@ -83,7 +85,7 @@ class CSVSaver(Saver):
         max_index = 0
 
         _ = make_dirs(self.path)
-        prediction.set_index
+
 
         if not (self.path / ("0" + PREDICTION_CSV)).is_file():
             prediction_path = self.path / ("0" + PREDICTION_CSV)
@@ -95,7 +97,7 @@ class CSVSaver(Saver):
             )
             prediction_path = self.path / (str(max_index) + PREDICTION_CSV)
 
-        prediction.to_csv(prediction_path, index=False)
+        forecaster.prediction.to_csv(prediction_path, index=False)
 
         return max_index
 
@@ -121,29 +123,35 @@ class DBSaver(Saver):
                     "alembic upgrade head"
                 )
 
-    def save(self, prediction: pd.DataFrame, model_data: str) -> int:
+    def save_forecaster(self, forecaster: Forecaster) -> int:
         """
-        Store the given data in the database for the schemas please check data_models.
-        The database migrations use alembic
+        Store the forecaster data in the database with the defined schema
+        in data_models. The database migrations use alembic
         
         Parameters
         ----------
-        prediction
-            A pandas DataFrame with the predicted values.
-        model_data
-            A string with the model name and it's parameters.
+        forecaster
+            A Forecaster object to store its data and model config.
         Returns
         -------
         int
             The id number
         """
-        insert_fr = ForecasterRuns(params=model_data, params_hash=hash_str(model_data))
-        run_id = self._insert_single(insert_fr)
-
-        prediction["run_id"] = run_id
-        self.db_client.insert_from_frame(prediction, ForecastValues.__tablename__)
+        save_prediction = forecaster.prediction.copy()
+        run_id = self.save_fr_run(forecaster)
+        save_prediction["run_id"] = run_id
+        self.db_client.insert_from_frame(save_prediction, ForecastValues.__tablename__)
 
         return run_id
+
+    def save_fr_run(self, forecaster: Forecaster) -> int:
+        """
+        Save the forecaster run configuration
+        """
+        insert_fr = ForecasterRuns(
+            params=str(forecaster.model), params_hash=hash_str(str(forecaster.model))
+        )
+        return self._insert_single(insert_fr)
 
     def _insert_single(self, element: AbstractIDBase) -> int:
         with session_scope(engine=self.db_client.get_engine()) as session:
