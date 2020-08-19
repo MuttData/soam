@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from decouple import AutoConfig
+from decouple import AutoConfig, config
 from muttlib.utils import make_dirs, template
 from pkg_resources import resource_string
 
@@ -53,6 +53,17 @@ def get_db_cred(setting_path: str = "settings.ini") -> dict:
     db_cred["host"] = config("DB_IP")
 
     return db_cred
+
+
+def get_slack_cred() -> dict:
+    """
+    Read the setting.ini file and retrieve the Slack credentials
+    """
+    slack_creds = {}
+
+    slack_creds["token"] = config("SLACK_TOKEN")
+
+    return slack_creds
 
 
 def get_db_uri(setting_path: str) -> str:

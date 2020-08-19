@@ -11,6 +11,7 @@ from typing import Optional
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
+from soam.constants import FORECAST_DATE, YHAT_COL
 
 # logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -75,8 +76,8 @@ class Forecaster:
         self.prediction.reset_index(level=0, inplace=True)
         self.prediction.rename(
             columns={
-                self.prediction.columns[0]: "forecast_date",
-                self.prediction.columns[1]: "yhat",
+                self.prediction.columns[0]: FORECAST_DATE,
+                self.prediction.columns[1]: YHAT_COL,
             },
             inplace=True,
         )

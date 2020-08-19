@@ -14,8 +14,15 @@ TOP_K_INFLUENCERS = 12
 PROJECT_NAME = "SoaM"
 DS_COL = "ds"
 Y_COL = "y"
-PRED_COLS = ["ds", "yhat", "yhat_lower", "yhat_upper", Y_COL]
+YHAT_COL = 'yhat'
+YHAT_LOWER_COL = 'yhat_lower'
+YHAT_UPPER_COL = 'yhat_upper'
+
+PRED_COLS = [DS_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL, Y_COL]
 SEED = 42
+
+YHAT_COL = "yhat"
+FORECAST_DATE = "forecast_date"
 
 # Status
 STATUS_ACTIVE = "active"
