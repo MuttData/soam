@@ -2,12 +2,10 @@
 
 """Utility functions."""
 from copy import deepcopy
-from datetime import datetime
 import logging
 import logging.config
+from pathlib import Path
 
-import jinja2
-from muttlib.utils import path_or_string
 import pandas as pd
 from pandas.tseries import offsets
 from soam.constants import PARENT_LOGGER
@@ -67,3 +65,13 @@ def sanitize_arg(v, default=None):
 def sanitize_arg_empty_dict(v):
     """Convenience function for `sanitize_arg(v, {})`"""
     return sanitize_arg(v, {})
+
+
+def get_file_path(path: Path, fn: str) -> Path:
+    """Find an available path for a file, using an index prefix"""
+    if not (path / ("0_" + fn)).is_file():
+        return path / ("0_" + fn)
+    else:
+        plot_files = path.glob('*' + fn)
+        max_index = max(int(plot.name.split("_")[0]) for plot in plot_files) + 1
+        return path / (f"{str(max_index)}_" + fn)
