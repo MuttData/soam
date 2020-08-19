@@ -66,6 +66,21 @@ def get_slack_cred() -> dict:
     return slack_creds
 
 
+def get_smtp_cred() -> dict:
+    """
+    Read the setting.ini file and retrieve the SMTP credentials
+    """
+    smtp_creds = {}
+
+    smtp_creds["user_address"] = config("SMTP_USER")
+    smtp_creds["password"] = config("SMTP_PASS")
+    smtp_creds["mail_from"] = config("SMTP_FROM")
+    smtp_creds["host"] = config("SMTP_HOST")
+    smtp_creds["port"] = config("SMTP_PORT")
+
+    return smtp_creds
+
+
 def get_db_uri(setting_path: str) -> str:
     db_cred = get_db_cred(setting_path)
 

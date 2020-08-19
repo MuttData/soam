@@ -1,389 +1,169 @@
 # mail_report.py
 """Mail creator and sender."""
-import io
-import logging
-import smtplib
-from datetime import timedelta
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import logging
 from os.path import basename
+from pathlib import Path
+import smtplib
+from typing import List, Union
 
-import pandas as pd
+from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
+from soam.constants import PARENT_LOGGER, PROJECT_NAME
 
-from soam.cfg import MAIL_TEMPLATE
-from soam.constants import (
-    DAILY_TIME_GRANULARITY,
-    DS_COL,
-    HOURLY_TIME_GRANULARITY,
-    PARENT_LOGGER,
-)
-from soam.forecast_plotter import anomaly_plot, plot_area_metrics
-from soam.forecaster import OUTLIER_SIGN_COL, OUTLIER_VALUE_COL, forecasts_fig_path
-from soam.helpers import AttributeHelperMixin
+DEFAULT_SUBJECT = "[{end_date}]Forecast report for {metric_name}"
+DEFAULT_SIGNATURE = PROJECT_NAME
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
-
-def send_mail(
-    smtp_credentials, mail_recipients, subject, mail_body, mime_image_list, attachments
-):
-    """Send."""
-    user = smtp_credentials.get('user_address')
-    password = smtp_credentials.get('password')
-    from_address = smtp_credentials['mail_from']
-    host = smtp_credentials['host']
-    port = smtp_credentials['port']
-    logger.info(
-        f"""About to send the following email:
-                'From: ' {from_address}
-                'To: ' {mail_recipients}
-                'Subject: ' {subject}
-                'Using host': {host} and port: {port}"""
-    )
-    logger.error(f'With the following body: \n {mail_body}')
-
-    msg_root = MIMEMultipart('related')
-    msg_root['From'] = from_address
-    msg_root['Subject'] = subject
-    msg_root['To'] = ', '.join(mail_recipients)
-
-    msg_alt = MIMEMultipart('alternative')
-    msg_root.attach(msg_alt)
-
-    msg_text = MIMEText(mail_body, 'html')
-    msg_alt.attach(msg_text)
-
-    for mim_img in mime_image_list:
-        msg_root.attach(mim_img)
-
-    for attachment in attachments:
-        with open(attachment, "rb") as f:
-            part = MIMEApplication(f.read(), Name=basename(attachment))
-        part['Content-Disposition'] = 'attachment; filename="%s"' % basename(attachment)
-        msg_root.attach(part)
-
-    with smtplib.SMTP(host, port) as server:
-        server.ehlo()
-        if user is not None and password is not None:
-            server.starttls()
-            server.ehlo()
-            server.login(user, password)
-        server.sendmail(from_address, mail_recipients, msg_root.as_string())
-    logger.info("Email sent succesfully")
+"""
+MailReport
+----------
+Class for building and sending a report via mail.
+"""
 
 
-def _build_subject_n_msg_body(
-    kpi,
-    end_date,
-    img_dict,
-    anomaly_range_stats,
-    anomaly_window,
-    granularity,
-    time_granularity,
-):
-    """Build body and subject."""
-    mail_kpi = kpi.mail_kpi
+class MailReport:
+    """
+        Builds and sends an email report.
+    """
 
-    s_time_gran = 'Daily' if time_granularity == DAILY_TIME_GRANULARITY else 'Hourly'
-    end_date_str = f'{end_date:%d-%b}'
-    end_date_hr = (
-        f'{end_date:%H} hs' if time_granularity == HOURLY_TIME_GRANULARITY else ''
-    )
-    subject = (
-        f"{anomaly_range_stats.get('nr_anomalies')} {s_time_gran} Anomalies "
-        f"detected in {mail_kpi} "
-        f"{end_date_str} {end_date_hr}"
-    )
-    logger.debug(f"Mail subject:\n {subject}")
-
-    jparams = {
-        'kpi': mail_kpi,
-        'end_date': end_date_str,
-        'img_dict': img_dict,
-        'anomaly_range_stats': anomaly_range_stats,
-        'anomaly_window': anomaly_window,
-        'granularity': granularity,
-        'time_granularity': time_granularity,
-    }
-    msg_body = getattr(MAIL_TEMPLATE, 'mail_body')(**jparams)
-    logger.debug(f"html mail body:\n {msg_body}")
-    return subject, msg_body
-
-
-def _get_mime_images(
-    kpi,
-    granularity,
-    factor_mgr,
-    start_date,
-    end_date,
-    anomaly_range_stats,
-    anomaly_window,
-    forecast_df,
-    time_granularity,
-    extra_info,
-):
-    """Extract images from local dir paths."""
-    mime_img_dict = {}  # type: ignore
-    mime_img_list = []  # type: ignore
-    if anomaly_range_stats['nr_anomalies'] == 0:
-        return mime_img_dict, mime_img_list
-
-    factor_levels = forecast_df['factor_val'].unique().tolist()
-    logger.info(f"FACTOR LEVELS: {factor_levels}")
-
-    # Generate outlier images
-    outliers_imgs = {}  # type: ignore
-
-    # Generate extra images
-    extra_imgs = {}  # type: ignore
-
-    for factor_val in factor_levels:
-        df_forecast = forecast_df[forecast_df['factor_val'] == factor_val]
-        # Anomaly plot
-        fig = anomaly_plot(
-            kpi_plot_name=kpi.anomaly_plot_ylabel,
-            kpi_name=kpi.mail_kpi,
-            granularity_val=factor_val,
-            forecast_df=df_forecast,
-            end_date=end_date,
-            anomaly_window=anomaly_window,
-            time_granularity=time_granularity,
-        )
-
-        out_fval = factor_val
-        end_date_hour = True if time_granularity == HOURLY_TIME_GRANULARITY else False
-        fig_p = forecasts_fig_path(
-            target_col=kpi.name,
-            start_date=start_date,
-            end_date=end_date,
-            time_granularity=time_granularity,
-            granularity=granularity,
-            suffix=out_fval,
-            as_posix=False,
-            end_date_hour=end_date_hour,
-        )
-
-        logger.info(f"Saving figure to {fig_p}...")
-        fig.savefig(fig_p, bbox_inches='tight')
-        outliers_imgs[factor_val] = fig_p
-
-        # Extra plot
-        if extra_info is not None:
-            if extra_imgs.get(factor_val, None) is None:
-                extra_imgs[factor_val] = []
-            for key in extra_info.keys():
-                logger.info(f'Creating extra plot for {key}')
-                ex_fig = plot_area_metrics(
-                    extra_info[key], factor_mgr.factor_col, factor_val
-                )
-                if ex_fig is None:
-                    logger.warning(
-                        f'Skipping {factor_val} for {key} because it has no data'
-                    )
-                    continue
-
-                ex_fig_p = forecasts_fig_path(
-                    target_col=kpi.name,
-                    start_date=start_date,
-                    end_date=end_date,
-                    time_granularity=time_granularity,
-                    granularity=granularity,
-                    suffix=f"{out_fval}_{key}_extra",
-                    as_posix=False,
-                    end_date_hour=end_date_hour,
-                )
-
-                logger.info(f"Saving extra figure to {ex_fig_p}...")
-                ex_fig.savefig(ex_fig_p, bbox_inches='tight')
-                extra_imgs[factor_val].append(ex_fig_p)
-
-    for factor_val, outliers_img in outliers_imgs.items():
-        if outliers_img.is_file():
-            if mime_img_dict.get('outliers', None) is None:
-                mime_img_dict['outliers'] = {}
-                mime_img_dict['extra'] = {}
-            with outliers_img.open('rb') as img_file:
-                msg_image = MIMEImage(img_file.read())
-                mime_img_list.append(msg_image)
-            img_name = f'{kpi.name_spanish}_{outliers_img.stem}'
-            msg_image.add_header('Content-Id', f'<{img_name}>')
-            mime_img_dict['outliers'][factor_val] = img_name
-            if extra_imgs.get(factor_val, None) is not None:
-                mime_img_dict['extra'][factor_val] = []
-                for extra_img in extra_imgs[factor_val]:
-                    with extra_img.open('rb') as img_file:
-                        msg_image = MIMEImage(img_file.read())
-                        mime_img_list.append(msg_image)
-                    img_name = f'{kpi.name_spanish}_{extra_img.stem}'
-                    msg_image.add_header('Content-Id', f'<{img_name}>')
-                    mime_img_dict['extra'][factor_val].append(img_name)
-
-    return mime_img_dict, mime_img_list
-
-
-def _format_link(factor):
-    return f'<a href=#{factor}>{factor}</a>'
-
-
-def _anomaly_range_statistics(outliers_data, granularity, end_date, time_granularity):
-    """Compute ouptut statistics string from anomalies data."""
-    df = outliers_data
-    d = {'nr_anomalies': 0, 'nr_anomalies_news': 0}
-
-    if not df.empty:
-        d['anomaly_dates'] = len(df[DS_COL].unique())
-        d['nr_anomalies'] = len(df)
-        d['pos_anomalies'] = len(df[df[f'{OUTLIER_SIGN_COL}'] == 1])
-        d['neg_anomalies'] = len(df[df[f'{OUTLIER_SIGN_COL}'] == -1])
-        worst_anomaly = (
-            df[df[OUTLIER_VALUE_COL] == df[OUTLIER_VALUE_COL].max()][DS_COL]
-            .head(1)
-            .squeeze()
-        )
-        d['worst_anomaly'] = worst_anomaly.strftime('%Y-%b-%d')
-        if time_granularity == HOURLY_TIME_GRANULARITY:
-            d['worst_anomaly_hour'] = worst_anomaly.strftime('%H')
-
-        # News
-        news_start = pd.Timestamp(end_date).replace(hour=0)
-        df_news = df[df[DS_COL] >= news_start]
-        d['nr_anomalies_news'] = len(df_news)
-        d['pos_anomalies_news'] = len(df_news[df_news[f'{OUTLIER_SIGN_COL}'] == 1])
-        d['neg_anomalies_news'] = len(df_news[df_news[f'{OUTLIER_SIGN_COL}'] == -1])
-
-        # Build summary table
-        pd.set_option('display.max_colwidth', -1)
-        df = (
-            df.groupby([DS_COL, f'{OUTLIER_SIGN_COL}'])
-            .agg({'factor_val': lambda x: ', '.join(x.apply(_format_link))})
-            .reset_index()
-        )
-        df = df.rename(
-            columns={
-                DS_COL: 'Date',
-                f'{OUTLIER_SIGN_COL}': 'Impact',
-                'factor_val': 'Game',
-            }
-        )
-
-        str_io = io.StringIO()
-        df.to_html(
-            buf=str_io,
-            classes='table table-striped',
-            index=False,
-            justify='center',
-            escape=False,
-        )
-        d['anomaly_summary'] = str_io.getvalue()  # type: ignore
-
-    return d
-
-
-def send_mail_report(
-    smtp_credentials,
-    mail_recipients,
-    kpi,
-    granularity,
-    factor_mgr,
-    start_date,
-    end_date,
-    anomaly_window,
-    outliers_data,
-    forecast_df,
-    time_granularity,
-    extra_info=None,
-    email_attachments=None,
-):
-    """Send mail report."""
-    logger.info(f"Sending email report to: {mail_recipients}")
-    anomaly_range_stats = _anomaly_range_statistics(
-        outliers_data, granularity, end_date, time_granularity
-    )
-    if time_granularity == HOURLY_TIME_GRANULARITY:
-        if anomaly_range_stats['nr_anomalies_news'] == 0:
-            logger.info("No anomalies found today. No need to send any alert.")
-            return
-    mime_img_dict, mime_img_list = _get_mime_images(
-        kpi,
-        granularity,
-        factor_mgr,
-        start_date,
-        end_date,
-        anomaly_range_stats=anomaly_range_stats,
-        anomaly_window=anomaly_window,
-        forecast_df=forecast_df,
-        time_granularity=time_granularity,
-        extra_info=extra_info,
-    )
-    subject, msg_body = _build_subject_n_msg_body(
-        kpi,
-        end_date,
-        mime_img_dict,
-        anomaly_range_stats,
-        anomaly_window,
-        granularity,
-        time_granularity,
-    )
-
-    send_mail(
-        smtp_credentials,
-        mail_recipients,
-        subject,
-        msg_body,
-        mime_img_list,
-        email_attachments,
-    )
-
-
-class MailReport(AttributeHelperMixin):
-    def __init__(self, mail_recipients_list, credentials):
+    def __init__(self, mail_recipients_list: List[str], metric_name: str):
+        """
+        Create MailReport object.
+               
+        Parameters
+        ----------
+        mail_recipients_list
+            Array of the mails to send the report to.
+        metric_name
+            Name of the metric being forecasted.
+        """
         self.mail_recipients_list = mail_recipients_list
+        credentials = get_smtp_cred()
         self.credentials = credentials
-        self.agg_forecast_df = []  # type: ignore
-
-    def store_forecast_data(self, forecaster, factor_conf, factor_mgr):
-        forecast_df = forecaster.forecast
-        forecast_df['factor_val'] = factor_conf[factor_mgr.factor_col]
-        self.agg_forecast_df.append(forecast_df)
-
-    @property
-    def aggregated_forecast_data(self):
-        return pd.concat(self.agg_forecast_df)
+        self.metric_name = metric_name
 
     def send(
         self,
-        kpi,
-        granularity,
-        factor_mgr,
-        time_range_conf,
-        forecaster_insertion_id,
-        extra_info,
-        email_attachments,
+        current_date: str,
+        plot_filename: Union[Path, str],
+        subject: str = DEFAULT_SUBJECT,
+        signature: str = DEFAULT_SIGNATURE,
     ):
-        try:
-            forecast_df = self.aggregated_forecast_data
-        except ValueError:
-            logger.warning("No data to do mail report!")
-            return
+        """
+        Send email report.
+        
+        Parameters
+        ----------
+        current_date
+            date the report will be sent.
+        plot_filename
+            str or pathlib.Path of the forecast plot to send.
+        subject
+            subject of the mail sent.
+        signature
+            signature with which to end the mail.
+        """
+        logger.info(f"Sending email report to: {self.mail_recipients_list}")
 
-        outliers_data = forecast_df.query(
-            f'{DS_COL} in @time_range_conf.anomaly_window_dates & {OUTLIER_SIGN_COL} != 0'
+        mime_img, mime_img_name = self._get_mime_images(Path(plot_filename))
+        subject, msg_body = self._build_subject_n_msg_body(
+            subject, signature, self.metric_name, current_date, mime_img_name,
         )
 
-        send_mail_report(
+        self._send_mail(
             self.credentials,
             self.mail_recipients_list,
-            kpi,
-            granularity,
-            factor_mgr,
-            time_range_conf.start_date,
-            time_range_conf.end_date,
-            time_range_conf.anomaly_window,
-            outliers_data,
-            forecast_df,
-            time_granularity=time_range_conf.time_granularity,
-            extra_info=extra_info,
-            email_attachments=email_attachments,
+            subject,
+            msg_body,
+            [mime_img],
+            [],
         )
+
+    def _send_mail(
+        self,
+        smtp_credentials,
+        mail_recipients,
+        subject,
+        mail_body,
+        mime_image_list,
+        attachments,
+    ):
+        """Send."""
+        user = smtp_credentials.get('user_address')
+        password = smtp_credentials.get('password')
+        from_address = smtp_credentials['mail_from']
+        host = smtp_credentials['host']
+        port = smtp_credentials['port']
+        logger.info(
+            f"""About to send the following email:
+                    'From: ' {from_address}
+                    'To: ' {mail_recipients}
+                    'Subject: ' {subject}
+                    'Using host': {host} and port: {port}"""
+        )
+        logger.error(f'With the following body: \n {mail_body}')
+
+        msg_root = MIMEMultipart('related')
+        msg_root['From'] = from_address
+        msg_root['Subject'] = subject
+        msg_root['To'] = ', '.join(mail_recipients)
+
+        msg_alt = MIMEMultipart('alternative')
+        msg_root.attach(msg_alt)
+
+        msg_text = MIMEText(mail_body, 'html')
+        msg_alt.attach(msg_text)
+
+        for mim_img in mime_image_list:
+            msg_root.attach(mim_img)
+
+        for attachment in attachments:
+            with open(attachment, "rb") as f:
+                part = MIMEApplication(f.read(), Name=basename(attachment))
+            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(
+                attachment
+            )
+            msg_root.attach(part)
+
+        with smtplib.SMTP(host, port) as server:
+            server.ehlo()
+            if user is not None and password is not None:
+                server.starttls()
+                server.ehlo()
+                server.login(user, password)
+            server.sendmail(from_address, mail_recipients, msg_root.as_string())
+        logger.info("Email sent succesfully")
+
+    def _build_subject_n_msg_body(
+        self, subject, signature, metric_name, end_date, mime_img
+    ):
+        """Build body and subject."""
+        if subject == DEFAULT_SUBJECT:
+            subject = subject.format(end_date=end_date, metric_name=metric_name)
+        logger.debug(f"Mail subject:\n {subject}")
+
+        jparams = {
+            'signature': signature,
+            'metric_name': metric_name,
+            'end_date': end_date,
+            'mime_img': mime_img,
+        }
+        msg_body = getattr(MAIL_TEMPLATE, 'mail_body')(**jparams)
+        logger.debug(f"html mail body:\n {msg_body}")
+        return subject, msg_body
+
+    def _get_mime_images(self, plot_filename: Path):
+        """Extract images from local dir paths."""
+        with plot_filename.open('rb') as img_file:
+            msg_image = MIMEImage(img_file.read())
+            img_name = str(plot_filename)
+            msg_image.add_header('Content-Id', f'<{img_name}>')
+
+        return msg_image, img_name
+
+    def _format_link(self, factor):
+        return f'<a href=#{factor}>{factor}</a>'

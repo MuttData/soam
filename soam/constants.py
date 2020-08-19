@@ -1,15 +1,6 @@
 # constants.py
 from datetime import datetime, timedelta
 
-# CLI defaults
-FORECASTER_FUTURE_WINDOW = 15
-FORECASTER_FUTURE_WINDOW_CUMSUM_KPI = 30
-FORECASTER_TRAIN_WINDOW = 90
-# ANOMALY_WINDOW = 7
-CLF_TRAIN_WINDOW = 7
-SAMPLE_SIZE = 2
-TOP_K_INFLUENCERS = 12
-
 # Global
 PROJECT_NAME = "SoaM"
 DS_COL = "ds"
@@ -21,8 +12,11 @@ YHAT_UPPER_COL = 'yhat_upper'
 PRED_COLS = [DS_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL, Y_COL]
 SEED = 42
 
-YHAT_COL = "yhat"
 FORECAST_DATE = "forecast_date"
+
+SEED = 42
+
+OUTLIER_SIGN_COL = 'sign'
 
 # Status
 STATUS_ACTIVE = "active"
@@ -33,6 +27,7 @@ HOURS = 24
 END_HOUR = 23
 HOURLY_TIME_GRANULARITY = "H"
 DAILY_TIME_GRANULARITY = "D"
+MONTHLY_TIME_GRANULARITY = "M"
 
 TIME_GRANULARITY_NAME_MAP = {
     HOURLY_TIME_GRANULARITY: "hourly",
@@ -52,41 +47,88 @@ YESTERDAY = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 # Aggregated mail report constants
 AGGREGATED_MAIL_IMAGES = ["aggregated_summary"]
 
+# Plot common config keys
+
+HISTORY = "history"
+FORECAST = "forecast"
+OUTLIER = "outlier"
+COLORS = "colors"
+ANOMALY_PLOT = "anomaly_plot"
+LABELS = "labels"
+TITLE = "title"
+ANOMALY_WIN = "anomaly_win"
+ANOMALY_WIN_FILL = "anomaly_win_fill"
+HISTORY_FILL = "history_fill"
+OUTLIERS_HISTORY = "outliers_history"
+OUTLIERS_POSITIVE = "outliers_positive"
+OUTLIERS_NEGATIVE = "outliers_negative"
+AXIS_GRID = "axis_grid"
+
+
+# Daily and Hourly config
+FIG_SIZE = "fig_size"
+MAJOR_INTERVAL = "major_interval"
+MINOR_INTERVAL = "minor_locator_interval"
+FUTURE_WINDOW = "future_window"
+HISTORY_WINDOW = "history_window"
+FONT_SIZE = "font_size"
+MINOR_LABEL_ROTATION = "minor_labelrotation"
+MAJOR_PAD = "major_pad"
+DATE_FORMAT = "date_format"
+
 # Plots config
 PLOT_CONFIG = {
-    "anomaly_plot": {
-        "daily_fig_size": (10, 6),
-        "hourly_fig_size": (13, 9),
-        "colors": {
-            "history": "k",
-            "history_fill": "gray",
-            "anomaly_win": "dodgerblue",
-            "anomaly_win_fill": "lightskyblue",
-            "forecast": "darkviolet",
-            "outliers_history": "black",
-            "outliers_positive": "green",
-            "outliers_negative": "red",
-            "axis_grid": "gray",
+    ANOMALY_PLOT: {
+        HOURLY_TIME_GRANULARITY: {
+            FIG_SIZE: (13, 9),
+            MAJOR_INTERVAL: 2,
+            FUTURE_WINDOW: 5,
+            HISTORY_WINDOW: 14,
+            FONT_SIZE: 7,
+            MINOR_LABEL_ROTATION: 40,
+            MAJOR_PAD: 25,
+            MINOR_INTERVAL: 8,
+            DATE_FORMAT: "%Y-%b-%d %Hhs",
         },
-        "daily_major_interval": 3,
-        "daily_future_window": 15,  # Number of future days posterior to anomaly-win
-        "daily_history_window": 60,  # Number of history days prior to anomaly-win
-        "hourly_major_interval": 2,
-        "hourly_history_window": 14,
-        "hourly_future_window": 5,
-        "hourly_font_size": 7,
-        "hourly_minor_labelrotation": 40,
-        "hourly_major_pad": 25,
-        "hourly_minor_locator_interval": 8,
-        "labels": {
+        DAILY_TIME_GRANULARITY: {
+            FIG_SIZE: (10, 6),
+            MAJOR_INTERVAL: 3,
+            FUTURE_WINDOW: 15,
+            HISTORY_WINDOW: 60,
+            FONT_SIZE: 7,
+            DATE_FORMAT: "%Y-%b-%d",
+        },
+        MONTHLY_TIME_GRANULARITY: {
+            FIG_SIZE: (13, 9),
+            MAJOR_INTERVAL: 2,
+            FUTURE_WINDOW: 5,
+            HISTORY_WINDOW: 14,
+            FONT_SIZE: 7,
+            MINOR_LABEL_ROTATION: 40,
+            MAJOR_PAD: 25,
+            MINOR_INTERVAL: 8,
+            DATE_FORMAT: "%Y-%b",
+        },
+        COLORS: {
+            HISTORY: "k",
+            HISTORY_FILL: "gray",
+            ANOMALY_WIN: "dodgerblue",
+            ANOMALY_WIN_FILL: "lightskyblue",
+            FORECAST: "darkviolet",
+            OUTLIERS_HISTORY: "black",
+            OUTLIERS_POSITIVE: "green",
+            OUTLIERS_NEGATIVE: "red",
+            AXIS_GRID: "gray",
+        },
+        LABELS: {
             "xlabel": "Date",
-            "ylabel": "{kpi_plot_name} ({base_10_scale_zeros}s)",
-            "history": "History",
-            "anomaly_win": "Last {anomaly_window} days",
-            "forecast": "Forecast",
-            "outlier": "Outlier: {date}",
+            "ylabel": "{metric_name} ({base_10_scale_zeros}s)",
+            HISTORY: "History",
+            ANOMALY_WIN: "Last {anomaly_window} days",
+            FORECAST: "Forecast",
+            OUTLIER: "Outlier: {date}",
         },
-        "title": "Anomalies for {kpi} - {granularity_val} {start_date:%d-%b} to {end_date:%d-%b}",
+        "title": "{plot_type} for {metric_name} {start_date:%d-%b} to {end_date:%d-%b}",
     }
 }
 
