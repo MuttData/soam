@@ -1,20 +1,23 @@
 # helpers.py
 """Project specific helper functions."""
 from abc import ABC
+from contextlib import contextmanager
 from datetime import timedelta
 import logging
 from pathlib import Path
 
-# TODO change range_datetime import, from muttlib.utils
-from muttlib.dbconn import session_scope
 from muttlib.utils import hash_str, make_dirs, str_to_datetime
 from pandas.tseries import offsets
 from sklearn.base import BaseEstimator as AttributeHelperMixin
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import sessionmaker
+
+
 from soam.constants import (
     DAILY_TIME_GRANULARITY,
     HOURLY_TIME_GRANULARITY,
     PARENT_LOGGER,
-    TIME_GRANULARITIES,
+    TIME_GRANULARITIES
 )
 from soam.utils import range_datetime
 
@@ -303,3 +306,22 @@ class AbstractAnalisysRun(AttributeHelperMixin, ABC):
                 run_ids[db_name] = run_obj.id
 
         return run_ids
+
+
+# TODO remove this function when added to muttlib
+@contextmanager
+def session_scope(engine: Engine, **session_kw):
+    """Provide a transactional scope around a series of operations."""
+
+    Session = sessionmaker(bind=engine)
+    session = Session(**session_kw)
+
+    try:
+        yield session
+        session.commit()
+    except Exception as err:
+        logger.exception(err)
+        session.rollback()
+        raise
+    finally:
+        session.close()

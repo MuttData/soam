@@ -6,8 +6,9 @@ from pkg_resources import resource_string
 
 SOAM_RUN_TABLE_BASENAME = "soam_runs"
 SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_run_factor_conf"
-FORECASTER_RUNS_TABLE_BASENAME = "forecaster_runs"
+STEP_RUNS_TABLE_BASENAME = "steps_runs"
 FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
+EXTRACT_VALUES_TABLE_BASENAME = "extract_values"
 
 # Setup paths
 _p = Path("/tmp/soam/")
@@ -29,8 +30,10 @@ SOAM_RUN_TABLE = f"{table_name_preffix}{SOAM_RUN_TABLE_BASENAME}"
 SOAM_RUN_FACTOR_CONF_TABLE = (
     f"{table_name_preffix}{SOAM_RUN_FACTOR_CONF_TABLE_BASENAME}"
 )
-FORECASTER_RUNS_TABLE = f"{table_name_preffix}{FORECASTER_RUNS_TABLE_BASENAME}"
+STEP_RUNS_TABLE = f"{table_name_preffix}{STEP_RUNS_TABLE_BASENAME}"
 FORECASTER_VALUES_TABLE = f"{table_name_preffix}{FORECASTER_VALUES_TABLE_BASENAME}"
+EXTRACT_VALUES_TABLE = f"{table_name_preffix}{EXTRACT_VALUES_TABLE_BASENAME}"
+
 
 # Mail report
 MAIL_TEMPLATE = template(
