@@ -3,21 +3,26 @@ Saver
 ----------
 `Saver` is an abstract class that create a way to save values.
 """
-
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
 import logging
 from pathlib import Path
 from typing import Union
 
 from muttlib.dbconn import BaseClient
 from muttlib.utils import hash_str, make_dirs
-import pandas as pd
 from soam.constants import PARENT_LOGGER
-from soam.data_models import AbstractIDBase, ForecasterRuns, ForecastValues
+from soam.data_models import (
+    AbstractIDBase,
+    ForecastValues,
+    PipelineRunSchema,
+    StepRunSchema,
+    StepTypeEnum
+)
 from soam.forecaster import Forecaster
-from sqlalchemy import engine
-from sqlalchemy.orm import sessionmaker
+from soam.helpers import session_scope
+from soam.runner import PipelineRun, StepRun
+from soam.step import Step
+from soam.utils import get_file_path
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -33,28 +38,73 @@ class Saver(ABC):
         pass
 
     @abstractmethod
-    def save_forecaster(self, forecaster: Forecaster) -> int:
+    def save_forecaster_impl(self, forecaster: Forecaster):
         """
-        This function will store the given data and the model from the forecaster
-        
+        This function will store the given data and the model from the forecaster.
+
         Parameters
         ----------
         forecaster
             A Forecaster object to store its data and model config.
-        
-        Returns
-        -------
-        int
-            stored id number
         """
+
+    def save_single_step(self, step: Step, run_id: str):
+        """
+        Store the step data.
+
+        Parameters
+        ----------
+        step
+            A Step object (such as a Forecaster) to store its data and model config.
+        run_id
+            Name of the pipeline created to store only this run.
+        """
+        pipeline_run = PipelineRun(run_id)
+        self.save_pipeline_run(pipeline_run)
+        step_run = StepRun(step, pipeline_run)
+        self.save_step_run(step_run)
+
+    def save_pipeline_run(self, pipeline_run: PipelineRun):
+        """Save a pipeline run object without steps.
+
+        Args:
+            pipeline_run (PipelineRun): PipelineRun object.
+        """
+
+    @abstractmethod
+    def save_step_run(self, step_run: StepRun):
+        """Save a StepRun.
+
+        This function should use get_step_save_op and get_step_type to save the
+        Step data.
+
+        Args:
+            step_run (StepRun): Step data.
+        """
+
+
+    def get_step_save_op(self, step: Step):
+        save_ops = {StepTypeEnum.forecast: self.save_forecaster_impl}
+        step_type = self.get_step_type(step)
+        save_op = save_ops.get(step_type, self.save_noop)
+        return save_op
+
+    def save_noop(self, *args, **kwargs):
         pass
+
+    def get_step_type(self, step: Step):
+        if isinstance(step, Forecaster):
+            step_type = StepTypeEnum.forecast
+        else:
+            step_type = StepTypeEnum.custom
+        return step_type
 
 
 class CSVSaver(Saver):
     def __init__(self, path: Union[str, Path]):
         """
         Create a saver object to store the predicted data in a csv file
-        
+
         Parameters
         ----------
         path
@@ -64,7 +114,16 @@ class CSVSaver(Saver):
         """
         self.path = Path(path)
 
-    def save_forecaster(self, forecaster: Forecaster) -> int:
+    def save_step_run(self, step_run: StepRun):
+        """Save a step run data to csv.
+
+        Args:
+            step_run (StepRun): Step data.
+        """
+        save_op = self.get_step_save_op(step_run.step)
+        save_op(step_run.step, step_run.pipeline_run.run_id)
+
+    def save_forecaster_impl(self, forecaster: Forecaster, run_id: str):
         """
         Store the forecaster data in the constructed path
         with the `prediction.csv`.
@@ -76,30 +135,11 @@ class CSVSaver(Saver):
         forecaster
             A Forecaster object to store its data and model config.
         Returns
-        -------
-        int
-            The id number
-
         """
-        PREDICTION_CSV = "_prediction.csv"
-        max_index = 0
-
+        PREDICTION_CSV_SUFFIX = f"{run_id}_prediction.csv"
         _ = make_dirs(self.path)
-
-
-        if not (self.path / ("0" + PREDICTION_CSV)).is_file():
-            prediction_path = self.path / ("0" + PREDICTION_CSV)
-
-        else:
-            predictions_files = self.path.glob("*_prediction.csv")
-            max_index = (
-                max(int(pred.name.split("_")[0]) for pred in predictions_files) + 1
-            )
-            prediction_path = self.path / (str(max_index) + PREDICTION_CSV)
-
+        prediction_path = get_file_path(self.path, PREDICTION_CSV_SUFFIX)
         forecaster.prediction.to_csv(prediction_path, index=False)
-
-        return max_index
 
 
 class DBSaver(Saver):
@@ -107,7 +147,7 @@ class DBSaver(Saver):
         """
         Create a DBSaver object and check if the database
         contains the tables it expect to store the data
-        
+
         Parameters
         ----------
         base_client
@@ -123,35 +163,50 @@ class DBSaver(Saver):
                     "alembic upgrade head"
                 )
 
-    def save_forecaster(self, forecaster: Forecaster) -> int:
-        """
-        Store the forecaster data in the database with the defined schema
-        in data_models. The database migrations use alembic
-        
-        Parameters
-        ----------
-        forecaster
-            A Forecaster object to store its data and model config.
-        Returns
-        -------
-        int
-            The id number
-        """
+    def save_forecaster_impl(self, forecaster: Forecaster, step_run_id: int):
         save_prediction = forecaster.prediction.copy()
-        run_id = self.save_fr_run(forecaster)
-        save_prediction["run_id"] = run_id
+        save_prediction["step_run_id"] = step_run_id
         self.db_client.insert_from_frame(save_prediction, ForecastValues.__tablename__)
 
-        return run_id
-
-    def save_fr_run(self, forecaster: Forecaster) -> int:
+    def save_step_run(self, step_run: StepRun):
         """
         Save the forecaster run configuration
         """
-        insert_fr = ForecasterRuns(
-            params=str(forecaster.model), params_hash=hash_str(str(forecaster.model))
+        save_op = self.get_step_save_op(step_run)
+        step_type = self.get_step_type(step_run)
+
+        run_id = self.get_pipeline_run_id(step_run.pipeline_run)
+        insert_fr = StepRunSchema(
+            params=repr(step_run),
+            params_hash=hash_str(repr(step_run)),
+            step_type=step_type,
+            run_id=run_id,
         )
-        return self._insert_single(insert_fr)
+        step_run_id = self._insert_single(insert_fr)
+        save_op(step_run.step, step_run_id)
+
+    def save_pipeline_run(self, pipeline_run: PipelineRun):
+        """
+        Save the forecaster run configuration
+        """
+        insert_fr = PipelineRunSchema(
+            run_id=pipeline_run.run_id,
+            start_datetime=pipeline_run.start_datetime,
+            end_datetime=pipeline_run.end_datetime,
+        )
+        self._insert_single(insert_fr)
+
+    def get_pipeline_run_id(self, pipeline_run: PipelineRun):
+        if pipeline_run is None:
+            return None
+        with session_scope(engine=self.db_client.get_engine()) as session:
+            pr = (
+                session.query(PipelineRunSchema)
+                .filter(PipelineRunSchema.run_id == pipeline_run.run_id)
+                .one_or_none()
+            )
+            rv = None if pr is None else pr.id
+            return rv
 
     def _insert_single(self, element: AbstractIDBase) -> int:
         with session_scope(engine=self.db_client.get_engine()) as session:
@@ -161,21 +216,3 @@ class DBSaver(Saver):
 
         return run_id
 
-
-# TODO remove this function when added to muttlib
-@contextmanager
-def session_scope(engine: engine.Engine, **session_kw):
-    """Provide a transactional scope around a series of operations."""
-
-    Session = sessionmaker(bind=engine)
-    session = Session(**session_kw)
-
-    try:
-        yield session
-        session.commit()
-    except Exception as err:
-        logger.exception(err)
-        session.rollback()
-        raise
-    finally:
-        session.close()

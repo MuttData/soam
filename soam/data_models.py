@@ -1,22 +1,25 @@
 # data_models.py
 
+from contextlib import contextmanager
 from datetime import datetime
+import enum
 import logging
 
-from soam.cfg import FORECASTER_RUNS_TABLE, FORECASTER_VALUES_TABLE
 from sqlalchemy import (
     Column,
     DateTime,
+    Enum,
     Float,
     ForeignKey,
     Integer,
+    String,
     Text,
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
 
-
+from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_RUN_TABLE, STEP_RUNS_TABLE
 
 def now_getter():
     return datetime.now()
@@ -70,17 +73,38 @@ class AbstractRunBase(AbstractIDBase):  # pylint: disable=too-few-public-methods
     params_hash = Column(Text, nullable=False)
 
 
-class ForecasterRuns(AbstractRunBase):
+class PipelineRunSchema(AbstractIDBase):
 
-    __tablename__ = FORECASTER_RUNS_TABLE
+    __tablename__ = SOAM_RUN_TABLE
+
+    run_id = Column(String, unique=True, index=True)
+    start_datetime = Column(DateTime, nullable=True)
+    end_datetime = Column(DateTime, nullable=True)
+
+
+class StepTypeEnum(enum.Enum):
+    extract = "extract"
+    preprocess = "preprocess"
+    forecast = "forecast"
+    postprocess = "postprocess"
+    custom = "custom"
+
+
+class StepRunSchema(AbstractRunBase):
+
+    __tablename__ = STEP_RUNS_TABLE
+    __table_args__ = (UniqueConstraint("run_id"),)
+
+    run_id = Column(Integer, ForeignKey(f"{SOAM_RUN_TABLE}.id"), nullable=False)
+    step_type = Column(Enum(StepTypeEnum), nullable=False)
 
 
 class ForecastValues(AbstractIDBase):
 
     __tablename__ = FORECASTER_VALUES_TABLE
-    __table_args__ = (UniqueConstraint("run_id", "forecast_date"),)
+    __table_args__ = (UniqueConstraint("step_run_id", "forecast_date"),)
 
-    run_id = Column(Integer, ForeignKey(f"{FORECASTER_RUNS_TABLE}.id"), nullable=False)
+    step_run_id = Column(Integer, ForeignKey(f"{STEP_RUNS_TABLE}.id"), nullable=False)
     forecast_date = Column(DateTime, nullable=False)
     yhat = Column(Float, nullable=False)
     yhat_lower = Column(Float)
@@ -89,3 +113,4 @@ class ForecastValues(AbstractIDBase):
     trend = Column(Float)
     outlier_value = Column(Float)
     outlier_sign = Column(Float)
+

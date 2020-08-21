@@ -5,18 +5,17 @@ Forecaster
 `Forecaster` is a main class of `SoaM`. It handle everything of the forecast task.
 """
 
-# import logging
 from typing import Optional
 
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
+
+from soam.step import Step
 from soam.constants import FORECAST_DATE, YHAT_COL
 
-# logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
-
-class Forecaster:
+class Forecaster(Step):
     def __init__(self, model: ForecastingModel):
         """
         A Forecaster is an object that is meant to handle models, data and storages.
@@ -30,13 +29,17 @@ class Forecaster:
         self.prediction = pd.DataFrame
         self.model = model
 
+    def __repr__(self):
+
+        return f"{self.model}"
+
     def run(
         self,
         raw_series: pd.DataFrame = None,
         input_length: Optional[int] = 1,
         output_length: int = 1,
         *args,
-        **kwargs
+        **kwargs,
     ) -> pd.DataFrame:
         """
         Execute fit and predict with Darts models,
