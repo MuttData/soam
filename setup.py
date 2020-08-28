@@ -19,7 +19,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     packages=["soam"],
-    package_data={"soam": ["resources/*.html"]},
+    package_data={"soam": ["resources/*.html", "templates/*", "db_migrations"]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -35,6 +35,9 @@ setuptools.setup(
         "darts",
         "alembic",
         "python-decouple",
+        "click",
+        "cookiecutter",
     ],
     dependency_links=["git+https://gitlab.com/mutt_data/muttlib"],
+    entry_points={'console_scripts': ['soam = soam.console:cli']},
 )

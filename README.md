@@ -53,6 +53,11 @@ In this last stage or stages we can work on the forecasts we generated for examp
 
 * Forecaster : here is a [notebook](./notebook/examples/forecaster.ipynb) using and explaining the forecaster stage.
 
+## SoaM CLI
+After installing SoaM locally (for example with `pip install soam`), you'll have some commands available:
+
+* `soam init --output`, create a sample project which is ready to use SoaM. `cookiecutter` will then ask for most parameters via prompt (such as package and project name).
+
 ## Database management
 For database storing we use some complementary tools:
 * [muttlib.dbcon](https://gitlab.com/mutt_data/muttlib/) for database connections.

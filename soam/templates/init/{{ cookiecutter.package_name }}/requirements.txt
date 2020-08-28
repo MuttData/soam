@@ -1,0 +1,5 @@
+python-decouple
+pandas
+darts
+git+https://gitlab.com/mutt_data/muttlib.git
+soam
