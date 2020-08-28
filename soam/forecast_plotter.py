@@ -6,7 +6,6 @@ from typing import Union
 
 import pandas as pd
 from soam.constants import DAILY_TIME_GRANULARITY, DS_COL, FORECAST_DATE, PARENT_LOGGER
-from soam.forecaster import Forecaster
 from soam.plot_utils import create_forecast_figure
 from soam.utils import get_file_path
 
@@ -34,7 +33,10 @@ class ForecastPlotter:
         self.metric_name = metric_name
 
     def plot(
-        self, forecaster: Forecaster, time_granularity: str = DAILY_TIME_GRANULARITY,
+        self,
+        raw_series: pd.DataFrame,
+        predictions: pd.DataFrame,
+        time_granularity: str = DAILY_TIME_GRANULARITY,
     ) -> Path:
         """
         Create and store the result plot in the constructed path.
@@ -43,8 +45,10 @@ class ForecastPlotter:
 
         Parameters
         ----------
-        forecaster
-            A Forecaster, it needs to already be `fitted` to properly format it.
+        raw_series
+            Dataframe belonging to a raw_series of data.
+        predictions
+            Dataframe with the result of the predictions.
         time_granularity
             Time granularity of the series (daily or hourly)
         Returns
@@ -53,14 +57,7 @@ class ForecastPlotter:
             The path of the resulting plot
 
         """
-        if forecaster.prediction is None:
-            logger.error(
-                "The Forecaster object hasn't had a prediction, it's required for plotting."
-            )
-
-        predictions = forecaster.prediction
         predictions[DS_COL] = predictions[FORECAST_DATE]
-        raw_series = forecaster.raw_series
 
         full_series = pd.concat([predictions, raw_series])
         full_series = full_series.drop(columns=[FORECAST_DATE])
