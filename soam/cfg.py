@@ -21,6 +21,14 @@ RES_DIR = make_dirs(Path(_p, "tmp", "results"))
 
 # Report paths and configs
 MAIL_REPORT = "resources/mail_report.html"
+
+# Template paths
+TEMPLATE_DIR = "templates"
+INIT_TEMPLATE = "init"
+INIT_TEMPLATE_DIR = f"{TEMPLATE_DIR}/{INIT_TEMPLATE}"
+TEMPLATES = [INIT_TEMPLATE]
+
+# Text config
 UTF_ENCODING = "utf-8"
 
 # Table name setup
