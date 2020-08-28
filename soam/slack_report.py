@@ -8,9 +8,9 @@ Slack reporting and message formatting tools.
 from pathlib import Path
 from typing import Union
 
+import pandas as pd
 from soam.cfg import get_slack_cred
 from soam.constants import FORECAST_DATE, YHAT_COL
-from soam.forecaster import Forecaster
 
 import slack
 
@@ -27,7 +27,7 @@ class SlackReport:
 
     def send_report(
         self,
-        forecaster: Forecaster,
+        prediction: pd.DataFrame,
         plot_filename: Union[str, Path],
         greeting_message: str = DEFAULT_GREETING_MESSAGE,
         farewell_message: str = DEFAULT_FAREWELL_MESSAGE,
@@ -38,7 +38,7 @@ class SlackReport:
         summary_entries = []
         summary_entries.append(greeting_message)
 
-        for index, row in forecaster.prediction.iterrows():
+        for index, row in prediction.iterrows():
             date = row[FORECAST_DATE].strftime('%Y-%b-%d')
             value = "{:.2f}".format(row[YHAT_COL])
             summary_entries.append(f"• *[{date}]* {value}\n")
