@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 PROJECT_NAME = "SoaM"
 DS_COL = "ds"
 Y_COL = "y"
-YHAT_COL = 'yhat'
-YHAT_LOWER_COL = 'yhat_lower'
-YHAT_UPPER_COL = 'yhat_upper'
+YHAT_COL = "yhat"
+YHAT_LOWER_COL = "yhat_lower"
+YHAT_UPPER_COL = "yhat_upper"
 
 PRED_COLS = [DS_COL, YHAT_COL, YHAT_LOWER_COL, YHAT_UPPER_COL, Y_COL]
 SEED = 42
@@ -16,7 +16,7 @@ FORECAST_DATE = "forecast_date"
 
 SEED = 42
 
-OUTLIER_SIGN_COL = 'sign'
+OUTLIER_SIGN_COL = "sign"
 
 # Status
 STATUS_ACTIVE = "active"
@@ -134,3 +134,7 @@ PLOT_CONFIG = {
 
 # Logger config
 PARENT_LOGGER = PROJECT_NAME
+
+# Saver Config
+FLOW_FILE_NAME = "flow_tasks.csv"
+LOCK_NAME = "flow.lock"
