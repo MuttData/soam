@@ -5,27 +5,40 @@ Forecaster
 `Forecaster` is a main class of `SoaM`. It handle everything of the forecast task.
 """
 
-from typing import Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
-
+from soam.constants import DS_COL, FORECAST_DATE, YHAT_COL
 from soam.step import Step
-from soam.constants import FORECAST_DATE, YHAT_COL
+
+if TYPE_CHECKING:
+    from soam.savers import Saver
 
 
 class Forecaster(Step):
-    def __init__(self, model: ForecastingModel):
+    def __init__(
+        self,
+        model: ForecastingModel = None,
+        savers: "Optional[Saver]" = None,
+        *args,
+        **kwargs,
+    ):
         """
         A Forecaster is an object that is meant to handle models, data and storages.
-        
+
         Parameters
         ----------
         model
             A darts ForecastingModel that will by fitted and execute the predictions.
         """
-        self.raw_series = pd.DataFrame
+        super().__init__(*args, **kwargs)
+        if savers is not None:
+            for saver in savers:
+                self.state_handlers.append(saver.save_forecast)
+
+        self.time_series = pd.DataFrame
         self.prediction = pd.DataFrame
         self.model = model
 
@@ -35,10 +48,9 @@ class Forecaster(Step):
 
     def run(
         self,
-        raw_series: pd.DataFrame = None,
+        time_series: pd.DataFrame = None,
         input_length: Optional[int] = 1,
         output_length: int = 1,
-        *args,
         **kwargs,
     ) -> pd.DataFrame:
         """
@@ -48,7 +60,7 @@ class Forecaster(Step):
 
         Parameters
         ----------
-        raw_series
+        time_series
             A pandas DataFrame containing as minimum the first column
             with DataTime values, the second column the y to predict
             and the other columns more data
@@ -61,16 +73,17 @@ class Forecaster(Step):
 
         Returns
         -------
-        pandas.DataFrame
-            Optionally, pandas DataFrame containing the predicted values.
+        tuple(pandas.DataFrame, Darts.ForecastingModel)
+            a tuple containing a pandas DataFrame with the predicted values
+            and the trained model.
         """
-        DATETIME_COLUM = "ds"
-        self.raw_series = raw_series.copy()
-        values_columns = self.raw_series.columns.to_list()
-        values_columns.remove(DATETIME_COLUM)
+
+        self.time_series = time_series.copy()
+        values_columns = self.time_series.columns.to_list()
+        values_columns.remove(DS_COL)
 
         time_series = TimeSeries.from_dataframe(
-            self.raw_series, time_col=DATETIME_COLUM, value_cols=values_columns
+            self.time_series, time_col=DS_COL, value_cols=values_columns
         )
 
         self.model.fit(time_series, **kwargs)
@@ -85,4 +98,4 @@ class Forecaster(Step):
             inplace=True,
         )
 
-        return self.prediction
+        return (self.prediction, self.model)

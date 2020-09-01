@@ -3,34 +3,38 @@ Saver
 ----------
 `Saver` is an abstract class that create a way to save values.
 """
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import logging
 from pathlib import Path
 from typing import Union
 
+from filelock import FileLock
 from muttlib.dbconn import BaseClient
 from muttlib.utils import hash_str, make_dirs
-from soam.constants import PARENT_LOGGER
+import pandas as pd
+from prefect import Task, context
+from prefect.engine.state import State
+from soam.constants import FLOW_FILE_NAME, LOCK_NAME, PARENT_LOGGER
 from soam.data_models import (
-    AbstractIDBase,
+    Base,
     ForecastValues,
-    PipelineRunSchema,
-    StepRunSchema,
-    StepTypeEnum
+    SoamFlowRunSchema,
+    SoamTaskRunSchema,
+    StepTypeEnum,
 )
 from soam.forecaster import Forecaster
 from soam.helpers import session_scope
-from soam.runner import PipelineRun, StepRun
-from soam.step import Step
+from soam.runner import SoamFlow
 from soam.utils import get_file_path
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-class Saver(ABC):
+class Saver(Task):
     """ The base class for all savers objects.
 
-    All implementations of Saver have to implement the `save()` method defined below.
+    All implementations of Saver have to implement the state_handler of Prefect.
+    Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)  
     """
 
     @abstractmethod
@@ -38,62 +42,34 @@ class Saver(ABC):
         pass
 
     @abstractmethod
-    def save_forecaster_impl(self, forecaster: Forecaster):
+    def save_forecast(self, task, old_state: State, new_state: State):
         """
-        This function will store the given data and the model from the forecaster.
-
-        Parameters
-        ----------
-        forecaster
-            A Forecaster object to store its data and model config.
-        """
-
-    def save_single_step(self, step: Step, run_id: str):
-        """
-        Store the step data.
-
-        Parameters
-        ----------
-        step
-            A Step object (such as a Forecaster) to store its data and model config.
-        run_id
-            Name of the pipeline created to store only this run.
-        """
-        pipeline_run = PipelineRun(run_id)
-        self.save_pipeline_run(pipeline_run)
-        step_run = StepRun(step, pipeline_run)
-        self.save_step_run(step_run)
-
-    def save_pipeline_run(self, pipeline_run: PipelineRun):
-        """Save a pipeline run object without steps.
-
-        Args:
-            pipeline_run (PipelineRun): PipelineRun object.
+        This function will store the forecasts values.
         """
 
     @abstractmethod
-    def save_step_run(self, step_run: StepRun):
-        """Save a StepRun.
-
-        This function should use get_step_save_op and get_step_type to save the
-        Step data.
-
-        Args:
-            step_run (StepRun): Step data.
+    def save_task_run(self, task, old_state: State, new_state: State):
+        """
+        This function will store the task run.
         """
 
+    @abstractmethod
+    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+        """
+        Will store the SoamFlow run.
+        """
 
-    def get_step_save_op(self, step: Step):
-        save_ops = {StepTypeEnum.forecast: self.save_forecaster_impl}
-        step_type = self.get_step_type(step)
-        save_op = save_ops.get(step_type, self.save_noop)
-        return save_op
+    def get_task_type(self, task: Task):
+        """
 
-    def save_noop(self, *args, **kwargs):
-        pass
+        Parameters
+        ----------
 
-    def get_step_type(self, step: Step):
-        if isinstance(step, Forecaster):
+        Return
+        ----------
+
+        """
+        if isinstance(task, Forecaster):
             step_type = StepTypeEnum.forecast
         else:
             step_type = StepTypeEnum.custom
@@ -103,43 +79,101 @@ class Saver(ABC):
 class CSVSaver(Saver):
     def __init__(self, path: Union[str, Path]):
         """
-        Create a saver object to store the predicted data in a csv file
+        Create a saver object to store the predcitions and the runs.
+
+        You can use a CSVSaver for storing runs and/or values.
 
         Parameters
         ----------
         path
             str or pathlib.Path where the file will be created.
-        filename
-            A string with file name.
         """
-        self.path = Path(path)
+        self.path = Path(make_dirs(path))
 
-    def save_step_run(self, step_run: StepRun):
-        """Save a step run data to csv.
+    @property
+    def flow_path(self):
+        flow_run_folder = (
+            context["flow_name"]
+            + "_"
+            + context["date"].replace(microsecond=0, tzinfo=None).isoformat()
+            + "_"
+            + context["flow_run_id"]
+        )
+        return make_dirs(self.path / flow_run_folder)
 
-        Args:
-            step_run (StepRun): Step data.
-        """
-        save_op = self.get_step_save_op(step_run.step)
-        save_op(step_run.step, step_run.pipeline_run.run_id)
+    @property
+    def flow_file_path(self):
+        return self.flow_path / FLOW_FILE_NAME
 
-    def save_forecaster_impl(self, forecaster: Forecaster, run_id: str):
+    @property
+    def flow_run_lock(self):
+        return self.flow_path / LOCK_NAME
+
+    def save_forecast(self, task: Task, old_state: State, new_state: State):
         """
         Store the forecaster data in the constructed path
-        with the `prediction.csv`.
-
-        If the path does not exist, it will be created.
-
-        Parameters
-        ----------
-        forecaster
-            A Forecaster object to store its data and model config.
-        Returns
+        with the `{task_slug}_forecasts.csv`.
         """
-        PREDICTION_CSV_SUFFIX = f"{run_id}_prediction.csv"
-        _ = make_dirs(self.path)
-        prediction_path = get_file_path(self.path, PREDICTION_CSV_SUFFIX)
-        forecaster.prediction.to_csv(prediction_path, index=False)
+        if new_state.is_successful():
+            save_prediction = new_state.result[0].copy()
+            save_prediction["task_run_id"] = context["task_run_id"]
+
+            task_run_id = context["task_slug"] + "_" + context["task_run_id"]
+            PREDICTION_CSV_SUFFIX = f"{task_run_id}_forecasts.csv"
+            prediction_path = get_file_path(self.flow_path, PREDICTION_CSV_SUFFIX)
+
+            save_prediction.to_csv(prediction_path, index=False)
+
+        return new_state
+
+    def save_task_run(self, task: Task, old_state: State, new_state: State):
+        """
+        Store the task run information in the csv file created by `save_flow_run`
+        """
+        if new_state.is_successful():
+            flow_run_file = self.flow_file_path
+            lock = FileLock(self.flow_run_lock)
+
+            with lock.acquire(timeout=5):
+                read_df = pd.read_csv(flow_run_file)
+                flow_values = read_df[read_df.flow_state.str.contains("Running")].iloc[
+                    0
+                ]
+                csv_data = {
+                    "flow_run_id": [flow_values["flow_run_id"]],
+                    "start_datetime": [flow_values["start_datetime"]],
+                    "end_datetime": [flow_values["end_datetime"]],
+                    "flow_state": [flow_values["flow_state"]],
+                    "task_run_id": [context["task_run_id"]],
+                    "repr_task": [repr(task)],
+                }
+
+                df = pd.DataFrame.from_dict(csv_data)
+                df.to_csv(flow_run_file, mode="a", header=False, index=False)
+
+        return new_state
+
+    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+        """
+        Store the SoamFlow run information, create a folder for the run with a csv file.
+        """
+        if new_state.is_running():
+            csv_data = {
+                "flow_run_id": [context["flow_run_id"]],
+                "start_datetime": [soamflow.start_datetime],
+                "end_datetime": [soamflow.start_datetime],
+                "flow_state": [new_state.message],
+                "task_run_id": None,
+                "repr_task": None,
+            }
+
+            df = pd.DataFrame.from_dict(csv_data)
+            df.to_csv(self.flow_file_path, index=False)
+
+        elif new_state.is_successful():
+            self.flow_run_lock.unlink()
+
+        return new_state
 
 
 class DBSaver(Saver):
@@ -147,6 +181,9 @@ class DBSaver(Saver):
         """
         Create a DBSaver object and check if the database
         contains the tables it expect to store the data
+
+        You can use a DBSaver for storing runs or runs + values.
+        The values use the runs data as a Foreign Key.
 
         Parameters
         ----------
@@ -163,56 +200,61 @@ class DBSaver(Saver):
                     "alembic upgrade head"
                 )
 
-    def save_forecaster_impl(self, forecaster: Forecaster, step_run_id: int):
-        save_prediction = forecaster.prediction.copy()
-        save_prediction["step_run_id"] = step_run_id
-        self.db_client.insert_from_frame(save_prediction, ForecastValues.__tablename__)
-
-    def save_step_run(self, step_run: StepRun):
+    def save_forecast(self, task: Task, old_state: State, new_state: State):
         """
-        Save the forecaster run configuration
+        Store the forecaster data in the create connection to a database.
         """
-        save_op = self.get_step_save_op(step_run)
-        step_type = self.get_step_type(step_run)
-
-        run_id = self.get_pipeline_run_id(step_run.pipeline_run)
-        insert_fr = StepRunSchema(
-            params=repr(step_run),
-            params_hash=hash_str(repr(step_run)),
-            step_type=step_type,
-            run_id=run_id,
-        )
-        step_run_id = self._insert_single(insert_fr)
-        save_op(step_run.step, step_run_id)
-
-    def save_pipeline_run(self, pipeline_run: PipelineRun):
-        """
-        Save the forecaster run configuration
-        """
-        insert_fr = PipelineRunSchema(
-            run_id=pipeline_run.run_id,
-            start_datetime=pipeline_run.start_datetime,
-            end_datetime=pipeline_run.end_datetime,
-        )
-        self._insert_single(insert_fr)
-
-    def get_pipeline_run_id(self, pipeline_run: PipelineRun):
-        if pipeline_run is None:
-            return None
-        with session_scope(engine=self.db_client.get_engine()) as session:
-            pr = (
-                session.query(PipelineRunSchema)
-                .filter(PipelineRunSchema.run_id == pipeline_run.run_id)
-                .one_or_none()
+        if new_state.is_successful():
+            save_prediction = new_state.result[0].copy()
+            save_prediction["task_run_id"] = context["task_run_id"]
+            self.db_client.insert_from_frame(
+                save_prediction, ForecastValues.__tablename__
             )
-            rv = None if pr is None else pr.id
-            return rv
 
-    def _insert_single(self, element: AbstractIDBase) -> int:
+        return new_state
+
+    def save_task_run(self, task: Task, old_state: State, new_state: State):
+        """
+        Store the data of the task run in the create connection to a database.
+        """
+        if new_state.is_running():
+            flow_run_id = context["flow_run_id"]
+            task_run_id = context["task_run_id"]
+
+            step_type = self.get_task_type(task)
+
+            insert_fr = SoamTaskRunSchema(
+                task_run_id=task_run_id,
+                params=repr(task),
+                params_hash=hash_str(repr(task)),
+                step_type=step_type,
+                flow_run_id=flow_run_id,
+            )
+            _ = self._insert_single(insert_fr)
+
+        return new_state
+
+    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+        """
+        Save the SoamFlow run data in the create connection to a database.
+        """
+        if new_state.is_running():
+            flow_run_id = context["flow_run_id"]
+            run_date = context["date"]
+
+            insert_fr = SoamFlowRunSchema(
+                flow_run_id=flow_run_id,
+                run_date=run_date,
+                start_datetime=soamflow.start_datetime,
+                end_datetime=soamflow.end_datetime,
+            )
+
+            _ = self._insert_single(insert_fr)
+
+        return new_state
+
+    def _insert_single(self, element: Base) -> int:
         with session_scope(engine=self.db_client.get_engine()) as session:
             session.add(element)
-            session.flush()
-            run_id = element.id
 
-        return run_id
-
+        return element

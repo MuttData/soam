@@ -69,6 +69,6 @@ def sanitize_arg_empty_dict(v):
 
 def get_file_path(path: Path, fn: str) -> Path:
     """Find an available path for a file, using an index prefix."""
-    paths = path.glob(f'*_{fn}')
-    max_index = max([0], *(int(p.name.split("_")[0]) for p in paths)) + 1
+    paths = path.glob(f"*_{fn}")
+    max_index = max((int(p.name.split("_")[0]) for p in paths), default=-1) + 1
     return path / f"{max_index}_{fn}"

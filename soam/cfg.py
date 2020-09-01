@@ -4,9 +4,9 @@ from decouple import AutoConfig, config
 from muttlib.utils import make_dirs, template
 from pkg_resources import resource_string
 
-SOAM_RUN_TABLE_BASENAME = "soam_runs"
-SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_run_factor_conf"
-STEP_RUNS_TABLE_BASENAME = "steps_runs"
+SOAM_RUN_TABLE_BASENAME = "soam_flow_runs"
+SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_flow_run_factor_conf"
+SOAM_TASK_RUNS_TABLE_BASENAME = "tasks_runs"
 FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
 EXTRACT_VALUES_TABLE_BASENAME = "extract_values"
 
@@ -34,11 +34,11 @@ UTF_ENCODING = "utf-8"
 # Table name setup
 table_name_preffix = ""
 
-SOAM_RUN_TABLE = f"{table_name_preffix}{SOAM_RUN_TABLE_BASENAME}"
-SOAM_RUN_FACTOR_CONF_TABLE = (
+SOAM_FLOW_RUN_TABLE = f"{table_name_preffix}{SOAM_RUN_TABLE_BASENAME}"
+SOAM_FLOW_RUN_TABLE_FACTOR_CONF_TABLE = (
     f"{table_name_preffix}{SOAM_RUN_FACTOR_CONF_TABLE_BASENAME}"
 )
-STEP_RUNS_TABLE = f"{table_name_preffix}{STEP_RUNS_TABLE_BASENAME}"
+SOAM_TASK_RUNS_TABLE = f"{table_name_preffix}{SOAM_TASK_RUNS_TABLE_BASENAME}"
 FORECASTER_VALUES_TABLE = f"{table_name_preffix}{FORECASTER_VALUES_TABLE_BASENAME}"
 EXTRACT_VALUES_TABLE = f"{table_name_preffix}{EXTRACT_VALUES_TABLE_BASENAME}"
 

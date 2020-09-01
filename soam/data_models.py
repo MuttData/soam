@@ -1,10 +1,10 @@
 # data_models.py
 
-from contextlib import contextmanager
 from datetime import datetime
 import enum
 import logging
 
+from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, SOAM_TASK_RUNS_TABLE
 from sqlalchemy import (
     Column,
     DateTime,
@@ -18,8 +18,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
+from sqlalchemy_utils.types.uuid import UUIDType
 
-from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_RUN_TABLE, STEP_RUNS_TABLE
 
 def now_getter():
     return datetime.now()
@@ -64,20 +64,12 @@ class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-met
     id = Column(Identity, primary_key=True)
 
 
-class AbstractRunBase(AbstractIDBase):  # pylint: disable=too-few-public-methods
-    """Helper class to represent runs of modules or submodules."""
+class SoamFlowRunSchema(Base):
 
-    __abstract__ = True
+    __tablename__ = SOAM_FLOW_RUN_TABLE
 
-    params = Column(Text, nullable=False)
-    params_hash = Column(Text, nullable=False)
-
-
-class PipelineRunSchema(AbstractIDBase):
-
-    __tablename__ = SOAM_RUN_TABLE
-
-    run_id = Column(String, unique=True, index=True)
+    flow_run_id = Column(UUIDType(binary=False), primary_key=True)
+    run_date = Column(DateTime, nullable=True)
     start_datetime = Column(DateTime, nullable=True)
     end_datetime = Column(DateTime, nullable=True)
 
@@ -90,21 +82,39 @@ class StepTypeEnum(enum.Enum):
     custom = "custom"
 
 
-class StepRunSchema(AbstractRunBase):
+"""
+Be aware when droping the table you will have to manually drop the type, 
+it persist after droping the table:
+DROP TYPE steptypeenum;
+"""
 
-    __tablename__ = STEP_RUNS_TABLE
-    __table_args__ = (UniqueConstraint("run_id"),)
 
-    run_id = Column(Integer, ForeignKey(f"{SOAM_RUN_TABLE}.id"), nullable=False)
+class SoamTaskRunSchema(Base):
+
+    __tablename__ = SOAM_TASK_RUNS_TABLE
+
+    params = Column(Text, nullable=False)
+    params_hash = Column(Text, nullable=False)
+
+    task_run_id = Column(UUIDType(binary=False), primary_key=True)
+    flow_run_id = Column(
+        UUIDType(binary=False),
+        ForeignKey(f"{SOAM_FLOW_RUN_TABLE}.flow_run_id"),
+        nullable=True,
+    )
     step_type = Column(Enum(StepTypeEnum), nullable=False)
 
 
 class ForecastValues(AbstractIDBase):
 
     __tablename__ = FORECASTER_VALUES_TABLE
-    __table_args__ = (UniqueConstraint("step_run_id", "forecast_date"),)
+    __table_args__ = (UniqueConstraint("task_run_id", "forecast_date"),)
 
-    step_run_id = Column(Integer, ForeignKey(f"{STEP_RUNS_TABLE}.id"), nullable=False)
+    task_run_id = Column(
+        UUIDType(binary=False),
+        ForeignKey(f"{SOAM_TASK_RUNS_TABLE}.task_run_id"),
+        nullable=False,
+    )
     forecast_date = Column(DateTime, nullable=False)
     yhat = Column(Float, nullable=False)
     yhat_lower = Column(Float)
@@ -113,4 +123,3 @@ class ForecastValues(AbstractIDBase):
     trend = Column(Float)
     outlier_value = Column(Float)
     outlier_sign = Column(Float)
-

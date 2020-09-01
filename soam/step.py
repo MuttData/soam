@@ -5,22 +5,24 @@ Step Base Class
 An abstract base class for every step
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 import pandas as pd
+from prefect import Task, context
 
 
-class Step(ABC):
+class Step(Task):
     """ The base class for all steps.
     All implementations of step have to implement the `run()` method defined below.
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.time_series = pd.DataFrame
 
     @abstractmethod
-    def run(self, time_series: pd.DataFrame) -> pd.DataFrame:
+    def run(self, time_series: pd.DataFrame, **kwargs) -> pd.DataFrame:
         """
         Execute this step function
 
@@ -38,3 +40,6 @@ class Step(ABC):
     @abstractmethod
     def __repr__(self) -> str:
         pass
+
+    def get_task_id(self) -> str:
+        return context["flow_run_id"]
