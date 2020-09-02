@@ -1,5 +1,6 @@
 python-decouple
 pandas
-darts
+u8darts
 git+https://gitlab.com/mutt_data/muttlib.git
 soam
+scikit-learn
