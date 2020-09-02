@@ -9,17 +9,13 @@ from abc import abstractmethod
 
 import pandas as pd
 from prefect import Task, context
+from sklearn.base import BaseEstimator
 
 
-class Step(Task):
+class Step(Task, BaseEstimator):
     """ The base class for all steps.
     All implementations of step have to implement the `run()` method defined below.
     """
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.time_series = pd.DataFrame
 
     @abstractmethod
     def run(self, time_series: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -35,11 +31,9 @@ class Step(Task):
         pandas.DataFrame
             pandas DataFrame containing the output values.
         """
-        pass
 
-    @abstractmethod
-    def __repr__(self) -> str:
-        pass
-
-    def get_task_id(self) -> str:
+    def get_task_id(self) -> str:  # pylint: disable=no-self-use
         return context["flow_run_id"]
+
+    def __repr__(self) -> str:
+        return f"<Task: {BaseEstimator.__repr__(self)}>"

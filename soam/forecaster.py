@@ -22,7 +22,6 @@ class Forecaster(Step):
         self,
         model: ForecastingModel = None,
         savers: "Optional[Saver]" = None,
-        *args,
         **kwargs,
     ):
         """
@@ -33,7 +32,7 @@ class Forecaster(Step):
         model
             A darts ForecastingModel that will by fitted and execute the predictions.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
         if savers is not None:
             for saver in savers:
                 self.state_handlers.append(saver.save_forecast)
@@ -41,10 +40,6 @@ class Forecaster(Step):
         self.time_series = pd.DataFrame
         self.prediction = pd.DataFrame
         self.model = model
-
-    def __repr__(self):
-
-        return f"{self.model}"
 
     def run(
         self,
