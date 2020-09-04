@@ -4,6 +4,8 @@ from decouple import AutoConfig, config
 from muttlib.utils import make_dirs, template
 from pkg_resources import resource_string
 
+SQLITE = 'sqlite'
+
 SOAM_RUN_TABLE_BASENAME = "soam_flow_runs"
 SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_flow_run_factor_conf"
 SOAM_TASK_RUNS_TABLE_BASENAME = "tasks_runs"
@@ -94,5 +96,8 @@ def get_smtp_cred() -> dict:
 
 def get_db_uri(setting_path: str) -> str:
     db_cred = get_db_cred(setting_path)
+
+    if db_cred['dialect'] == SQLITE:
+        return f"{db_cred['dialect']}:///{db_cred['database']}"
 
     return f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/{db_cred['database']}"
