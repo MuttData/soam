@@ -39,7 +39,8 @@ setuptools.setup(
         "filelock",
         "click",
         "cookiecutter",
+        "slack",
     ],
     dependency_links=["git+https://gitlab.com/mutt_data/muttlib"],
-    entry_points={'console_scripts': ['soam = soam.console:cli']},
+    entry_points={"console_scripts": ["soam = soam.console:cli"]},
 )

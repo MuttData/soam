@@ -93,4 +93,4 @@ class Forecaster(Step):
             inplace=True,
         )
 
-        return (self.prediction, self.model)
+        return (self.prediction, self.time_series, self.model)
