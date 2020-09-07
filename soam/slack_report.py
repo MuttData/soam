@@ -6,21 +6,24 @@ Slack reporting and message formatting tools.
 """
 
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import pandas as pd
+import slack
+
 from soam.cfg import get_slack_cred
 from soam.constants import FORECAST_DATE, YHAT_COL
-
-import slack
+from soam.step import Step
 
 DEFAULT_GREETING_MESSAGE = "Hello everyone! Here are the results of the forecast for the *{metric_name}* metric:\n"
 DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
 
 
 class SlackReport:
-    def __init__(self, channel_id: str, metric_name: str):
-        credentials = get_slack_cred()
+    def __init__(
+        self, channel_id: str, metric_name: str, setting_path: Optional[str], **kwargs,
+    ):
+        credentials = get_slack_cred(setting_path)
         self.slack_client = slack.WebClient(credentials["token"])
         self.channel_id = channel_id
         self.metric_name = metric_name
@@ -29,8 +32,8 @@ class SlackReport:
         self,
         prediction: pd.DataFrame,
         plot_filename: Union[str, Path],
-        greeting_message: str = DEFAULT_GREETING_MESSAGE,
-        farewell_message: str = DEFAULT_FAREWELL_MESSAGE,
+        greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
+        farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
     ):
         if greeting_message == DEFAULT_GREETING_MESSAGE:
             greeting_message.format(metric_name=self.metric_name)
@@ -39,7 +42,7 @@ class SlackReport:
         summary_entries.append(greeting_message)
 
         for index, row in prediction.iterrows():
-            date = row[FORECAST_DATE].strftime('%Y-%b-%d')
+            date = row[FORECAST_DATE].strftime("%Y-%b-%d")
             value = "{:.2f}".format(row[YHAT_COL])
             summary_entries.append(f"• *[{date}]* {value}\n")
 
@@ -53,3 +56,22 @@ class SlackReport:
             initial_comment=summary_message,
             title=f"{self.metric_name} Forecast",
         )
+
+
+class SlackReportTask(Step, SlackReport):
+    def __init__(
+        self, channel_id: str, metric_name: str, setting_path: Optional[str], **kwargs
+    ):
+        Step.__init__(self, **kwargs)
+        SlackReport.__init__(
+            self, channel_id, metric_name, setting_path,
+        )
+
+    def run(
+        self,
+        prediction: pd.DataFrame,
+        plot_filename: Union[str, Path],
+        greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
+        farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
+    ):
+        return self.send_report(prediction, plot_filename, greeting_message, farewell_message)
