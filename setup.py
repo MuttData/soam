@@ -43,3 +43,4 @@ setuptools.setup(
     dependency_links=["git+https://gitlab.com/mutt_data/muttlib"],
     entry_points={'console_scripts': ['soam = soam.console:cli']},
 )
+# include python versions https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
