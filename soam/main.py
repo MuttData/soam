@@ -1,32 +1,27 @@
 import logging
+from soam.dbconn import PgClient
+from soam.kpi import KPI
 
 from soam.cfg import FIG_DIR
 from soam.constants import PARENT_LOGGER
-from soam.dbconn import PgClient
 from soam.forecast_plotter import ForecastPlotter
 from soam.forecaster import Forecaster, run_forecaster_pipeline
 from soam.helpers import TimeRangeConfiguration
-from soam.kpi import KPI
 from soam.mail_report import MailReport
 from soam.series import FactorManager, run_series_pipeline
 from soam.utils import make_dirs
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
+# TODO: this file seems to be unused, review if we have to delete it, the following imports are failing:
+# soam.dbconn
+# soam.kpi
+# soam.forecaster.run_forecaster_pipeline
+# soam.utils.make_dirs
 
-def main(
-    series_dict,
-    factor_col,
-    granularity,
-    kpi_dict,
-    time_range_dict,
-    db_creds,
-    smtp_creds,
-    mail_recipients,
-    extra_info=None,
-    email_attachments=None,
-):
 
+def main(series_dict, factor_col, granularity, kpi_dict, time_range_dict, db_creds, smtp_creds, mail_recipients,
+         extra_info=None, email_attachments=None):
     kpi = KPI(
         target_series=kpi_dict["target_series"],
         target_col=kpi_dict["target_col"],

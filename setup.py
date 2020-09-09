@@ -29,6 +29,8 @@ setuptools.setup(
     install_requires=[
         "jinja2",
         "pandas>=1.0.0",
+        "statsmodels<0.12,>=0.11",
+        "Cython<0.29.18,>=0.29",
         "progressbar2",
         "sqlalchemy",
         "fbprophet",
@@ -39,8 +41,8 @@ setuptools.setup(
         "filelock",
         "click",
         "cookiecutter",
+        "muttlib @ git+https://gitlab.com/mutt_data/muttlib#egg=muttlib"
     ],
-    dependency_links=["git+https://gitlab.com/mutt_data/muttlib"],
     entry_points={'console_scripts': ['soam = soam.console:cli']},
 )
 # include python versions https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
