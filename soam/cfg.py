@@ -48,6 +48,9 @@ SOAM_FLOW_RUN_TABLE_FACTOR_CONF_TABLE = (
 )
 SOAM_TASK_RUNS_TABLE = f"{table_name_preffix}{SOAM_TASK_RUNS_TABLE_BASENAME}"
 FORECASTER_VALUES_TABLE = f"{table_name_preffix}{FORECASTER_VALUES_TABLE_BASENAME}"
+# TODO: replace syntax to be length compliant
+# FORECASTER_VALUES_TABLE = (f"{table_name_preffix}"
+#                            f"{FORECASTER_VALUES_TABLE_BASENAME}")
 EXTRACT_VALUES_TABLE = f"{table_name_preffix}{EXTRACT_VALUES_TABLE_BASENAME}"
 
 
@@ -58,8 +61,17 @@ MAIL_TEMPLATE = template(
 
 
 def get_db_cred(setting_path: str = "settings.ini") -> dict:
-    """
-    Read the setting.ini file and retrieve the database credentials
+    """Read the setting.ini file and retrieve the database credentials
+
+    Parameters
+    ----------
+    setting_path : str
+        The path for the .ini document with the settings.
+
+    Returns
+    -------
+    dict
+        A dict containing: username, dialect, password, database, port, host.
     """
     config = AutoConfig(search_path=setting_path)
     db_cred = {}
@@ -75,8 +87,12 @@ def get_db_cred(setting_path: str = "settings.ini") -> dict:
 
 
 def get_slack_cred() -> dict:
-    """
-    Read the setting.ini file and retrieve the Slack credentials
+    """Retrieve the Slack credentials
+    
+    Returns
+    -------
+    dict
+        A dict containing the slack token.
     """
     slack_creds = {}
 
@@ -86,8 +102,12 @@ def get_slack_cred() -> dict:
 
 
 def get_smtp_cred() -> dict:
-    """
-    Read the setting.ini file and retrieve the SMTP credentials
+    """Retrieve the SMTP credentials
+
+    Returns
+    -------
+    dict
+        A dict containing: user_address, password, mail_from, host, port.
     """
     smtp_creds = {}
 
@@ -101,12 +121,20 @@ def get_smtp_cred() -> dict:
 
 
 def get_db_uri(setting_path: str) -> str:
+    """Retrieve the uri for the database.
+
+    Returns
+    -------
+    str
+        A string with the database uri.
+    """
     db_cred = get_db_cred(setting_path)
 
     if db_cred['dialect'] == SQLITE:
         return f"{db_cred['dialect']}:///{db_cred['database']}"
 
     return f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/{db_cred['database']}"
-    # TODO: replace return syntax to be length compliant
-    # return (f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/"
-    #         f"{db_cred['database']}")
+    # TODO: replace syntax to be length compliant
+    # return (f"{db_cred['dialect']}://{db_cred['username']}:"
+    #         f"db_cred['password']}@{db_cred['host']}:"
+    #         f"{db_cred['port']}/{db_cred['database']}")
