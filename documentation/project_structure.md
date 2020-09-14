@@ -1,18 +1,18 @@
 # Directory structure
 
 ## root
-### .gitignore
+### [gitignore](../.gitignore)
 This [description file](https://git-scm.com/docs/gitignore) specifies the excluded documents and folders from git.
 
-### README.md
+### [README](../README.md)
 This document contains a brief overview of the project working and how to use it, it's oriented to the users of the
 package.
 
-### setup.py
+### [setup.py](../setup.py)
 This [configuration file](https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-py)
 determines how the SoaM package is going to be installed and what commands it supports.
  
-### setup.cfg
+### [setup.cfg](../setup.cfg)
 This [ini file](https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-cfg) defines default
 options for the setup.py commands.
 
@@ -22,16 +22,17 @@ Contains the technical documentation for the project, it's oriented to the devel
 ### images
 The diagrams and visualizations for the documentation.
 
-### classes
+### [classes](classes.md)
 Explanation and diagrams of the classes and patterns in the project.
 
-### developers_starting_point
-Steps description to setup the project for development.
+### [developers starting point](developers_starting_point.md)
+Steps description to setup the project for development. If you are new in SoaM this is your next document in your path
+to start developing.
 
-### project_structure
+### project structure
 This document :D
 
-### references
+### [references](references.md)
 Papers, articles and videos to understand the theoretical background, libraries and technologies used in the project.
 
 [//comment]: # (TODO: ### architecture)
@@ -46,7 +47,7 @@ The root of the source code for the project.
 ### db_migrations
 This directory contains the migrations for the database that stores the data and runs with the DBSaver.
 
-### alembic.ini
+### [alembic.ini](../soam/alembic.ini)
 Configures the alembic library to manage the migrations for the DBSaver.
 
 ### templates
