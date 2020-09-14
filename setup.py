@@ -43,6 +43,7 @@ setuptools.setup(
         "cookiecutter",
         "muttlib @ git+https://gitlab.com/mutt_data/muttlib#egg=muttlib"
     ],
+    python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},
 )
-# include python versions https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
+# TODO: check why 'python setup.py develop' is failing to obtain muttlib, but 'pip install -e .' is working
