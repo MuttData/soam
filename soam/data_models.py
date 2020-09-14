@@ -1,10 +1,17 @@
 # data_models.py
+"""
+Data models
+----------
+Contains the data models for SQLAlchemy used in the DBSaver.
 
-from datetime import datetime
+See Also
+--------
+savers.DBSaver : Saver used to store data and parameters in a database.
+"""
 import enum
-import logging
+from datetime import datetime
 
-from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, SOAM_TASK_RUNS_TABLE
+import sqlalchemy.types as types
 from sqlalchemy import (
     Column,
     DateTime,
@@ -12,24 +19,44 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    String,
     Text,
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
-import sqlalchemy.types as types
 from sqlalchemy_utils.types.uuid import UUIDType
+# TODO: sqlalchemy_utils missing dependency.
+
+from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, \
+    SOAM_TASK_RUNS_TABLE
 
 
-def now_getter():
+def now_getter() -> datetime:
+    """Wrapper for datetime.now()
+    TODO: check why we need this wrapper.
+
+    Returns
+    -------
+    datetime
+        The current datetime.
+    """
     return datetime.now()
 
 
-def get_default_run_name():
+def get_default_run_name() -> str:
+    """Obtains a run name that contains the current datetime.
+    TODO: unused function.
+
+    Returns
+    -------
+    str
+        A concatenated string of 'forecast-run-' and the current datetime
+        in isoformat
+    """
     return f"forecast-run-{now_getter().isoformat()}"
 
 
 Base = declarative_base()
+# TODO: The rest of this file is not checked to be numpydoc complaint.
 
 
 class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
@@ -56,7 +83,8 @@ class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
         return value
 
 
-class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-methods
+class AbstractIDBase(
+    Base):  # type: ignore # pylint: disable=too-few-public-methods
     """Helper class to add primary keys."""
 
     __abstract__ = True
@@ -65,7 +93,6 @@ class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-met
 
 
 class SoamFlowRunSchema(Base):
-
     __tablename__ = SOAM_FLOW_RUN_TABLE
 
     flow_run_id = Column(UUIDType(binary=False), primary_key=True)
@@ -90,7 +117,6 @@ DROP TYPE steptypeenum;
 
 
 class SoamTaskRunSchema(Base):
-
     __tablename__ = SOAM_TASK_RUNS_TABLE
 
     params = Column(Text, nullable=False)
@@ -106,7 +132,6 @@ class SoamTaskRunSchema(Base):
 
 
 class ForecastValues(AbstractIDBase):
-
     __tablename__ = FORECASTER_VALUES_TABLE
     __table_args__ = (UniqueConstraint("task_run_id", "forecast_date"),)
 
