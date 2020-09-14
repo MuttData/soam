@@ -2,7 +2,10 @@
 """
 Console
 ----------
-Console commands and utilities.
+Console commands and utilities. It uses click library to run the app in a
+command line interface.
+It has a hook inside setup.py:
+"entry_points={'console_scripts': ['soam = soam.console:cli']}"
 """
 # from sys import argv
 from typing import NoReturn

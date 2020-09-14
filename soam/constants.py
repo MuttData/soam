@@ -1,4 +1,9 @@
 # constants.py
+"""
+Constants
+----------
+Constants for the whole project.
+"""
 from datetime import datetime, timedelta
 
 # Global
