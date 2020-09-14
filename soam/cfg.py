@@ -1,3 +1,9 @@
+# cfg.py
+"""
+Configurations
+----------
+Configuration values for the SlackReport, MailReport and DBSaver.
+"""
 from pathlib import Path
 
 from decouple import AutoConfig, config
@@ -101,3 +107,6 @@ def get_db_uri(setting_path: str) -> str:
         return f"{db_cred['dialect']}:///{db_cred['database']}"
 
     return f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/{db_cred['database']}"
+    # TODO: replace return syntax to be length compliant
+    # return (f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/"
+    #         f"{db_cred['database']}")
