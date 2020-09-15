@@ -2,6 +2,7 @@
 
 from darts import models
 import pandas as pd
+
 from soam.forecaster import Forecaster
 
 

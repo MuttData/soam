@@ -4,11 +4,11 @@ Console
 ----------
 Console commands and utilities.
 """
-from pkg_resources import resource_filename
-from soam.cfg import INIT_TEMPLATE_DIR
-
 import click
 from cookiecutter.main import cookiecutter
+from pkg_resources import resource_filename
+
+from soam.cfg import INIT_TEMPLATE_DIR
 
 
 @click.group()

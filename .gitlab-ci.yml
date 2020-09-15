@@ -1,0 +1,19 @@
+image: python:3.7
+before_script:
+  - apt update
+  - apt upgrade -y
+
+# test:
+#  script:
+#    - pip install nox
+#    - nox --sessions tests
+
+lint:
+  script:
+    - pip install nox
+    - nox --sessions lint
+
+bandit:
+  script:
+    - pip install nox
+    - nox --sessions bandit

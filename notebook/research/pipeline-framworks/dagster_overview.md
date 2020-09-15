@@ -5,8 +5,8 @@ In this document will show the overview of [Dagster](https://docs.dagster.io/).
 Dagster is an open-source Python framework for data orchestrator in machine learning, analytics, and ETL.
 
 ## Overview
-Don't have project template, you have to make it yourself from the examples. 
-Eery object is instanced with a decorator. 
+Don't have project template, you have to make it yourself from the examples.
+Eery object is instanced with a decorator.
 
 Configuration and definitions have to be in a yaml file.
 
@@ -32,7 +32,7 @@ dagster --version
 
 While whe write this overview Dagster is on version 0.9.2
 
-## Project Template 
+## Project Template
 Dagster doesn't provide a project template like `cookiecutter` or other, but it is on their issues to address.
 
 Dagster contains a CLI done with click. Very basic with a few commands.
@@ -42,8 +42,8 @@ The context of the run, each solid need the context at the construction.
 It contains the context data for logging, storing, debugging, etc.
 
 ## Pipeline abstraction
-Dagster is based on a Pipeline and Solid objects to run. 
-The Dagster objects are defined with decorators, to define a resource, solid or pipeline. 
+Dagster is based on a Pipeline and Solid objects to run.
+The Dagster objects are defined with decorators, to define a resource, solid or pipeline.
 
 Here is a simple Dagster Pipeline.
 
@@ -79,22 +79,22 @@ execute_pipeline(serial_pipeline)
 
 Dependencies between solids in Dagster are defined using `InputDefinitions` and `OutputDefinitions`
 
-With Solids you can return more than one thing, yielding more than one Output, an ExpectationResult (they have their own expectations), Failure, and [others](https://docs.dagster.io/overview/solids-pipelines/solid-events). 
+With Solids you can return more than one thing, yielding more than one Output, an ExpectationResult (they have their own expectations), Failure, and [others](https://docs.dagster.io/overview/solids-pipelines/solid-events).
 
-You can customize a [solid definition](https://docs.dagster.io/overview/solids-pipelines/solid-factories) 
+You can customize a [solid definition](https://docs.dagster.io/overview/solids-pipelines/solid-factories)
 
-## Run 
+## Run
 You can run a pipeline in diferent ways:
-* CLI: 
+* CLI:
     ```bash
     dagster pipeline execute -f hello_cereal.py
     ```
     With `-f` define the file where its the pipeline, or you can use `-p` and define the name of the pipeline
-* Python API: 
+* Python API:
     ```python
     execute_pipeline(serial_pipeline)
     ```
-    This way you will execute the pipeline and you can add configurations and modes to run it. 
+    This way you will execute the pipeline and you can add configurations and modes to run it.
 * From the GUI in the `Dagit` tool
 
 ## Partitions and Backfills
@@ -112,8 +112,8 @@ There are several defined Executors:
 * `in process`
 * `multi process`
 
-## Run versioning 
-For storing each run dagster provides a feature to save in a database (SQLite or Postgres). 
+## Run versioning
+For storing each run dagster provides a feature to save in a database (SQLite or Postgres).
 It also can store event logs, compute logs, and others elements.
 
 For storing each solid run you may log what you want.
@@ -127,7 +127,7 @@ I try this as its documented but no log record was generated.
 For debugging the docs page suggest to debug with logs and the UI.
 
 ## Configuration
-You can define a configurable parameters to run your pipeline with `run_config`. 
+You can define a configurable parameters to run your pipeline with `run_config`.
 You can configure:
 * execution: Determine and configure the Executor.
 * storage: Define how data between solid will be persisted.
@@ -159,8 +159,8 @@ def run_config_example():
 ```
 
 ## Modes and Resources
-Modes and resources provide a way to control the behavior of multiple solids at pipeline execution time. 
-A typical usage for modes is to vary pipeline behavior between different deployment environments. 
+Modes and resources provide a way to control the behavior of multiple solids at pipeline execution time.
+A typical usage for modes is to vary pipeline behavior between different deployment environments.
 
 ```python
 @pipeline(
@@ -180,7 +180,7 @@ dagster pipeline execute -d local_dev generate_tables_pipeline
 ```
 
 ## UI
-For the UI Dagster has Dagit, very useful UI. 
+For the UI Dagster has Dagit, very useful UI.
 You can run the pipeline, see the historical runs, run a part of the pipeline, see errors and more.
 
 ![Dagit](https://docs.dagster.io/assets/images/tutorial/serial_pipeline_figure_one.png)

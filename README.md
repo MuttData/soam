@@ -23,14 +23,14 @@ This stage extracts data from the needed sources to build the condensed dataset 
 Then it converts the full dataset to the desired time granularity and aggregation level by some categorical attribute/s.
 
 ### Preprocessing
-Here we implement functions to further cleanup and prepare the data for the following steps. 
+Here we implement functions to further cleanup and prepare the data for the following steps.
 
 Such as:
 * Add feature/transformation
 * Fill nan values
 * Apply value normalizations
 * Shift values
-* ... 
+* ...
 
 ### Forecasting
 This stage receives the clean data, performs the forecast and store the predicted values where the user defines.
@@ -62,7 +62,7 @@ After installing SoaM locally (for example with `pip install soam`), you'll have
 For database storing we use some complementary tools:
 * [muttlib.dbcon](https://gitlab.com/mutt_data/muttlib/) for database connections.
 
-* [Decouple](https://github.com/henriquebastos/python-decouple) storing the database information in a separated file. 
+* [Decouple](https://github.com/henriquebastos/python-decouple) storing the database information in a separated file.
     We have a [`settings.ini`](soam/settings.ini) file to store the database credentials, when modifying it don't change the keys names
 
 * [Alembic](https://alembic.sqlalchemy.org/en/latest/) for create the database migrations.
@@ -75,18 +75,18 @@ A brief description is below
 This package uses alembic and expects you to use it!
 
 Alembic is a database migration tool for usage with SQLAlchemy.
-You define schemas with the SQLAlchemy and with Alembic you keep track of the database modifications such as add new columns, modify a schema or add new tables. 
- 
+You define schemas with the SQLAlchemy and with Alembic you keep track of the database modifications such as add new columns, modify a schema or add new tables.
+
 Here we setup alembic to use the credentials from the `settings.ini` file and get the defined models from `data_models`.
 Be aware that alembic to run need this package installed!
 
 When making any change of the data models you need them to impact into the database for this you will have to run:
 ```bash
-alembic revision --autogenerate 
+alembic revision --autogenerate
 alembic upgrade head
 ```
 
-The first command will check the last version of the database and will [autogenerate](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect) the python file with the necessary changes. 
+The first command will check the last version of the database and will [autogenerate](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect) the python file with the necessary changes.
 It is always necessary to manually review and correct the candidate migrations that autogenerate produces.
 
 The second command will use this file to impact the changes in the database.

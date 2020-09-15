@@ -3,7 +3,7 @@ Saver
 ----------
 `Saver` is an abstract class that create a way to save values.
 """
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 import logging
 from pathlib import Path
 from typing import Union
@@ -14,6 +14,7 @@ from muttlib.utils import hash_str, make_dirs
 import pandas as pd
 from prefect import Task, context
 from prefect.engine.state import State
+
 from soam.constants import FLOW_FILE_NAME, LOCK_NAME, PARENT_LOGGER
 from soam.data_models import (
     Base,
@@ -30,15 +31,15 @@ from soam.utils import get_file_path
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-class Saver(Task):
+class Saver(ABC):  # pylint:disable=abstract-method
     """ The base class for all savers objects.
 
     All implementations of Saver have to implement the state_handler of Prefect.
-    Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)  
+    Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self):  # pylint:disable=abstract-method
         pass
 
     @abstractmethod
@@ -88,6 +89,7 @@ class CSVSaver(Saver):
         path
             str or pathlib.Path where the file will be created.
         """
+        super().__init__()
         self.path = Path(make_dirs(path))
 
     @property
@@ -190,6 +192,7 @@ class DBSaver(Saver):
         base_client
             A BaseClient with connection to the database
         """
+        super().__init__()
         self.db_client = base_client
 
         if base_client._connect() is not None:
@@ -255,6 +258,6 @@ class DBSaver(Saver):
 
     def _insert_single(self, element: Base) -> int:
         with session_scope(engine=self.db_client.get_engine()) as session:
-            session.add(element)
+            session.add(element)  # pylint: disable=maybe-no-member
 
         return element
