@@ -5,7 +5,6 @@ from darts import models
 from muttlib.dbconn import PgClient
 import pandas as pd
 from prefect import task
-from prefect.utilities.debug import raise_on_exception
 
 from soam.cfg import get_db_cred
 from soam.constants import PARENT_LOGGER
@@ -21,7 +20,7 @@ URL = "notebook/data/revenue.csv"
 now = datetime.datetime.today()
 
 
-@task()
+@task
 def read_csv_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path)
     df["ds"] = df["date"]

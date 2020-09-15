@@ -1,14 +1,17 @@
 """first
 
 Revision ID: 74f172dd880e
-Revises: 
+Revises: Fabian
 Create Date: 2020-09-01 15:23:00.216000
 
 """
+# pylint: skip-file
+
 from alembic import op
-from soam.data_models import Identity
 import sqlalchemy as sa
 from sqlalchemy_utils.types.uuid import UUIDType
+
+from soam.data_models import Identity
 
 # revision identifiers, used by Alembic.
 revision = "74f172dd880e"

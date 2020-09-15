@@ -1,5 +1,3 @@
-"""Entrypoint for nox."""
-
 import nox
 
 
@@ -7,7 +5,7 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[test,forecast,gdrive]")
+    session.install(".[test]")
 
     cmd = ["pytest", "-n", "auto"]
 
@@ -18,8 +16,9 @@ def tests(session):
 
 
 @nox.session(reuse_venv=True)
-def cop(session):
+def lint(session):
     """Run all pre-commit hooks."""
+
     session.install(".")
     session.install(".[dev]")
     session.install(".[test]")
@@ -33,6 +32,4 @@ def bandit(session):
     """Run all pre-commit hooks."""
     session.install("bandit")
 
-    session.run(
-        "bandit", "-r", "{{cookiecutter.package_name}}/", "-ll", "-c", "bandit.yaml"
-    )
+    session.run("bandit", "-r", "soam/", "-ll", "-c", "bandit.yaml")

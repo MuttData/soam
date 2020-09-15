@@ -5,11 +5,12 @@ Forecaster
 `Forecaster` is a main class of `SoaM`. It handle everything of the forecast task.
 """
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional  # pylint:disable=unused-import
 
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
+
 from soam.constants import DS_COL, FORECAST_DATE, YHAT_COL
 from soam.step import Step
 
@@ -19,10 +20,7 @@ if TYPE_CHECKING:
 
 class Forecaster(Step):
     def __init__(
-        self,
-        model: ForecastingModel = None,
-        savers: "Optional[Saver]" = None,
-        **kwargs,
+        self, model: ForecastingModel, savers: "Optional[List[Saver]]", **kwargs,
     ):
         """
         A Forecaster is an object that is meant to handle models, data and storages.
@@ -43,8 +41,8 @@ class Forecaster(Step):
 
     def run(
         self,
-        time_series: pd.DataFrame = None,
-        input_length: Optional[int] = 1,
+        time_series: pd.DataFrame,
+        input_length: Optional[int] = 1,  # pylint:disable=unused-argument
         output_length: int = 1,
         **kwargs,
     ) -> pd.DataFrame:
@@ -72,7 +70,6 @@ class Forecaster(Step):
             a tuple containing a pandas DataFrame with the predicted values
             and the trained model.
         """
-
         self.time_series = time_series.copy()
         values_columns = self.time_series.columns.to_list()
         values_columns.remove(DS_COL)

@@ -2,9 +2,7 @@
 
 from datetime import datetime
 import enum
-import logging
 
-from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, SOAM_TASK_RUNS_TABLE
 from sqlalchemy import (
     Column,
     DateTime,
@@ -12,13 +10,14 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    String,
     Text,
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
 from sqlalchemy_utils.types.uuid import UUIDType
+
+from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, SOAM_TASK_RUNS_TABLE
 
 
 def now_getter():
@@ -64,7 +63,7 @@ class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-met
     id = Column(Identity, primary_key=True)
 
 
-class SoamFlowRunSchema(Base):
+class SoamFlowRunSchema(Base):  # type: ignore
 
     __tablename__ = SOAM_FLOW_RUN_TABLE
 
@@ -82,14 +81,12 @@ class StepTypeEnum(enum.Enum):
     custom = "custom"
 
 
-"""
-Be aware when droping the table you will have to manually drop the type, 
-it persist after droping the table:
-DROP TYPE steptypeenum;
-"""
+# Be aware when droping the table you will have to manually drop the type,
+# it persist after droping the table:
+# DROP TYPE steptypeenum;
 
 
-class SoamTaskRunSchema(Base):
+class SoamTaskRunSchema(Base):  # type: ignore
 
     __tablename__ = SOAM_TASK_RUNS_TABLE
 

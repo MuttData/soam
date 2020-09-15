@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
+
 from soam.constants import (
     ANOMALY_WIN,
     ANOMALY_WIN_FILL,
@@ -81,8 +82,7 @@ def _base_10_tick_scaler(median_val):
     for i in reversed(range(1, 4)):
         if median_val / (10 ** i) >= 1:
             return i
-    else:
-        return 0
+    return 0
 
 
 def _create_common_series(df, ds_col, sd, ed=None):  # pylint:disable=unused-argument

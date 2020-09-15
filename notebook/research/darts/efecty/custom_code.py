@@ -10,7 +10,9 @@ def sumape(
     actual_series: TimeSeries,
     pred_series: TimeSeries,
     intersect: bool = True,
-    reduction: Callable[[np.ndarray], float] = np.mean,
+    reduction: Callable[  # pylint:disable=unused-argument
+        [np.ndarray], float
+    ] = np.mean,
 ) -> float:
     """ Sum of Mean Absolute Percentage Error (SuMAPE).
     Given a time series of actual values :math:`y_t` and a time series of predicted values :math:`\\hat{y}_t`
@@ -34,7 +36,10 @@ def sumape(
         The SUM of Mean Absolute Percentage Error (SuMAPE)
     """
 
-    y_true, y_hat = metrics.metrics._get_values_or_raise(
+    (
+        y_true,
+        y_hat,
+    ) = metrics.metrics._get_values_or_raise(  # pylint:disable=protected-access
         actual_series, pred_series, intersect
     )
 
