@@ -1,14 +1,15 @@
 # mail_report.py
-"""Mail creator and sender."""
+"""Mail creator and sender. Its a postprocess that sends a report with
+the model forecasts."""
+import logging
+import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import logging
 from os.path import basename
 from pathlib import Path
-import smtplib
-from typing import List, Union
+from typing import List, Union, NoReturn, Tuple
 
 from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
 from soam.constants import PARENT_LOGGER, PROJECT_NAME
@@ -18,27 +19,22 @@ DEFAULT_SIGNATURE = PROJECT_NAME
 
 logger = logging.getLogger(f'{PARENT_LOGGER}.{__name__}')
 
-"""
-MailReport
-----------
-Class for building and sending a report via mail.
-"""
-
 
 class MailReport:
     """
-        Builds and sends an email report.
+    MailReport
+    ----------
+    Builds and sends reports via mail.
     """
 
     def __init__(self, mail_recipients_list: List[str], metric_name: str):
-        """
-        Create MailReport object.
+        """Create MailReport object.
                
         Parameters
         ----------
-        mail_recipients_list
-            Array of the mails to send the report to.
-        metric_name
+        mail_recipients_list : list of str
+            The mails of the recipients for the report.
+        metric_name : str
             Name of the metric being forecasted.
         """
         self.mail_recipients_list = mail_recipients_list
@@ -46,53 +42,54 @@ class MailReport:
         self.credentials = credentials
         self.metric_name = metric_name
 
-    def send(
-        self,
-        current_date: str,
-        plot_filename: Union[Path, str],
-        subject: str = DEFAULT_SUBJECT,
-        signature: str = DEFAULT_SIGNATURE,
-    ):
+    def send(self, current_date: str, plot_filename: Union[Path, str],
+             subject: str = DEFAULT_SUBJECT,
+             signature: str = DEFAULT_SIGNATURE) -> NoReturn:
         """
         Send email report.
         
         Parameters
         ----------
-        current_date
-            date the report will be sent.
-        plot_filename
-            str or pathlib.Path of the forecast plot to send.
-        subject
-            subject of the mail sent.
-        signature
-            signature with which to end the mail.
+        current_date : str
+            Date when the report will be sent.
+        plot_filename : str or pathlib.Path
+             Path of the forecast plot to send.
+        subject : str
+            Subject of the email.
+        signature : str
+            Signature for the email.
         """
         logger.info(f"Sending email report to: {self.mail_recipients_list}")
 
         mime_img, mime_img_name = self._get_mime_images(Path(plot_filename))
         subject, msg_body = self._build_subject_n_msg_body(
-            subject, signature, self.metric_name, current_date, mime_img_name,
-        )
+            subject, signature, self.metric_name, current_date, mime_img_name)
 
-        self._send_mail(
-            self.credentials,
-            self.mail_recipients_list,
-            subject,
-            msg_body,
-            [mime_img],
-            [],
-        )
+        self._send_mail(self.credentials, self.mail_recipients_list, subject,
+                        msg_body, [mime_img], [])
 
-    def _send_mail(
-        self,
-        smtp_credentials,
-        mail_recipients,
-        subject,
-        mail_body,
-        mime_image_list,
-        attachments,
-    ):
-        """Send."""
+    def _send_mail(self, smtp_credentials: dict, mail_recipients: List[str],
+                   subject: str, mail_body: str,
+                   mime_image_list: List[MIMEImage], attachments: List[str]):
+        """ Send a report email.
+        TODO: review method, may be static
+
+        Parameters
+        ----------
+        smtp_credentials : dict
+            Credentials for the SMTP service.
+        mail_recipients : list of str
+            The mails of the recipients for the report.
+            TODO: this data is on self.
+        subject : str
+            Subject of the email.
+        mail_body : str
+            The message to be sent
+        mime_image_list : list of email.mime.image.MIMEImage
+            List of images to sent
+        attachments : list of str
+            List of files to attach in the email.
+        """
         user = smtp_credentials.get('user_address')
         password = smtp_credentials.get('password')
         from_address = smtp_credentials['mail_from']
@@ -124,7 +121,8 @@ class MailReport:
         for attachment in attachments:
             with open(attachment, "rb") as f:
                 part = MIMEApplication(f.read(), Name=basename(attachment))
-            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(
+            part[
+                'Content-Disposition'] = 'attachment; filename="%s"' % basename(
                 attachment
             )
             msg_root.attach(part)
@@ -135,15 +133,40 @@ class MailReport:
                 server.starttls()
                 server.ehlo()
                 server.login(user, password)
-            server.sendmail(from_address, mail_recipients, msg_root.as_string())
+            server.sendmail(from_address, mail_recipients,
+                            msg_root.as_string())
         logger.info("Email sent succesfully")
 
-    def _build_subject_n_msg_body(
-        self, subject, signature, metric_name, end_date, mime_img
-    ):
+    def _build_subject_n_msg_body(self, subject: str, signature: str,
+                                  metric_name: str, end_date,
+                                  mime_img: str) -> Tuple[str, str]:
+        """Creates the subject and message body
+        TODO: review method, may be static
+
+        Parameters
+        ----------
+        subject : str
+            The subject to format
+        signature : str
+            The message signature
+        metric_name : str
+            The name for the metric
+        end_date : ?
+            ?
+        mime_img : str
+            The path to the mime image.
+
+        Returns
+        -------
+        str
+            The subject of the email.
+        str
+            The message body of the email.
+        """
         """Build body and subject."""
         if subject == DEFAULT_SUBJECT:
-            subject = subject.format(end_date=end_date, metric_name=metric_name)
+            subject = subject.format(end_date=end_date,
+                                     metric_name=metric_name)
         logger.debug(f"Mail subject:\n {subject}")
 
         jparams = {
@@ -156,8 +179,22 @@ class MailReport:
         logger.debug(f"html mail body:\n {msg_body}")
         return subject, msg_body
 
-    def _get_mime_images(self, plot_filename: Path):
-        """Extract images from local dir paths."""
+    def _get_mime_images(self, plot_filename: Path) -> Tuple[MIMEImage, str]:
+        """Extract images from local dir paths.
+        TODO: review method, may be static
+
+        Parameters
+        ----------
+        plot_filename : pathlib.Path
+            The path to the plot image.
+
+        Returns
+        -------
+        MIMEImage
+            The image MIME document.
+        str
+            The plot filename.
+        """
         with plot_filename.open('rb') as img_file:
             msg_image = MIMEImage(img_file.read())
             img_name = str(plot_filename)
@@ -165,5 +202,16 @@ class MailReport:
 
         return msg_image, img_name
 
-    def _format_link(self, factor):
+    def _format_link(self, factor: str) -> str:
+        """
+        TODO: review unused method
+
+        Parameters
+        ----------
+        factor
+
+        Returns
+        -------
+
+        """
         return f'<a href=#{factor}>{factor}</a>'

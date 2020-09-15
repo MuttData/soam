@@ -1,9 +1,12 @@
 # helpers.py
-"""Project specific helper functions."""
+"""Utility functions for the project.
+
+TODO: review this file, it seems unused in the rest of the project.
+"""
+import logging
 from abc import ABC
 from contextlib import contextmanager
 from datetime import timedelta
-import logging
 from pathlib import Path
 
 from muttlib.utils import hash_str, make_dirs, str_to_datetime
@@ -11,7 +14,6 @@ from pandas.tseries import offsets
 from sklearn.base import BaseEstimator as AttributeHelperMixin
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
-
 
 from soam.constants import (
     DAILY_TIME_GRANULARITY,
