@@ -1,3 +1,4 @@
+# forecast_plotter.py
 """
 Forecast Plotter
 ----------
@@ -45,9 +46,9 @@ class ForecastPlotter:
 
         Parameters
         ----------
-        raw_series : pandas.Dataframe
+        raw_series : pandas.DataFrame
             The raw_series of data.
-        predictions : pandas.Dataframe
+        predictions : pandas.DataFrame
             The result of the predictions.
         time_granularity : str
             Time granularity of the series (daily or hourly)
