@@ -1,19 +1,22 @@
+# savers.py
 """
 Saver
 ----------
-`Saver` is an abstract class that create a way to save values.
+Saver is an abstract class used to store parameters and data through the
+pipeline.
 """
-from abc import abstractmethod
 import logging
+from abc import abstractmethod
 from pathlib import Path
 from typing import Union
 
+import pandas as pd
 from filelock import FileLock
 from muttlib.dbconn import BaseClient
 from muttlib.utils import hash_str, make_dirs
-import pandas as pd
 from prefect import Task, context
 from prefect.engine.state import State
+
 from soam.constants import FLOW_FILE_NAME, LOCK_NAME, PARENT_LOGGER
 from soam.data_models import (
     Base,
@@ -34,7 +37,8 @@ class Saver(Task):
     """ The base class for all savers objects.
 
     All implementations of Saver have to implement the state_handler of Prefect.
-    Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)  
+    Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)
+    TODO: inherit from ABC or use ABCMeta to ensure abstractmethods implementation
     """
 
     @abstractmethod
@@ -42,13 +46,13 @@ class Saver(Task):
         pass
 
     @abstractmethod
-    def save_forecast(self, task, old_state: State, new_state: State):
+    def save_forecast(self, task: Task, old_state: State, new_state: State):
         """
         This function will store the forecasts values.
         """
 
     @abstractmethod
-    def save_task_run(self, task, old_state: State, new_state: State):
+    def save_task_run(self, task: Task, old_state: State, new_state: State):
         """
         This function will store the task run.
         """
@@ -88,28 +92,30 @@ class CSVSaver(Saver):
         path
             str or pathlib.Path where the file will be created.
         """
+        # TODO: call super class __init__
         self.path = Path(make_dirs(path))
 
     @property
-    def flow_path(self):
+    def flow_path(self) -> Path:
         flow_run_folder = (
-            context["flow_name"]
-            + "_"
-            + context["date"].replace(microsecond=0, tzinfo=None).isoformat()
-            + "_"
-            + context["flow_run_id"]
+                context["flow_name"]
+                + "_"
+                + context["date"].replace(microsecond=0, tzinfo=None).isoformat()
+                + "_"
+                + context["flow_run_id"]
         )
         return make_dirs(self.path / flow_run_folder)
 
     @property
-    def flow_file_path(self):
+    def flow_file_path(self) -> Path:
         return self.flow_path / FLOW_FILE_NAME
 
     @property
-    def flow_run_lock(self):
+    def flow_run_lock(self) -> Path:
         return self.flow_path / LOCK_NAME
 
-    def save_forecast(self, task: Task, old_state: State, new_state: State):
+    def save_forecast(self, task: Task, old_state: State,
+                      new_state: State) -> State:
         """
         Store the forecaster data in the constructed path
         with the `{task_slug}_forecasts.csv`.
@@ -126,7 +132,8 @@ class CSVSaver(Saver):
 
         return new_state
 
-    def save_task_run(self, task: Task, old_state: State, new_state: State):
+    def save_task_run(self, task: Task, old_state: State,
+                      new_state: State) -> State:
         """
         Store the task run information in the csv file created by `save_flow_run`
         """
@@ -153,7 +160,8 @@ class CSVSaver(Saver):
 
         return new_state
 
-    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+    def save_flow_run(self, soamflow: SoamFlow, old_state: State,
+                      new_state: State) -> State:
         """
         Store the SoamFlow run information, create a folder for the run with a csv file.
         """
@@ -190,6 +198,7 @@ class DBSaver(Saver):
         base_client
             A BaseClient with connection to the database
         """
+        # TODO: call super class __init__
         self.db_client = base_client
 
         if base_client._connect() is not None:
@@ -200,7 +209,8 @@ class DBSaver(Saver):
                     "alembic upgrade head"
                 )
 
-    def save_forecast(self, task: Task, old_state: State, new_state: State):
+    def save_forecast(self, task: Task, old_state: State,
+                      new_state: State) -> State:
         """
         Store the forecaster data in the create connection to a database.
         """
@@ -213,7 +223,8 @@ class DBSaver(Saver):
 
         return new_state
 
-    def save_task_run(self, task: Task, old_state: State, new_state: State):
+    def save_task_run(self, task: Task, old_state: State,
+                      new_state: State) -> State:
         """
         Store the data of the task run in the create connection to a database.
         """
@@ -234,7 +245,8 @@ class DBSaver(Saver):
 
         return new_state
 
-    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+    def save_flow_run(self, soamflow: SoamFlow, old_state: State,
+                      new_state: State) -> State:
         """
         Save the SoamFlow run data in the create connection to a database.
         """

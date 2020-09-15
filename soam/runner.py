@@ -2,10 +2,12 @@
 """
 SoamFlow Class
 ----------
-A class that can execute all steps at once
-and keep track of the whole run data
-"""
+A class that can execute the pipeline steps and keep track of the whole run
+data
 
+TODO: review if SoamFlow is going to be the only class that can run the
+ pipeline
+"""
 from datetime import datetime
 from typing import TYPE_CHECKING
 

@@ -1,6 +1,10 @@
 # mail_report.py
-"""Mail creator and sender. Its a postprocess that sends a report with
-the model forecasts."""
+"""
+Mail Report
+----------
+Mail creator and sender. Its a postprocess that sends a report with
+the model forecasts.
+"""
 import logging
 import smtplib
 from email.mime.application import MIMEApplication

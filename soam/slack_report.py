@@ -1,18 +1,20 @@
 # slack_report.py
 """
-SlackReport
+Slack Report
 ----------
-Slack reporting and message formatting tools.
+Slack reporting and message formatting tools. Its a postprocess that sends the
+model forecasts though the slack app.
 """
-
 from pathlib import Path
-from typing import Union
+from typing import Union, NoReturn
 
 import pandas as pd
+import slack
+# TODO: slack missing dependency.
+
 from soam.cfg import get_slack_cred
 from soam.constants import FORECAST_DATE, YHAT_COL
 
-import slack
 
 DEFAULT_GREETING_MESSAGE = "Hello everyone! Here are the results of the forecast for the *{metric_name}* metric:\n"
 DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
@@ -25,13 +27,11 @@ class SlackReport:
         self.channel_id = channel_id
         self.metric_name = metric_name
 
-    def send_report(
-        self,
-        prediction: pd.DataFrame,
-        plot_filename: Union[str, Path],
-        greeting_message: str = DEFAULT_GREETING_MESSAGE,
-        farewell_message: str = DEFAULT_FAREWELL_MESSAGE,
-    ):
+    def send_report(self, prediction: pd.DataFrame,
+                    plot_filename: Union[str, Path],
+                    greeting_message: str = DEFAULT_GREETING_MESSAGE,
+                    farewell_message:
+                    str = DEFAULT_FAREWELL_MESSAGE) -> NoReturn:
         if greeting_message == DEFAULT_GREETING_MESSAGE:
             greeting_message.format(metric_name=self.metric_name)
 
@@ -47,9 +47,7 @@ class SlackReport:
 
         summary_message = "\n".join(summary_entries)
 
-        self.slack_client.files_upload(
-            channels=self.channel_id,
-            file=str(plot_filename),
-            initial_comment=summary_message,
-            title=f"{self.metric_name} Forecast",
-        )
+        self.slack_client.files_upload(channels=self.channel_id,
+                                       file=str(plot_filename),
+                                       initial_comment=summary_message,
+                                       title=f"{self.metric_name} Forecast")
