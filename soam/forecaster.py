@@ -41,7 +41,7 @@ class Forecaster(Step):
 
     def run(self, time_series: pd.DataFrame = None,
             input_length: Optional[int] = 1, output_length: int = 1,
-            **kwargs) -> Tuple[pd.DataFrame, ForecastingModel]:
+            **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame, ForecastingModel]:
         """Executes the models fit and predict
 
         Creates a TimeSeries from a pandas DataFrame and stores the
@@ -94,4 +94,4 @@ class Forecaster(Step):
             inplace=True,
         )
 
-        return self.prediction, self.model
+        return self.prediction, self.time_series, self.model

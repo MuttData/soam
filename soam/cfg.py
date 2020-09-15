@@ -86,14 +86,15 @@ def get_db_cred(setting_path: str = "settings.ini") -> dict:
     return db_cred
 
 
-def get_slack_cred() -> dict:
+def get_slack_cred(setting_path: str = "settings.ini") -> dict:
     """Retrieve the Slack credentials
-    
+
     Returns
     -------
     dict
         A dict containing the slack token.
     """
+    config = AutoConfig(search_path=setting_path)
     slack_creds = {}
 
     slack_creds["token"] = config("SLACK_TOKEN")

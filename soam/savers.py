@@ -178,7 +178,7 @@ class CSVSaver(Saver):
             df = pd.DataFrame.from_dict(csv_data)
             df.to_csv(self.flow_file_path, index=False)
 
-        elif new_state.is_successful():
+        elif new_state.is_successful() or new_state.is_failed():
             self.flow_run_lock.unlink()
 
         return new_state

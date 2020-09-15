@@ -6,28 +6,24 @@ Postprocess to plot the model forecasts.
 """
 import logging
 from pathlib import Path
-from typing import Union, NoReturn
+from typing import Optional, Union, NoReturn
 
 import pandas as pd
 
 from soam.constants import (DAILY_TIME_GRANULARITY, DS_COL, FORECAST_DATE,
                             PARENT_LOGGER)
 from soam.plot_utils import create_forecast_figure
+from soam.step import Step
 from soam.utils import get_file_path
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 class ForecastPlotter:
-    """
-    ForecastPlotter
-    ----------
-    In charge of formatting and plotting the results of a fitted model.
-    """
-
-    def __init__(self, path: Union[Path, str], metric_name: str) -> NoReturn:
-        """Formats and plots the forecaster passed as a parameter.
-
+    def __init__(self, path: Union[Path, str], metric_name: str):
+        """
+        Formats and plots the forecaster passed as a parameter.
+        
         Parameters
         ----------
         path : str or pathlib.Path
@@ -35,22 +31,24 @@ class ForecastPlotter:
         metric_name : str
             The name for the metric that its going to plot.
         """
+
         self.path = Path(path)
         self.metric_name = metric_name
 
-    def plot(self, raw_series: pd.DataFrame, predictions: pd.DataFrame,
+    def plot(self, time_series: pd.DataFrame, predictions: pd.DataFrame,
              time_granularity: str = DAILY_TIME_GRANULARITY) -> Path:
-        """Create and store the result plot in the constructed path.
+        """
+        Create and store the result plot in the constructed path.
         
         If the path does not exist, it will be created.
 
         Parameters
         ----------
-        raw_series : pandas.DataFrame
-            The raw_series of data.
-        predictions : pandas.DataFrame
-            The result of the predictions.
-        time_granularity : str
+        time_series
+            Dataframe belonging to a time_series of data.
+        predictions
+            Dataframe with the result of the predictions.
+        time_granularity
             Time granularity of the series (daily or hourly)
 
         Returns
@@ -60,11 +58,11 @@ class ForecastPlotter:
         """
         predictions[DS_COL] = predictions[FORECAST_DATE]
 
-        full_series = pd.concat([predictions, raw_series])
+        full_series = pd.concat([predictions, time_series])
         full_series = full_series.drop(columns=[FORECAST_DATE])
         full_series[DS_COL] = pd.to_datetime(full_series[DS_COL])
-        start_date = min(pd.to_datetime(raw_series[DS_COL]))
-        end_date = max(pd.to_datetime(raw_series[DS_COL]))
+        start_date = min(pd.to_datetime(time_series[DS_COL]))
+        end_date = max(pd.to_datetime(time_series[DS_COL]))
 
         fig = create_forecast_figure(
             full_series,
@@ -81,3 +79,19 @@ class ForecastPlotter:
         logger.debug(f"Saving forecast figure to {plot_path}...")
         fig.savefig(plot_path, bbox_inches="tight")
         return plot_path
+
+
+class ForecastPlotterTask(Step, ForecastPlotter):
+    def __init__(
+        self, path: Union[Path, str], metric_name: str, **kwargs,
+    ):
+        Step.__init__(self, **kwargs)
+        ForecastPlotter.__init__(self, path, metric_name)
+
+    def run(
+        self,
+        time_series: pd.DataFrame,
+        predictions: pd.DataFrame,
+        time_granularity: Optional[str] = DAILY_TIME_GRANULARITY,
+    ) -> Path:
+        return self.plot(time_series, predictions, time_granularity)

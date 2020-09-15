@@ -41,6 +41,7 @@ setuptools.setup(
         "filelock",
         "click",
         "cookiecutter",
+        "slack",
         "muttlib @ git+https://gitlab.com/mutt_data/muttlib#egg=muttlib"
     ],
     python_requires="~=3.6",
