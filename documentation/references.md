@@ -11,7 +11,12 @@ This is the priority order to understand the dependencies:
 [//comment]: # (TODO: Ask Pedro to improve the background documents
  with the knowledge learned from delver)
 
-# Libraries references
+# Slack
+In our slack there is a channel #dev-soam, were we discuss project design
+details, libraries and issues. There are also some other project related
+documents pinned for you to read on.
+
+# Core libraries references
 This section contains references to the different libraries and their
 associated project files.
 
@@ -148,3 +153,12 @@ Used in: utils.py
 
 https://docs.python.org/3/library/copy.html
 
+# CI libraries references
+
+### copy
+https://nox.thea.codes/en/stable/
+http://mypy-lang.org/
+https://github.com/PyCQA/pylint
+https://pycqa.github.io/isort/
+https://github.com/psf/black
+https://bandit.readthedocs.io/en/latest/
