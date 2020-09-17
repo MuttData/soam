@@ -1,3 +1,9 @@
+# cfg.py
+"""
+Configurations
+----------
+Configuration values for the SlackReport, MailReport and DBSaver.
+"""
 from pathlib import Path
 import tempfile
 from typing import Optional
@@ -45,6 +51,9 @@ SOAM_FLOW_RUN_TABLE_FACTOR_CONF_TABLE = (
 )
 SOAM_TASK_RUNS_TABLE = f"{table_name_preffix}{SOAM_TASK_RUNS_TABLE_BASENAME}"
 FORECASTER_VALUES_TABLE = f"{table_name_preffix}{FORECASTER_VALUES_TABLE_BASENAME}"
+# TODO: replace syntax to be length compliant
+# FORECASTER_VALUES_TABLE = (f"{table_name_preffix}"
+#                            f"{FORECASTER_VALUES_TABLE_BASENAME}")
 EXTRACT_VALUES_TABLE = f"{table_name_preffix}{EXTRACT_VALUES_TABLE_BASENAME}"
 
 
@@ -55,8 +64,17 @@ MAIL_TEMPLATE = template(
 
 
 def get_db_cred(setting_path: Optional[str] = None) -> dict:
-    """
-    Read the setting.ini file in the given path and retrieve the database credentials
+    """Read the setting.ini file and retrieve the database credentials
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
+
+    Returns
+    -------
+    dict
+        A dict containing: username, dialect, password, database, port, host.
     """
     config = AutoConfig(search_path=setting_path)
     db_cred = {}
@@ -72,8 +90,17 @@ def get_db_cred(setting_path: Optional[str] = None) -> dict:
 
 
 def get_slack_cred(setting_path: Optional[str] = None) -> dict:
-    """
-    Read the setting.ini file in the given path and retrieve the Slack credentials
+    """Retrieve the Slack credentials
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
+
+    Returns
+    -------
+    dict
+        A dict containing the slack token.
     """
     config = AutoConfig(search_path=setting_path)
     slack_creds = {}
@@ -84,8 +111,17 @@ def get_slack_cred(setting_path: Optional[str] = None) -> dict:
 
 
 def get_smtp_cred(setting_path: Optional[str] = None) -> dict:
-    """
-    Read the setting.ini file in the given path and retrieve the SMTP credentials
+    """Retrieve the SMTP credentials
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
+
+    Returns
+    -------
+    dict
+        A dict containing: user_address, password, mail_from, host, port.
     """
     config = AutoConfig(search_path=setting_path)
     smtp_creds = {}
@@ -100,9 +136,25 @@ def get_smtp_cred(setting_path: Optional[str] = None) -> dict:
 
 
 def get_db_uri(setting_path: Optional[str]) -> str:
+    """Retrieve the uri for the database.
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
+
+    Returns
+    -------
+    str
+        A string with the database uri.
+    """
     db_cred = get_db_cred(setting_path)
 
     if db_cred['dialect'] == SQLITE:
         return f"{db_cred['dialect']}:///{db_cred['database']}"
 
     return f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/{db_cred['database']}"
+    # TODO: replace syntax to be length compliant
+    # return (f"{db_cred['dialect']}://{db_cred['username']}:"
+    #         f"db_cred['password']}@{db_cred['host']}:"
+    #         f"{db_cred['port']}/{db_cred['database']}")

@@ -1,8 +1,12 @@
 # forecast_plotter.py
-
+"""
+Forecast Plotter
+----------
+Postprocess to plot the model forecasts.
+"""
 import logging
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import pandas as pd
 
@@ -14,13 +18,6 @@ from soam.utils import get_file_path
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-"""
-ForecastPlotter
-----------
-In charge of formatting and plotting the results of a fitted model.
-"""
-
-
 class ForecastPlotter:
     def __init__(self, path: Union[Path, str], metric_name: str):
         """
@@ -28,8 +25,10 @@ class ForecastPlotter:
 
         Parameters
         ----------
-        path
-            str or pathlib.Path where the plots will be stored.
+        path : str or pathlib.Path
+            Where the plots will be stored.
+        metric_name : str
+            The name for the metric that its going to plot.
         """
 
         self.path = Path(path)
@@ -39,7 +38,7 @@ class ForecastPlotter:
         self,
         time_series: pd.DataFrame,
         predictions: pd.DataFrame,
-        time_granularity: Optional[str] = DAILY_TIME_GRANULARITY,
+        time_granularity: str = DAILY_TIME_GRANULARITY,
     ) -> Path:
         """
         Create and store the result plot in the constructed path.
@@ -54,11 +53,11 @@ class ForecastPlotter:
             Dataframe with the result of the predictions.
         time_granularity
             Time granularity of the series (daily or hourly)
+
         Returns
         -------
-        Path
+        pathlib.Path
             The path of the resulting plot
-
         """
         predictions[DS_COL] = predictions[FORECAST_DATE]
 
@@ -97,6 +96,6 @@ class ForecastPlotterTask(Step, ForecastPlotter):
         self,
         time_series: pd.DataFrame,
         predictions: pd.DataFrame,
-        time_granularity: Optional[str] = DAILY_TIME_GRANULARITY,
+        time_granularity: str = DAILY_TIME_GRANULARITY,
     ) -> Path:
         return self.plot(time_series, predictions, time_granularity)

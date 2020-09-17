@@ -29,6 +29,8 @@ setuptools.setup(
     install_requires=[
         "jinja2",
         "pandas>=1.0.0",
+        "statsmodels<0.12,>=0.11",
+        "Cython<0.29.18,>=0.29",
         "progressbar2",
         "sqlalchemy",
         "sqlalchemy_utils",
@@ -67,5 +69,7 @@ setuptools.setup(
             'hypothesis',
         ],
     },
+    python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},
 )
+# TODO: check why 'python setup.py develop' is failing to obtain muttlib, but 'pip install -e .' is working

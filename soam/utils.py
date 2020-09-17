@@ -1,8 +1,10 @@
 # utils.py
-
-"""Utility functions."""
+"""
+Utils
+----------
+Utility functions for the whole project.
+"""
 from copy import deepcopy
-import logging
 import logging.config
 from pathlib import Path
 
@@ -15,8 +17,14 @@ logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 def range_datetime(
-    datetime_start, datetime_end, hourly_offset=False, timeskip=None, as_datetime=False
+    datetime_start,
+    datetime_end,
+    hourly_offset: bool = False,
+    timeskip=None,
+    as_datetime: bool = False,
 ):
+    # TODO: review datetime_start, datetime_end, are datetimes?
+    # TODO: timeskip is Tick?
     """Build datetime generator over successive time steps."""
     if timeskip is None:
         timeskip = offsets.Day(1) if not hourly_offset else offsets.Hour(1)

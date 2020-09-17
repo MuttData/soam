@@ -2,9 +2,9 @@
 """
 Step Base Class
 ----------
-An abstract base class for every step
+An abstract base class for the steps in the pipeline, including: postprocess,
+preprocess, extract and forecaster.
 """
-
 from abc import abstractmethod
 
 import pandas as pd
@@ -18,7 +18,7 @@ class Step(Task, BaseEstimator):
     """
 
     @abstractmethod
-    def run(self, time_series: pd.DataFrame, **kwargs) -> pd.DataFrame:
+    def run(self) -> pd.DataFrame:
         """
         Execute this step function
 

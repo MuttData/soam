@@ -1,6 +1,9 @@
 # helpers.py
 # pylint: skip-file
-"""Project specific helper functions."""
+"""Utility functions for the project.
+
+TODO: review this file, it seems unused in the rest of the project.
+"""
 from abc import ABC
 from contextlib import contextmanager
 from datetime import timedelta

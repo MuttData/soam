@@ -1,7 +1,9 @@
+# savers.py
 """
 Saver
 ----------
-`Saver` is an abstract class that create a way to save values.
+Saver is an abstract class used to store parameters and data through the
+pipeline.
 """
 from abc import ABC, abstractmethod
 import logging
@@ -36,6 +38,7 @@ class Saver(ABC):  # pylint:disable=abstract-method
 
     All implementations of Saver have to implement the state_handler of Prefect.
     Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)
+    TODO: inherit from ABC or use ABCMeta to ensure abstractmethods implementation
     """
 
     @abstractmethod
@@ -43,13 +46,13 @@ class Saver(ABC):  # pylint:disable=abstract-method
         pass
 
     @abstractmethod
-    def save_forecast(self, task, old_state: State, new_state: State):
+    def save_forecast(self, task: Task, old_state: State, new_state: State):
         """
         This function will store the forecasts values.
         """
 
     @abstractmethod
-    def save_task_run(self, task, old_state: State, new_state: State):
+    def save_task_run(self, task: Task, old_state: State, new_state: State):
         """
         This function will store the task run.
         """
@@ -93,7 +96,7 @@ class CSVSaver(Saver):
         self.path = Path(make_dirs(path))
 
     @property
-    def flow_path(self):
+    def flow_path(self) -> Path:
         flow_run_folder = (
             context["flow_name"]
             + "_"
@@ -104,14 +107,14 @@ class CSVSaver(Saver):
         return make_dirs(self.path / flow_run_folder)
 
     @property
-    def flow_file_path(self):
+    def flow_file_path(self) -> Path:
         return self.flow_path / FLOW_FILE_NAME
 
     @property
-    def flow_run_lock(self):
+    def flow_run_lock(self) -> Path:
         return self.flow_path / LOCK_NAME
 
-    def save_forecast(self, task: Task, old_state: State, new_state: State):
+    def save_forecast(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the forecaster data in the constructed path
         with the `{task_slug}_forecasts.csv`.
@@ -128,7 +131,7 @@ class CSVSaver(Saver):
 
         return new_state
 
-    def save_task_run(self, task: Task, old_state: State, new_state: State):
+    def save_task_run(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the task run information in the csv file created by `save_flow_run`
         """
@@ -155,7 +158,9 @@ class CSVSaver(Saver):
 
         return new_state
 
-    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+    def save_flow_run(
+        self, soamflow: SoamFlow, old_state: State, new_state: State
+    ) -> State:
         """
         Store the SoamFlow run information, create a folder for the run with a csv file.
         """
@@ -203,7 +208,7 @@ class DBSaver(Saver):
                     "alembic upgrade head"
                 )
 
-    def save_forecast(self, task: Task, old_state: State, new_state: State):
+    def save_forecast(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the forecaster data in the create connection to a database.
         """
@@ -216,7 +221,7 @@ class DBSaver(Saver):
 
         return new_state
 
-    def save_task_run(self, task: Task, old_state: State, new_state: State):
+    def save_task_run(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the data of the task run in the create connection to a database.
         """
@@ -237,7 +242,9 @@ class DBSaver(Saver):
 
         return new_state
 
-    def save_flow_run(self, soamflow: SoamFlow, old_state: State, new_state: State):
+    def save_flow_run(
+        self, soamflow: SoamFlow, old_state: State, new_state: State
+    ) -> State:
         """
         Save the SoamFlow run data in the create connection to a database.
         """
