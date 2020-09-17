@@ -73,9 +73,11 @@ via prompt.
 For database storing there are complementary tools:
 * [muttlib.dbcon](https://gitlab.com/mutt_data/muttlib/) for database connections.
 
-* [Decouple](https://github.com/henriquebastos/python-decouple) storing the database information in a separated file. 
-    With a [`settings.ini`](soam/settings.ini) file to store the database credentials, when modifying it don't change
-    the keys names
+* [Decouple](https://github.com/henriquebastos/python-decouple) storing the
+ database information in a separated file. 
+ With a [`settings.ini`](soam/settings.ini) file to store the database
+ credentials and general configurations, when modifying it don't change
+ the keys names
 
 * [Alembic](https://alembic.sqlalchemy.org/en/latest/) to create the database migrations.
 A brief description is below
