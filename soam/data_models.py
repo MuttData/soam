@@ -24,7 +24,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils.types.uuid import UUIDType
-# TODO: sqlalchemy_utils missing dependency.
 
 from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, \
     SOAM_TASK_RUNS_TABLE
