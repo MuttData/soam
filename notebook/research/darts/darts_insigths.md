@@ -1,10 +1,10 @@
 # Darts insights
-Darts base all the library on the TimeSeries Class, a Class created by them with datetime type as index. 
+Darts base all the library on the TimeSeries Class, a Class created by them with datetime type as index.
 You can create a TimeSeries from a pandas df or other sources.
 
-* It supports using uni-variate and multivariate features, but the multivariate capability is still under active development. 
+* It supports using uni-variate and multivariate features, but the multivariate capability is still under active development.
 
-* Because the datetime is the index and must be unique you cant have more than one entity per model. 
+* Because the datetime is the index and must be unique you cant have more than one entity per model.
 
 * Contains many classical statistical models (ARIMA, Theta, ...), Prophet and some deep learning models (RNN and TCN), not all models can use multivariate data, deep learning models and Prophet (adding holidays)
 
@@ -15,7 +15,7 @@ There is a function in utils to `fillna` with pandas interpolation methods.
 
 * Has the basic forecasting error metrics, you can easily create a custom one with a decorator.
 
-* For preprocessing has some functions, normalize data between [0,1], interpolate `nan` values. 
+* For preprocessing has some functions, normalize data between [0,1], interpolate `nan` values.
 
 * add features attributes
 

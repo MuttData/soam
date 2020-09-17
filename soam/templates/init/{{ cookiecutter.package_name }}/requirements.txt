@@ -1,6 +1,6 @@
-python-decouple
-pandas
-u8darts
 git+https://gitlab.com/mutt_data/muttlib.git
-soam
+pandas
+python-decouple
 scikit-learn
+soam
+u8darts

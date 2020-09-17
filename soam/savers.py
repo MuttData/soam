@@ -6,6 +6,7 @@ Saver is an abstract class used to store parameters and data through the
 pipeline.
 """
 import logging
+from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 from typing import Union
@@ -33,7 +34,7 @@ from soam.utils import get_file_path
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-class Saver(Task):
+class Saver(ABC):  # pylint:disable=abstract-method
     """ The base class for all savers objects.
 
     All implementations of Saver have to implement the state_handler of Prefect.
@@ -42,7 +43,7 @@ class Saver(Task):
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self):  # pylint:disable=abstract-method
         pass
 
     @abstractmethod
@@ -92,7 +93,7 @@ class CSVSaver(Saver):
         path
             str or pathlib.Path where the file will be created.
         """
-        # TODO: call super class __init__
+        super().__init__()
         self.path = Path(make_dirs(path))
 
     @property
@@ -198,7 +199,7 @@ class DBSaver(Saver):
         base_client
             A BaseClient with connection to the database
         """
-        # TODO: call super class __init__
+        super().__init__()
         self.db_client = base_client
 
         if base_client._connect() is not None:
@@ -267,6 +268,6 @@ class DBSaver(Saver):
 
     def _insert_single(self, element: Base) -> int:
         with session_scope(engine=self.db_client.get_engine()) as session:
-            session.add(element)
+            session.add(element)  # pylint: disable=maybe-no-member
 
         return element

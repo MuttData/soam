@@ -5,8 +5,10 @@ Configurations
 Configuration values for the SlackReport, MailReport and DBSaver.
 """
 from pathlib import Path
+import tempfile
+from typing import Optional
 
-from decouple import AutoConfig, config
+from decouple import AutoConfig
 from muttlib.utils import make_dirs, template
 from pkg_resources import resource_string
 
@@ -19,7 +21,8 @@ FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
 EXTRACT_VALUES_TABLE_BASENAME = "extract_values"
 
 # Setup paths
-_p = Path("/tmp/soam/")
+# _p = Path("/tmp/soam/")
+_p = tempfile.mkdtemp(dir="soam/")
 SQL_DIR = make_dirs(Path(_p, "resources"))
 LOG_DIR = make_dirs(Path(_p, "tmp", "logs"))
 DATA_DIR = make_dirs(Path(_p, "tmp", "data"))
@@ -60,12 +63,12 @@ MAIL_TEMPLATE = template(
 ).module
 
 
-def get_db_cred(setting_path: str = "settings.ini") -> dict:
+def get_db_cred(setting_path: Optional[str] = None) -> dict:
     """Read the setting.ini file and retrieve the database credentials
 
     Parameters
     ----------
-    setting_path : str
+    setting_path : str, optional
         The path for the .ini document with the settings.
 
     Returns
@@ -86,8 +89,13 @@ def get_db_cred(setting_path: str = "settings.ini") -> dict:
     return db_cred
 
 
-def get_slack_cred(setting_path: str = "settings.ini") -> dict:
+def get_slack_cred(setting_path: Optional[str] = None) -> dict:
     """Retrieve the Slack credentials
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
 
     Returns
     -------
@@ -102,14 +110,20 @@ def get_slack_cred(setting_path: str = "settings.ini") -> dict:
     return slack_creds
 
 
-def get_smtp_cred() -> dict:
+def get_smtp_cred(setting_path: Optional[str] = None) -> dict:
     """Retrieve the SMTP credentials
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
 
     Returns
     -------
     dict
         A dict containing: user_address, password, mail_from, host, port.
     """
+    config = AutoConfig(search_path=setting_path)
     smtp_creds = {}
 
     smtp_creds["user_address"] = config("SMTP_USER")
@@ -121,8 +135,13 @@ def get_smtp_cred() -> dict:
     return smtp_creds
 
 
-def get_db_uri(setting_path: str) -> str:
+def get_db_uri(setting_path: Optional[str]) -> str:
     """Retrieve the uri for the database.
+
+    Parameters
+    ----------
+    setting_path : str, optional
+        The path for the .ini document with the settings.
 
     Returns
     -------

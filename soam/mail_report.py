@@ -17,7 +17,7 @@ from typing import List, Union, NoReturn, Tuple
 
 from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
 from soam.constants import PARENT_LOGGER, PROJECT_NAME
-from soam.runner import Step
+from soam.step import Step
 
 DEFAULT_SUBJECT = "[{end_date}]Forecast report for {metric_name}"
 DEFAULT_SIGNATURE = PROJECT_NAME
@@ -33,8 +33,9 @@ class MailReport:
     """
 
     def __init__(self, mail_recipients_list: List[str], metric_name: str):
-        """Create MailReport object.
-               
+        """
+        Create MailReport object.
+
         Parameters
         ----------
         mail_recipients_list : list of str
@@ -52,7 +53,7 @@ class MailReport:
              signature: str = DEFAULT_SIGNATURE) -> NoReturn:
         """
         Send email report.
-        
+
         Parameters
         ----------
         current_date : str
@@ -223,14 +224,14 @@ class MailReport:
 
 class MailReportTask(Step, MailReport):
     def __init__(self, mail_recipients_list: List[str], metric_name: str, **kwargs):
-        Step.__init__(self, **kwargs)
+        Step.__init__(self, **kwargs)  # type: ignore
         MailReport.__init__(self, mail_recipients_list, metric_name)
 
-    def run(
+    def run(  # type: ignore
         self,
         current_date: str,
         plot_filename: Union[Path, str],
         subject: str = DEFAULT_SUBJECT,
         signature: str = DEFAULT_SIGNATURE,
     ):
-        return self.send(self, current_date, plot_filename, subject, signature)
+        return self.send(current_date, plot_filename, subject, signature)

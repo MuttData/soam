@@ -96,7 +96,7 @@ Be aware that alembic needs this package installed to run!
 
 When making any change of the data models you need them to impact into the database for this you will have to run:
 ```bash
-alembic revision --autogenerate 
+alembic revision --autogenerate
 alembic upgrade head
 ```
 

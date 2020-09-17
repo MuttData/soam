@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.axes import Axes
-from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter
 
@@ -95,8 +94,7 @@ def _base_10_tick_scaler(median_val: float) -> int:
     for i in reversed(range(1, 4)):
         if median_val / (10 ** i) >= 1:
             return i
-    else:
-        return 0
+    return 0
 
 
 def _create_common_series(df: pd.DataFrame, ds_col: str, sd,

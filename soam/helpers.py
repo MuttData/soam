@@ -1,4 +1,5 @@
 # helpers.py
+# pylint: skip-file
 """Utility functions for the project.
 
 TODO: review this file, it seems unused in the rest of the project.
@@ -19,7 +20,7 @@ from soam.constants import (
     DAILY_TIME_GRANULARITY,
     HOURLY_TIME_GRANULARITY,
     PARENT_LOGGER,
-    TIME_GRANULARITIES
+    TIME_GRANULARITIES,
 )
 from soam.utils import range_datetime
 

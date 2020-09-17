@@ -32,11 +32,11 @@ for all the dependencies or define which dependencies you want to install
     kedro allows teams to create analytics
     projects. It is developed as part of
     the Kedro initiative at QuantumBlack.
-    
+
     No plugins installed
 
 
-## Project Template 
+## Project Template
 Kedro provides a standard, modifiable and easy-to-use project template based on [Cookiecutter Data Science](https://github.com/drivendata/cookiecutter-data-science/).
 ```bash
 kedro new project-name
@@ -221,10 +221,10 @@ loaded_mem.tail()
 
 ### Partitioned dataset
 Loads and saves partitioned file-like data using the underlying dataset definition.
-No db nor a DataFrame 
+No db nor a DataFrame
 
 ## Pipeline abstraction
-Kedro is based on a Pipeline and node objects to run. 
+Kedro is based on a Pipeline and node objects to run.
 
 Here is a simple Kedro Pipeline.
 
@@ -265,7 +265,7 @@ runner.run(pipeline, data_catalog)
 
 
 ## Runner
-As you can see in the above example you define a runner and provide a pipeline and a datacatalog to run. 
+As you can see in the above example you define a runner and provide a pipeline and a datacatalog to run.
 
 There are 3 defined Runners:
 * `SequentialRunner`
@@ -274,7 +274,7 @@ There are 3 defined Runners:
 
 There is no `Dask` or other runners implementations
 
-You can run with the Python or with CLI : 
+You can run with the Python or with CLI :
 ```bash
 kedro run
 ```
@@ -339,7 +339,7 @@ Journal in Kedro allows you to save the history of pipeline.
 Each pipeline run creates a log file formatted as `journal_YYYY-MM-DDThh.mm.ss.sssZ.log`, which is saved in the logs/journals directory.
 The log file contains two kinds of journal records.
 
-### Context journal record 
+### Context journal record
 A context journal record captures all the necessary information to reproduce the pipeline run, and has the following JSON format
 
 ### Dataset journal record
@@ -350,7 +350,7 @@ While the context journal record is always logged at every run time of your pipe
 Didn't find a proper way to setup the `Journal`
 
 ## Debugging
-Kedro can be debugged with an IDE and it example how to set it up. 
+Kedro can be debugged with an IDE and it example how to set it up.
 
 If not you can add a Hook on_[node|pipe]_error and implement an error Hook with `pdb` or `ipdb`.
 
@@ -380,7 +380,7 @@ class PDBNodeDebugHook:
         pdb.post_mortem(traceback_object)
 ```
 
-Remember that every hook must be registered in the ProjectContext 
+Remember that every hook must be registered in the ProjectContext
 
 ```python
 class ProjectContext(KedroContext):
@@ -395,5 +395,5 @@ For the UI kedro add a plugin [Kedro-Viz](https://github.com/quantumblacklabs/ke
 ## Extras
 * [Kedro-Docker](https://github.com/quantumblacklabs/kedro-docker): a tool for packaging and shipping Kedro projects within containers
 * [Kedro-Airflow](https://github.com/quantumblacklabs/kedro-airflow): a tool for converting your Kedro project into an Airflow project
-* [Kedro-Pandas-Profiling](https://github.com/BrickFrog/kedro-pandas-profiling) : A simple wrapper to use Pandas Profiling easily in Kedro 
+* [Kedro-Pandas-Profiling](https://github.com/BrickFrog/kedro-pandas-profiling) : A simple wrapper to use Pandas Profiling easily in Kedro
 * `Jupyter`: Kedro brings a jupyter notebook installed, just running kedro jupyter notebook will start a jupyter server and see the files in the notebook folder

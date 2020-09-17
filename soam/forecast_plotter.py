@@ -6,7 +6,7 @@ Postprocess to plot the model forecasts.
 """
 import logging
 from pathlib import Path
-from typing import Optional, Union, NoReturn
+from typing import Any, Optional, Union
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ class ForecastPlotter:
     def __init__(self, path: Union[Path, str], metric_name: str):
         """
         Formats and plots the forecaster passed as a parameter.
-        
+
         Parameters
         ----------
         path : str or pathlib.Path
@@ -39,7 +39,7 @@ class ForecastPlotter:
              time_granularity: str = DAILY_TIME_GRANULARITY) -> Path:
         """
         Create and store the result plot in the constructed path.
-        
+
         If the path does not exist, it will be created.
 
         Parameters
@@ -83,12 +83,12 @@ class ForecastPlotter:
 
 class ForecastPlotterTask(Step, ForecastPlotter):
     def __init__(
-        self, path: Union[Path, str], metric_name: str, **kwargs,
+        self, path: Union[Path, str], metric_name: str, **kwargs: Any,
     ):
-        Step.__init__(self, **kwargs)
+        Step.__init__(self, **kwargs)  # type: ignore
         ForecastPlotter.__init__(self, path, metric_name)
 
-    def run(
+    def run(  # type: ignore
         self,
         time_series: pd.DataFrame,
         predictions: pd.DataFrame,

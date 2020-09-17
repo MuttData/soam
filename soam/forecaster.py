@@ -5,11 +5,12 @@ Forecaster
 Is a main class of SoaM. It manages the models, data and storages.
 """
 
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple, List  # pylint:disable=unused-import
 
 import pandas as pd
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
+import pandas as pd
 
 from soam.constants import DS_COL, FORECAST_DATE, YHAT_COL
 from soam.step import Step
@@ -19,15 +20,15 @@ if TYPE_CHECKING:
 
 
 class Forecaster(Step):
-    def __init__(self, model: ForecastingModel = None,
-                 savers: Optional[Saver] = None, **kwargs):
+    def __init__(self, model: ForecastingModel,
+                 savers: "Optional[List[Saver]]", **kwargs):
         """A Forecaster handles models, data and storages.
 
         Parameters
         ----------
         model : darts.models.forecasting_model.ForecastingModel
             The model that will be fitted and execute the predictions.
-        savers : soam.savers.Saver
+        savers : list of soam.savers.Saver, optional
             The saver to store the parameters and state changes.
         """
         super().__init__(**kwargs)
@@ -39,13 +40,13 @@ class Forecaster(Step):
         self.prediction = pd.DataFrame
         self.model = model
 
-    def run(self, time_series: pd.DataFrame = None,
-            input_length: Optional[int] = 1, output_length: int = 1,
-            **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame, ForecastingModel]:
-        """Executes the models fit and predict
-
-        Creates a TimeSeries from a pandas DataFrame and stores the
-         predictions.
+    def run(self, time_series: pd.DataFrame,
+        input_length: Optional[int] = 1,  # pylint:disable=unused-argument
+        output_length: int = 1, **kwargs) -> pd.DataFrame:
+        """
+        Execute fit and predict with Darts models,
+        creating a TimeSeries from a pandas DataFrame
+        and storing the prediction with in the object.
 
         Parameters
         ----------
