@@ -8,10 +8,9 @@ See Also
 --------
 savers.DBSaver : Saver used to store data and parameters in a database.
 """
-import enum
 from datetime import datetime
+import enum
 
-import sqlalchemy.types as types
 from sqlalchemy import (
     Column,
     DateTime,
@@ -23,10 +22,8 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
+import sqlalchemy.types as types
 from sqlalchemy_utils.types.uuid import UUIDType
-
-from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, \
-    SOAM_TASK_RUNS_TABLE
 
 from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, SOAM_TASK_RUNS_TABLE
 
@@ -84,8 +81,7 @@ class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
         return value
 
 
-class AbstractIDBase(
-    Base):  # type: ignore # pylint: disable=too-few-public-methods
+class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-methods
     """Helper class to add primary keys."""
 
     __abstract__ = True

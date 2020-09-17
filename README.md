@@ -26,7 +26,7 @@ project dependent.
 Then it converts the full dataset to the desired time granularity and aggregation level by some categorical attribute/s.
 
 ### Preprocessing
-This step implements functions to further cleanup and prepare the data for the following steps. 
+This step implements functions to further cleanup and prepare the data for the following steps.
 
 Such as:
 * Add feature/transformation
@@ -74,7 +74,7 @@ For database storing there are complementary tools:
 * [muttlib.dbcon](https://gitlab.com/mutt_data/muttlib/) for database connections.
 
 * [Decouple](https://github.com/henriquebastos/python-decouple) storing the
- database information in a separated file. 
+ database information in a separated file.
  With a [`settings.ini`](soam/settings.ini) file to store the database
  credentials and general configurations, when modifying it don't change
  the keys names
@@ -91,8 +91,8 @@ This package uses alembic and expects you to use it!
 
 Alembic is a database migration tool for usage with SQLAlchemy.
 After defining the schemas, with SQLAlchemy, Alembic keeps track of the database modifications such as add new
-columns, modify a schema or add new tables. 
- 
+columns, modify a schema or add new tables.
+
 Alembic is set up to use the credentials from the `settings.ini` file and get the defined models from `data_models`.
 Be aware that alembic needs this package installed to run!
 
@@ -104,7 +104,7 @@ alembic upgrade head
 
 The first command will check the last version of the database and will
 [autogenerate](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect)
-the python file with the necessary changes. 
+the python file with the necessary changes.
 It is always necessary to manually review and correct the candidate migrations that autogenerate produces.
 
 The second command will use this file to impact the changes in the database.

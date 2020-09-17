@@ -5,7 +5,8 @@ To install the dependencies in [editable mode](https://pip.pypa.io/en/stable/ref
 in the root of the project run:
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
+pip install -e ".[test]"
 ```
 
 [//comment]: # (TODO: 'python setup.py develop' is not working, should be the same as 'pip install -e .')

@@ -8,17 +8,17 @@ See Also
 --------
 forecast_plotter.py.ForecastPlotter : Postprocessor to plot the forecasts.
 """
-import logging
 from datetime import timedelta
+import logging
 from typing import Tuple
 
+from matplotlib.axes import Axes
 import matplotlib.dates as mdates
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.ticker import FuncFormatter
 
 from soam.constants import (
     ANOMALY_WIN,
@@ -58,8 +58,9 @@ pd.plotting.register_matplotlib_converters()
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-def _set_time_locator_interval(fig: Figure, ax: Axes, time_granularity: str,
-                               plot_conf: dict) -> Tuple[Figure, Axes]:
+def _set_time_locator_interval(
+    fig: Figure, ax: Axes, time_granularity: str, plot_conf: dict
+) -> Tuple[Figure, Axes]:
     major_locator = getattr(mdates, DAYLOCATOR)
     major_locator_interval = plot_conf[MAJOR_INTERVAL]
     date_format = "%Y-%b-%d"
@@ -97,8 +98,9 @@ def _base_10_tick_scaler(median_val: float) -> int:
     return 0
 
 
-def _create_common_series(df: pd.DataFrame, ds_col: str, sd,
-                          ed=None) -> Tuple[pd.DataFrame, np.ndarray]:  # pylint:disable=unused-argument
+def _create_common_series(
+    df: pd.DataFrame, ds_col: str, ed=None
+) -> Tuple[pd.DataFrame, np.ndarray]:  # pylint:disable=unused-argument
     """Get series data for start/end date range.
 
     Return filtered values and dates."""
@@ -109,30 +111,30 @@ def _create_common_series(df: pd.DataFrame, ds_col: str, sd,
     return window, window_dates
 
 
-def create_forecast_figure(df: pd.DataFrame, metric_name: str, end_date,
-                           forecast_window, anomaly_window: int = 0,
-                           time_granularity:
-                           str = DAILY_TIME_GRANULARITY) -> Figure:
+def create_forecast_figure(
+    df: pd.DataFrame,
+    metric_name: str,
+    end_date,
+    forecast_window,
+    anomaly_window: int = 0,
+    time_granularity: str = DAILY_TIME_GRANULARITY,
+) -> Figure:
     """Plot trend, forecast and anomalies with history, anomaly and forecast phases."""
 
-    PLOT_CONF = PLOT_CONFIG["anomaly_plot"]
+    PLOT_CONF: dict = PLOT_CONFIG["anomaly_plot"]
     PLOT_TIME_CONF = PLOT_CONF[time_granularity]
     COLOR_CONF = PLOT_CONF[COLORS]
     LABEL_CONF = PLOT_CONF[LABELS]
     future_window = forecast_window
-    history_window = len(df) - forecast_window
 
     anomaly_sd = end_date - timedelta(days=(anomaly_window))
-    history_sd = anomaly_sd - timedelta(days=(history_window))
     future_date = end_date + timedelta(days=future_window)
 
     # Note: we need to convert datetime values in series to pydatetime explicitly
     # See: https://stackoverflow.com/q/29329725/2149400
-    history, history_dates = _create_common_series(df, DS_COL, history_sd, anomaly_sd)
-    anomaly_win, anomaly_win_dates = _create_common_series(
-        df, DS_COL, anomaly_sd, end_date
-    )
-    forecast, forecast_dates = _create_common_series(df, DS_COL, end_date, future_date)
+    history, history_dates = _create_common_series(df, DS_COL, anomaly_sd)
+    anomaly_win, anomaly_win_dates = _create_common_series(df, DS_COL, end_date)
+    forecast, forecast_dates = _create_common_series(df, DS_COL, future_date)
 
     date_format = PLOT_TIME_CONF[DATE_FORMAT]
     fig_size = PLOT_TIME_CONF[FIG_SIZE]

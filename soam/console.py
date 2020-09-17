@@ -23,7 +23,6 @@ def cli() -> NoReturn:
     TODO: review why we are using this.
     https://click.palletsprojects.com/en/7.x/commands/#callback-invocation
     """
-    pass
 
 
 @cli.command()

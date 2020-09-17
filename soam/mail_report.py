@@ -5,15 +5,15 @@ Mail Report
 Mail creator and sender. Its a postprocess that sends a report with
 the model forecasts.
 """
-import logging
-import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import logging
 from os.path import basename
 from pathlib import Path
-from typing import List, Union, NoReturn, Tuple
+import smtplib
+from typing import List, Tuple, Union
 
 from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
 from soam.constants import PARENT_LOGGER, PROJECT_NAME
@@ -48,9 +48,13 @@ class MailReport:
         self.credentials = credentials
         self.metric_name = metric_name
 
-    def send(self, current_date: str, plot_filename: Union[Path, str],
-             subject: str = DEFAULT_SUBJECT,
-             signature: str = DEFAULT_SIGNATURE) -> NoReturn:
+    def send(
+        self,
+        current_date: str,
+        plot_filename: Union[Path, str],
+        subject: str = DEFAULT_SUBJECT,
+        signature: str = DEFAULT_SIGNATURE,
+    ):
         """
         Send email report.
 
@@ -69,14 +73,27 @@ class MailReport:
 
         mime_img, mime_img_name = self._get_mime_images(Path(plot_filename))
         subject, msg_body = self._build_subject_n_msg_body(
-            subject, signature, self.metric_name, current_date, mime_img_name)
+            subject, signature, self.metric_name, current_date, mime_img_name
+        )
 
-        self._send_mail(self.credentials, self.mail_recipients_list, subject,
-                        msg_body, [mime_img], [])
+        self._send_mail(
+            self.credentials,
+            self.mail_recipients_list,
+            subject,
+            msg_body,
+            [mime_img],
+            [],
+        )
 
-    def _send_mail(self, smtp_credentials: dict, mail_recipients: List[str],
-                   subject: str, mail_body: str,
-                   mime_image_list: List[MIMEImage], attachments: List[str]):
+    def _send_mail(
+        self,
+        smtp_credentials: dict,
+        mail_recipients: List[str],
+        subject: str,
+        mail_body: str,
+        mime_image_list: List[MIMEImage],
+        attachments: List[str],
+    ):
         """ Send a report email.
         TODO: review method, may be static
 
@@ -138,13 +155,12 @@ class MailReport:
                 server.starttls()
                 server.ehlo()
                 server.login(user, password)
-            server.sendmail(from_address, mail_recipients,
-                            msg_root.as_string())
+            server.sendmail(from_address, mail_recipients, msg_root.as_string())
         logger.info("Email sent succesfully")
 
-    def _build_subject_n_msg_body(self, subject: str, signature: str,
-                                  metric_name: str, end_date,
-                                  mime_img: str) -> Tuple[str, str]:
+    def _build_subject_n_msg_body(
+        self, subject: str, signature: str, metric_name: str, end_date, mime_img: str
+    ) -> Tuple[str, str]:
         """Creates the subject and message body
         TODO: review method, may be static
 
@@ -168,10 +184,8 @@ class MailReport:
         str
             The message body of the email.
         """
-        """Build body and subject."""
         if subject == DEFAULT_SUBJECT:
-            subject = subject.format(end_date=end_date,
-                                     metric_name=metric_name)
+            subject = subject.format(end_date=end_date, metric_name=metric_name)
         logger.debug(f"Mail subject:\n {subject}")
 
         jparams = {

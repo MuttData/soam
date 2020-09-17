@@ -4,8 +4,8 @@ Utils
 ----------
 Utility functions for the whole project.
 """
-import logging.config
 from copy import deepcopy
+import logging.config
 from pathlib import Path
 
 import pandas as pd
@@ -16,8 +16,13 @@ from soam.constants import PARENT_LOGGER
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
-def range_datetime(datetime_start, datetime_end, hourly_offset: bool = False,
-                   timeskip=None, as_datetime: bool = False):
+def range_datetime(
+    datetime_start,
+    datetime_end,
+    hourly_offset: bool = False,
+    timeskip=None,
+    as_datetime: bool = False,
+):
     # TODO: review datetime_start, datetime_end, are datetimes?
     # TODO: timeskip is Tick?
     """Build datetime generator over successive time steps."""

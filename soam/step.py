@@ -31,6 +31,7 @@ class Step(Task, BaseEstimator):
         pandas.DataFrame
             pandas DataFrame containing the output values.
         """
+
     def get_task_id(self) -> str:  # pylint: disable=no-self-use
         return context["flow_run_id"]
 

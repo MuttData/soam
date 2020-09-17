@@ -11,7 +11,7 @@ package.
 ### [setup.py](../setup.py)
 This [configuration file](https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-py)
 determines how the SoaM package is going to be installed and what commands it supports.
- 
+
 ### [setup.cfg](../setup.cfg)
 This [ini file](https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-cfg) defines default
 options for the setup.py commands.

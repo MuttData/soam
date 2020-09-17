@@ -6,12 +6,11 @@ Postprocess to plot the model forecasts.
 """
 import logging
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import pandas as pd
 
-from soam.constants import (DAILY_TIME_GRANULARITY, DS_COL, FORECAST_DATE,
-                            PARENT_LOGGER)
+from soam.constants import DAILY_TIME_GRANULARITY, DS_COL, FORECAST_DATE, PARENT_LOGGER
 from soam.plot_utils import create_forecast_figure
 from soam.step import Step
 from soam.utils import get_file_path
@@ -35,8 +34,12 @@ class ForecastPlotter:
         self.path = Path(path)
         self.metric_name = metric_name
 
-    def plot(self, time_series: pd.DataFrame, predictions: pd.DataFrame,
-             time_granularity: str = DAILY_TIME_GRANULARITY) -> Path:
+    def plot(
+        self,
+        time_series: pd.DataFrame,
+        predictions: pd.DataFrame,
+        time_granularity: str = DAILY_TIME_GRANULARITY,
+    ) -> Path:
         """
         Create and store the result plot in the constructed path.
 
@@ -73,8 +76,9 @@ class ForecastPlotter:
         )
 
         self.path.mkdir(parents=True, exist_ok=True)
-        fn = "_".join(["forecast", f"{start_date:%Y%m%d%H}",
-                       f"{end_date:%Y%m%d%H}", ".png"])
+        fn = "_".join(
+            ["forecast", f"{start_date:%Y%m%d%H}", f"{end_date:%Y%m%d%H}", ".png"]
+        )
         plot_path = get_file_path(self.path, fn)
         logger.debug(f"Saving forecast figure to {plot_path}...")
         fig.savefig(plot_path, bbox_inches="tight")
@@ -92,6 +96,6 @@ class ForecastPlotterTask(Step, ForecastPlotter):
         self,
         time_series: pd.DataFrame,
         predictions: pd.DataFrame,
-        time_granularity: Optional[str] = DAILY_TIME_GRANULARITY,
+        time_granularity: str = DAILY_TIME_GRANULARITY,
     ) -> Path:
         return self.plot(time_series, predictions, time_granularity)

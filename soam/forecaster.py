@@ -5,9 +5,8 @@ Forecaster
 Is a main class of SoaM. It manages the models, data and storages.
 """
 
-from typing import TYPE_CHECKING, Optional, Tuple, List  # pylint:disable=unused-import
+from typing import TYPE_CHECKING, List, Optional, Tuple  # pylint:disable=unused-import
 
-import pandas as pd
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
@@ -20,8 +19,9 @@ if TYPE_CHECKING:
 
 
 class Forecaster(Step):
-    def __init__(self, model: ForecastingModel,
-                 savers: "Optional[List[Saver]]", **kwargs):
+    def __init__(
+        self, model: ForecastingModel, savers: "Optional[List[Saver]]", **kwargs
+    ):
         """A Forecaster handles models, data and storages.
 
         Parameters
@@ -40,9 +40,13 @@ class Forecaster(Step):
         self.prediction = pd.DataFrame
         self.model = model
 
-    def run(self, time_series: pd.DataFrame,
+    def run(  # type: ignore
+        self,
+        time_series: pd.DataFrame,
         input_length: Optional[int] = 1,  # pylint:disable=unused-argument
-        output_length: int = 1, **kwargs) -> pd.DataFrame:
+        output_length: int = 1,
+        **kwargs
+    ) -> pd.DataFrame:
         """
         Execute fit and predict with Darts models,
         creating a TimeSeries from a pandas DataFrame
