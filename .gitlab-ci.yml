@@ -17,3 +17,10 @@ bandit:
   script:
     - pip install nox
     - nox --sessions bandit
+
+pyreverse:
+  script:
+    - apt-get -qq update
+    - apt-get -qq install -y graphviz
+    - pip install nox
+    - nox --sessions pyreverse

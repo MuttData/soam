@@ -155,10 +155,10 @@ https://docs.python.org/3/library/copy.html
 
 # CI libraries references
 
-### copy
 https://nox.thea.codes/en/stable/
 http://mypy-lang.org/
 https://github.com/PyCQA/pylint
 https://pycqa.github.io/isort/
 https://github.com/psf/black
 https://bandit.readthedocs.io/en/latest/
+https://pythonhosted.org/theape/documentation/developer/explorations/explore_graphs/explore_pyreverse.html
