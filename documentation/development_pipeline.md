@@ -21,3 +21,5 @@ We are using:
  * mypy for static type checking
 
 This runs on a gitlab machine after every commit.
+
+We are also running pyreverse to create diagrams for the project.

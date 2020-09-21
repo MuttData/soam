@@ -33,3 +33,22 @@ def bandit(session):
     session.install("bandit")
 
     session.run("bandit", "-r", "soam/", "-ll", "-c", "bandit.yaml")
+
+
+@nox.session(reuse_venv=True)
+def pyreverse(session):
+    """Create class diagrams."""
+    session.install("pylint")
+
+    # TODO: create smaller diagrams with portions of the project.
+    session.run("pyreverse", "soam", "-o", "png")
+
+    session.run(
+        "mv",
+        "packages.png",
+        "documentation/images/packages_dependencies.png",
+        external=True,
+    )
+    session.run(
+        "mv", "classes.png", "documentation/images/project_classes.png", external=True
+    )
