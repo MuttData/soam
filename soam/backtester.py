@@ -40,7 +40,7 @@ class Backetester(Step):
             Forecaster that will be fitted and execute the predictions.
         test_window: pd.Timedelta
             Time range to be extracted from the main timeseries on which the model will be evaluated on each backtesting run.
-        train_window: Optional[pd.Timedelta]
+        train_window: pd.Timedelta, optional
             Time range on which the model will trained on each backtesting run.
             If a pd.Timedelta value is passed then the sliding method will be used to select the training data.
             If `None` then the full time series will be used. This is the expanding window method.
