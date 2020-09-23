@@ -81,3 +81,38 @@ def get_file_path(path: Path, fn: str) -> Path:
     paths = path.glob(f"*_{fn}")
     max_index = max((int(p.name.split("_")[0]) for p in paths), default=-1) + 1
     return path / f"{max_index}_{fn}"
+
+
+def split_backtesting_ranges(
+    time_series: pd.DataFrame,
+    test_window: pd.Timedelta,
+    train_window: pd.Timedelta = None,
+    step_size: pd.Timedelta = 1,
+) -> "List[Tuple(pd.DataFrame, pd.DataFrame)]":
+    """Generate the indices to partition a time series according for backtesting.
+
+    Parameters
+    ----------
+    time_series: int
+        Data used to train and evaluate the data.
+    test_window: int
+        Time range to be extracted from the main timeseries on which the model will be evaluated on each backtesting run.
+    train_window: Optional[pd.Timedelta]
+        Time range on which the model will trained on each backtesting run.
+        If a pd.Timedelta value is passed then the sliding method will be used to select the training data.
+        If `None` then the full time series will be used. This is the expanding window method.
+    step_size: int
+        Distance between each successive step between the beggining of each forecasting range.
+
+    Returns
+    -------
+    list(tuple(train_set, test_set))
+        A list of tuples of datasets to be used to train or evaluate the model.
+    """
+    # Validate data: Time series must be long enough to build at least one index set for backtesting.
+    # TODO
+
+    # - Build the splits
+    # TODO
+
+    logger.warning("Not implemented")
