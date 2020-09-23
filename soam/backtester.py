@@ -26,6 +26,7 @@ class Backetester(Step):
         self,
         forecaster: Forecaster,
         test_window: pd.Timedelta,
+        preprocessor: Preprocessor = None,
         train_window: "Optional[pd.Timedelta]" = None,  # pylint:disable=unused-argument
         metrics: "Dict[str, Callable]" = None,
         savers: "Optional[List[Saver]]" = None,
@@ -51,14 +52,18 @@ class Backetester(Step):
             The saver to store the parameters and state changes.
         """
         self.forecaster = forecaster
+        self.preprocessor = preprocessor
         self.test_window = test_window
         self.train_window = train_window
         self.metrics = metrics
 
-    @defaults_from_attrs('forecaster', 'test_window', 'train_window', 'metrics')
+    @defaults_from_attrs(
+        'forecaster', 'preprocessor', 'test_window', 'train_window', 'metrics'
+    )
     def run(  # type: ignore
         self,
         time_series: pd.DataFrame,
+        preprocessor: Preprocessor = None,
         forecaster: Forecaster = None,
         test_window: pd.Timedelta = None,
         train_window: Optional[pd.Timedelta] = None,
@@ -74,6 +79,10 @@ class Backetester(Step):
         # TODO
         # - If test_window is not passed we should use the forecaster ouput_lenght arg instead.
         # - Decide wether to return a dict or a Maybe return a `dict` or a Datafram with metrics.
+        # - What is the effect of reusing steps like this if they have saver set?
+        # - Implement Preprocessor. Should use the fit/transform API of sklearn.
+        # - Should we add a column to select the column that will be used as target (both for training and testing)?
+        #   => Better be consistent with the Forecaster.
 
         time_series_splits = split_backtesting_ranges(
             time_series, test_window, train_window,
@@ -82,7 +91,12 @@ class Backetester(Step):
         for train_set, test_set in time_series_splits:
             # At this point
             fc = forecaster.copy()
-            prediction, _, _ = fc.run(train_set, test_window)
+            preproc = preprocessor.copy()
+
+            ready_train_set, fitted_preproc = preprocessor.run(train_set)
+            prediction, _, _ = fc.run(ready_train_set, test_window)
+
+            read_test_set = fitted_preproc(test_set)
             slice_metrics = compute_metrics(test_set, prediction)
 
             train_start = train_set[DS].min()
