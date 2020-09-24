@@ -11,9 +11,9 @@ It has a hook inside setup.py:
 from typing import NoReturn
 
 import click
-from cookiecutter.main import cookiecutter
 from pkg_resources import resource_filename
 
+from cookiecutter.main import cookiecutter
 from soam.cfg import INIT_TEMPLATE_DIR
 
 
