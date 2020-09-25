@@ -119,3 +119,25 @@ For more alembic commands visit the [documentation](https://alembic.sqlalchemy.o
 
 If you are going to develop SoaM, you should checkout the documentation directory before adding code,
 you can start in the [project structure document](documentation/project_structure.md).
+
+## Testing
+
+To run the default testsuite run this:
+```
+pytest
+```
+
+The tests for the extractor currently depende on having a local Postgres database and the variable `TEST_DB_CONNSTR` set with it's connection string.
+
+The easiest way to to this is as follows:
+```
+docker run --network=host \
+    -e "POSTGRES_USER=soam" \
+    -e "POSTGRES_PASSWORD=soam" \
+    -e "POSTGRES_DB=soam" \
+    --rm postgres
+
+TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest tests/test_time_series_extractor.py
+```
+
+Note that even though the example has a DB name during the tests a new database is created and dropped to ensure that no state is maintened between runs.

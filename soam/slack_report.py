@@ -17,9 +17,6 @@ from soam.cfg import get_slack_cred
 from soam.constants import FORECAST_DATE, YHAT_COL
 from soam.step import Step
 
-# TODO: slack missing dependency.
-
-
 DEFAULT_GREETING_MESSAGE = "Hello everyone! Here are the results of the forecast for the *{metric_name}* metric:\n"
 DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
 
