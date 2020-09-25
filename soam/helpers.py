@@ -11,6 +11,7 @@ import logging
 from pathlib import Path
 
 from muttlib.utils import hash_str, make_dirs, str_to_datetime
+import pandas as pd
 from pandas.tseries import offsets
 from sklearn.base import BaseEstimator, TransformerMixin
 from sqlalchemy.engine import Engine
@@ -337,3 +338,14 @@ def session_scope(engine: Engine, **session_kw):
 
 class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
     """Provide an interface to transform pandas DataFrames."""
+
+    def fit(self, X: pd.DataFrames, **fit_params) -> "BaseDataFrameTransformer":
+        """This fits the transformer to the passed data."""
+        logger.warning("Subclasses should implement this.")
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        raise NotImplementedError("Subclasses should implement this.")
+
+    def fit_transform(self, X: pd.DataFrame, **fit_params) -> pd.DataFrame:
+        return self.fit(X, **fit_params).transform(X)

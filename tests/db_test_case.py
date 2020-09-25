@@ -1,8 +1,11 @@
+import logging
 import os
 from unittest import TestCase
 
 from muttlib.dbconn import get_client_from_connstr
 from sqlalchemy.exc import ResourceClosedError
+
+logger = logging.getLogger(__name__)
 
 TEST_DB_CONNSTR = "TEST_DB_CONNSTR"
 TEST_DB_NAME = "pytests"
@@ -11,12 +14,12 @@ TEST_DB_NAME = "pytests"
 class PgTestCase(TestCase):
 
     db_connstr = os.getenv(TEST_DB_CONNSTR)
-    if not db_connstr:
-        raise KeyError(f"Missing test database connection string in {TEST_DB_CONNSTR}")
-
-    _, db_client = get_client_from_connstr(db_connstr)
-    prev_database = db_client.database
-    # db_client.database = TEST_DB_NAME
+    if db_connstr:
+        _, db_client = get_client_from_connstr(db_connstr)
+        prev_database = db_client.database
+        # db_client.database = TEST_DB_NAME
+    else:
+        logger.warning(f"Missing test database connection string in {TEST_DB_CONNSTR}")
 
     @classmethod
     def run_query(cls, query):

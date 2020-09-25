@@ -7,7 +7,6 @@ Preprocessor
 from typing import TYPE_CHECKING, List, Optional, Tuple  # pylint:disable=unused-import
 
 import pandas as pd
-from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.helpers import BaseDataFrameTransformer
 from soam.step import Step
@@ -17,9 +16,12 @@ if TYPE_CHECKING:
 
 
 class Preprocessor(Step):
-    def __init__(
-        self, preprocessor: BaseDataFrameTransformer, savers: "Optional[List[Saver]]", **kwargs
-    ):
+    def __init__(  # type: ignore
+        self,
+        preprocessor: BaseDataFrameTransformer = None,
+        savers: "Optional[List[Saver]]" = None,
+        **kwargs
+    ):  # type: ignore
         """Handle transformations
 
         Parameters
@@ -35,12 +37,21 @@ class Preprocessor(Step):
                 self.state_handlers.append(saver.save_forecast)
 
         self.preprocessor = preprocessor
+        self.dataset = None
+        self.transformed_dataset = None
 
-    @defaults_from_attrs
+    def fit(self, dataset: pd.DataFrame) -> "Preprocessor":
+        self.preprocessor.fit(dataset)  # type: ignore
+        return self
+
+    def transform(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        return self.preprocessor.transform(dataset)  # type: ignore
+
+    def fit_transform(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        return self.preprocessor.fit(dataset).transform(dataset)  # type: ignore
+
     def run(  # type: ignore
-        self, 
-        dataset: pd.DataFrame,
-        **kwargs
+        self, dataset: pd.DataFrame
     ) -> Tuple[pd.DataFrame, BaseDataFrameTransformer]:
         """
         Run a preprocessor on ,
@@ -59,5 +70,5 @@ class Preprocessor(Step):
             and the fitted preprocessor.
         """
         self.dataset = dataset.copy()
-        self.transformed_data = self.preprocessor.fit_transform()
-        return transformed_data, self.preprocessor
+        self.transformed_dataset = self.fit_transform(dataset)
+        return self.transformed_dataset, self.preprocessor  # type: ignore
