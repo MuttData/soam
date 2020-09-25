@@ -12,7 +12,7 @@ from pathlib import Path
 
 from muttlib.utils import hash_str, make_dirs, str_to_datetime
 from pandas.tseries import offsets
-from sklearn.base import BaseEstimator as AttributeHelperMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 
@@ -23,6 +23,11 @@ from soam.constants import (
     TIME_GRANULARITIES,
 )
 from soam.utils import range_datetime
+
+
+class AttributeHelperMixin(BaseEstimator):
+    """Alias used on older Delver implementations. Check if it can be deprecated."""
+
 
 logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
@@ -328,3 +333,7 @@ def session_scope(engine: Engine, **session_kw):
         raise
     finally:
         session.close()
+
+
+class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
+    """Provide an interface to transform pandas DataFrames."""

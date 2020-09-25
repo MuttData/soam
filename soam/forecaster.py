@@ -2,7 +2,6 @@
 """
 Forecaster
 ----------
-Is a main class of SoaM. It manages the models, data and storages.
 """
 
 from typing import TYPE_CHECKING, List, Optional, Tuple  # pylint:disable=unused-import
@@ -22,7 +21,7 @@ class Forecaster(Step):
     def __init__(
         self, model: ForecastingModel, savers: "Optional[List[Saver]]", **kwargs
     ):
-        """A Forecaster handles models, data and storages.
+        """Wraps a forecasting model to run it inside a pipeline.
 
         Parameters
         ----------
