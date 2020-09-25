@@ -81,3 +81,7 @@ def get_file_path(path: Path, fn: str) -> Path:
     paths = path.glob(f"*_{fn}")
     max_index = max((int(p.name.split("_")[0]) for p in paths), default=-1) + 1
     return path / f"{max_index}_{fn}"
+
+
+def filter_by_class_or_subclass(l, c):
+    return [e for e in l if isinstance(e, c) or issubclass(e.__class__, c)]
