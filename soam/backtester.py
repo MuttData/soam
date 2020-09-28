@@ -36,7 +36,7 @@ class Backetester(Step):
         savers: "Optional[List[Saver]]" = None,
         **kwargs
     ):
-        """A Forecaster handles models, data and storages.
+        """Class to perform backtesting.
 
         Parameters
         ----------
