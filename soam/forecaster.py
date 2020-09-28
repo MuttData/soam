@@ -2,7 +2,6 @@
 """
 Forecaster
 ----------
-`Forecaster` is a main class of `SoaM`. It handle everything of the forecast task.
 """
 
 from typing import TYPE_CHECKING, List, Optional  # pylint: disable=unused-import
@@ -25,8 +24,7 @@ class Forecaster(Step):
         savers: "Optional[List[Saver]]" = None,
         **kwargs,
     ):
-        """
-        A Forecaster is an object that is meant to handle models, data and storages.
+        """Wraps a forecasting model to run it inside a pipeline.
 
         Parameters
         ----------
