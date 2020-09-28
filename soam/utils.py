@@ -7,6 +7,7 @@ Utility functions for the whole project.
 from copy import deepcopy
 import logging.config
 from pathlib import Path
+from typing import List, Tuple
 
 import pandas as pd
 from pandas.tseries import offsets
@@ -85,10 +86,10 @@ def get_file_path(path: Path, fn: str) -> Path:
 
 def split_backtesting_ranges(
     time_series: pd.DataFrame,
-    test_window: pd.Timedelta,
-    train_window: pd.Timedelta = None,
-    step_size: pd.Timedelta = 1,
-) -> "List[Tuple(pd.DataFrame, pd.DataFrame)]":
+    test_window: int = 1,
+    train_window: int = 1,
+    step_size: int = 1,
+) -> "List[Tuple[pd.DataFrame, pd.DataFrame]]":
     """Generate the indices to partition a time series according for backtesting.
 
     Parameters
@@ -115,7 +116,9 @@ def split_backtesting_ranges(
     # - Build the splits
     # TODO
 
-    logger.warning("Not implemented")
+    logger.warning("Not implemented: split_backtesting_ranges")
+    train_set, test_set = time_series.iloc[train_window-test_window:-test_window], time_series.iloc[-test_window:]
+    return [(train_set, test_set)]
 
 
 def filter_by_class_or_subclass(l, c):
