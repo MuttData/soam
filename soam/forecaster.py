@@ -2,7 +2,6 @@
 """
 Forecaster
 ----------
-`Forecaster` is a main class of `SoaM`. It handle everything of the forecast task.
 """
 
 from typing import (  # pylint:disable=unused-import
@@ -35,8 +34,7 @@ class Forecaster(Step):
         model_kwargs: Optional(Dict) = None,
         **kwargs
     ):
-        """
-        A Forecaster is an object that is meant to handle models, data and storages.
+        """Wraps a forecasting model to run it inside a pipeline.
 
         Parameters
         model : darts.models.forecasting_model.ForecastingModel
