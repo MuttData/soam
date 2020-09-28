@@ -16,12 +16,12 @@ if TYPE_CHECKING:
 
 
 class Preprocessor(Step):
-    def __init__(  # type: ignore
+    def __init__(
         self,
         preprocessor: BaseDataFrameTransformer = None,
         savers: "Optional[List[Saver]]" = None,
         **kwargs
-    ):  # type: ignore
+    ):
         """Handle transformations
 
         Parameters
