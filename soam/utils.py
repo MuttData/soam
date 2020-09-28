@@ -116,3 +116,7 @@ def split_backtesting_ranges(
     # TODO
 
     logger.warning("Not implemented")
+
+
+def filter_by_class_or_subclass(l, c):
+    return [e for e in l if isinstance(e, c) or issubclass(e.__class__, c)]

@@ -5,6 +5,7 @@ Constants
 Constants for the whole project.
 """
 from datetime import datetime, timedelta
+import re
 
 # Global
 PROJECT_NAME = "SoaM"
@@ -143,3 +144,10 @@ PARENT_LOGGER = PROJECT_NAME
 # Saver Config
 FLOW_FILE_NAME = "flow_tasks.csv"
 LOCK_NAME = "flow.lock"
+
+# Timeseries Extractor
+DONT_AGGREGATE_SYMBOL = "#"
+NEGATE_SYMBOL = "!"
+PREFIX_SYMBOLS = DONT_AGGREGATE_SYMBOL + NEGATE_SYMBOL  # dims prefix symbols
+regex_prefix_symbols = re.compile(f"^[{PREFIX_SYMBOLS }]*")
+TIMESTAMP_COL = 'timestamp'

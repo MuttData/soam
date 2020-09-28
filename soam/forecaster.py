@@ -2,21 +2,21 @@
 """
 Forecaster
 ----------
-Is a main class of SoaM. It manages the models, data and storages.
+`Forecaster` is a main class of `SoaM`. It handle everything of the forecast task.
 """
 
-from typing import (
+from typing import (  # pylint:disable=unused-import
     TYPE_CHECKING,
     Dict,
     List,
     Optional,
     Tuple,
-)  # pylint:disable=unused-import
+)
 
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
-from prefect.utilities.tasks import defaults_from_attrs
 import pandas as pd
+from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DS_COL, FORECAST_DATE, YHAT_COL
 from soam.step import Step
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 
 class Forecaster(Step):
-    def __init__(
+    def __init__(  # type: ignore
         self,
         model: ForecastingModel,
         savers: "Optional[List[Saver]]",
@@ -35,10 +35,10 @@ class Forecaster(Step):
         model_kwargs: Optional(Dict) = None,
         **kwargs
     ):
-        """A Forecaster handles models, data and storages.
+        """
+        A Forecaster is an object that is meant to handle models, data and storages.
 
         Parameters
-        ----------
         model : darts.models.forecasting_model.ForecastingModel
             The model that will be fitted and execute the predictions.
         output_length : int
@@ -71,10 +71,14 @@ class Forecaster(Step):
 
         Parameters
         ----------
-        time_series : pandas.DataFrame
+        time_series
             A pandas DataFrame containing as minimum the first column
             with DataTime values, the second column the y to predict
             and the other columns more data
+        output_length
+            The length of the output
+        model_kwargs
+            Keyword arguments to be passed to the model when fitting.
 
         Returns
         -------
@@ -82,7 +86,9 @@ class Forecaster(Step):
             a tuple containing a pandas DataFrame with the predicted values
             and the trained model.
         """
-        self.time_series = time_series.copy()
+        # TODO: **kwargs should be a dedicated variable for model hyperparams.
+
+        self.time_series = time_series.copy()  # type: ignore
         values_columns = self.time_series.columns.to_list()
         values_columns.remove(DS_COL)
 
@@ -91,8 +97,8 @@ class Forecaster(Step):
         )
 
         # TODO: fix Unexpected argument **kwargs in self.model.fit
-        self.model.fit(time_series, **model_kwargs)
-        self.prediction = self.model.predict(output_length).pd_dataframe()
+        self.model.fit(time_series, **model_kwargs)  # type: ignore
+        self.prediction = self.model.predict(output_length).pd_dataframe()  # type: ignore
 
         self.prediction.reset_index(level=0, inplace=True)
         self.prediction.rename(

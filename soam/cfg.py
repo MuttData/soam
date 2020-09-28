@@ -12,7 +12,7 @@ from decouple import AutoConfig
 from muttlib.utils import make_dirs, template
 from pkg_resources import resource_string
 
-SQLITE = 'sqlite'
+SQLITE = "sqlite"
 
 SOAM_RUN_TABLE_BASENAME = "soam_flow_runs"
 SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_flow_run_factor_conf"
@@ -150,7 +150,7 @@ def get_db_uri(setting_path: Optional[str]) -> str:
     """
     db_cred = get_db_cred(setting_path)
 
-    if db_cred['dialect'] == SQLITE:
+    if db_cred["dialect"] == SQLITE:
         return f"{db_cred['dialect']}:///{db_cred['database']}"
 
     return f"{db_cred['dialect']}://{db_cred['username']}:{db_cred['password']}@{db_cred['host']}:{db_cred['port']}/{db_cred['database']}"

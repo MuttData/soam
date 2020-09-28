@@ -23,9 +23,11 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.types as types
+from sqlalchemy.types import TIMESTAMP
 from sqlalchemy_utils.types.uuid import UUIDType
 
 from soam.cfg import FORECASTER_VALUES_TABLE, SOAM_FLOW_RUN_TABLE, SOAM_TASK_RUNS_TABLE
+from soam.constants import TIMESTAMP_COL
 
 
 def now_getter() -> datetime:
@@ -145,3 +147,21 @@ class ForecastValues(AbstractIDBase):
     trend = Column(Float)
     outlier_value = Column(Float)
     outlier_sign = Column(Float)
+
+
+class AbstractTimeSeriesTable(AbstractIDBase):
+    """Base table to store time series data.
+
+    This class should be used as base for the table from which timeseries will be
+    extracted.
+    ```
+    class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
+        __tablename__ = "concrete_ts"
+
+        fact_1 = Column(Float)
+        dimension_1 = Column()
+    ```
+    """
+
+    __abstract__ = True
+    timestamp = Column(TIMESTAMP_COL, TIMESTAMP, index=True)
