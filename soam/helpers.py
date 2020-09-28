@@ -339,7 +339,7 @@ def session_scope(engine: Engine, **session_kw):
 class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
     """Provide an interface to transform pandas DataFrames."""
 
-    def fit(self, X: pd.DataFrames, **fit_params) -> "BaseDataFrameTransformer":
+    def fit(self, X: pd.DataFrame, **fit_params) -> "BaseDataFrameTransformer":
         """This fits the transformer to the passed data."""
         logger.warning("Subclasses should implement this.")
         return self

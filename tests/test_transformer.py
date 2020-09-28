@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from soam.helpers import BaseDataFrameTransformer
-from soam.preprocessor import Preprocessor
+from soam.transformer import Transformer
 
 
 class SimpleProcessor(BaseDataFrameTransformer):
@@ -22,17 +22,17 @@ class SimpleProcessor(BaseDataFrameTransformer):
         return df_X
 
 
-class PreprocessorTestCase(TestCase):
+class TransformerTestCase(TestCase):
     def test_simple_case(self):
         test_data_X = pd.DataFrame({'a': [1, 2, 3]})
         test_data_X2 = pd.DataFrame({'a': [4, 6, 8]})
         expected_output = pd.DataFrame({"a": [-1.2247448714, 0.0, 1.2247448714]})
         expected_output_2 = pd.DataFrame({"a": [2.449490, 4.898979, 7.348469]})
 
-        preproc = Preprocessor(SimpleProcessor())
+        preproc = Transformer(SimpleProcessor())
         transformed_dataset, _ = preproc.run(test_data_X)
 
         pd.testing.assert_frame_equal(transformed_dataset, expected_output)
         pd.testing.assert_frame_equal(
-            preproc.preprocessor.transform(test_data_X2), expected_output_2
+            preproc.transform(test_data_X2), expected_output_2
         )
