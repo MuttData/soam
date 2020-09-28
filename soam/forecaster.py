@@ -31,7 +31,7 @@ class Forecaster(Step):
         model: ForecastingModel,
         savers: "Optional[List[Saver]]",
         output_length: int = 1,
-        model_kwargs: Optional(Dict) = None,
+        model_kwargs: Optional[Dict] = None,
         **kwargs
     ):
         """Wraps a forecasting model to run it inside a pipeline.
@@ -55,8 +55,8 @@ class Forecaster(Step):
         self.output_length = output_length
         self.model_kwargs = sanitize_arg_empty_dict(model_kwargs)
 
-        self.time_series = None
-        self.prediction = None
+        self.time_series = pd.DataFrame()
+        self.prediction = pd.DataFrame()
 
     @defaults_from_attrs('output_length', 'model_kwargs')
     def run(  # type: ignore
