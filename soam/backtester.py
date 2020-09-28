@@ -1,6 +1,8 @@
 import logging
 from typing import (  # pylint:disable=unused-import
     TYPE_CHECKING,
+    Callable,
+    Dict,
     List,
     Optional,
     Tuple,
@@ -10,8 +12,10 @@ from typing import (  # pylint:disable=unused-import
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
+from soam.constants import DS_COL
 from soam.forecaster import Forecaster
 from soam.step import Step
+from soam.transformer import Transformer
 from soam.utils import split_backtesting_ranges
 
 if TYPE_CHECKING:
@@ -25,9 +29,9 @@ class Backetester(Step):
     def __init__(
         self,
         forecaster: Forecaster,
-        test_window: pd.Timedelta,
-        preprocessor: Preprocessor = None,
-        train_window: "Optional[pd.Timedelta]" = None,  # pylint:disable=unused-argument
+        test_window: "Optional[int]" = 1,
+        preprocessor: Transformer = None,
+        train_window: "Optional[int]" = 1,
         metrics: "Dict[str, Callable]" = None,
         savers: "Optional[List[Saver]]" = None,
         **kwargs
@@ -51,6 +55,11 @@ class Backetester(Step):
         savers : list of soam.savers.Saver, optional
             The saver to store the parameters and state changes.
         """
+        super().__init__(**kwargs)
+        if savers is not None:
+            for saver in savers:
+                self.state_handlers.append(saver.save_step)
+
         self.forecaster = forecaster
         self.preprocessor = preprocessor
         self.test_window = test_window
@@ -63,12 +72,12 @@ class Backetester(Step):
     def run(  # type: ignore
         self,
         time_series: pd.DataFrame,
-        preprocessor: Preprocessor = None,
+        preprocessor: Transformer = None,
         forecaster: Forecaster = None,
         test_window: pd.Timedelta = None,
         train_window: Optional[pd.Timedelta] = None,
         metrics: "Dict[str, Callable]" = None,
-    ) -> dict:
+    ) -> Dict:
         """Train the model with past data and compute metrics.
 
         Parameters
@@ -93,14 +102,18 @@ class Backetester(Step):
             fc = forecaster.copy()
             preproc = preprocessor.copy()
 
-            ready_train_set, fitted_preproc = preprocessor.run(train_set)
+            ready_train_set, fitted_preproc = preproc.run(train_set)
             prediction, _, _ = fc.run(ready_train_set, test_window)
 
-            read_test_set = fitted_preproc(test_set)
-            slice_metrics = compute_metrics(test_set, prediction)
+            ready_test_set = fitted_preproc(test_set)
+            slice_metrics = compute_metrics(ready_test_set, prediction, metrics)
 
-            train_start = train_set[DS].min()
-            train_end = train_set[DS].max()
-            test_end = train_set[DS].max()
+            train_start = train_set[DS_COL].min()
+            train_end = train_set[DS_COL].max()
+            test_end = train_set[DS_COL].max()
             rv.append((train_start, train_end, test_end), slice_metrics)
         return rv
+
+
+def compute_metrics(y_true, y_pred, metrics):
+    return {metric_name: func(y_true, y_pred) for metric_name, func in metrics.items()}

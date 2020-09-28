@@ -117,7 +117,10 @@ def split_backtesting_ranges(
     # TODO
 
     logger.warning("Not implemented: split_backtesting_ranges")
-    train_set, test_set = time_series.iloc[train_window-test_window:-test_window], time_series.iloc[-test_window:]
+    train_set, test_set = (
+        time_series.iloc[train_window - test_window : -test_window],
+        time_series.iloc[-test_window:],
+    )
     return [(train_set, test_set)]
 
 
