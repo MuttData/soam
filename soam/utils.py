@@ -7,6 +7,7 @@ Utility functions for the whole project.
 from copy import deepcopy
 import logging.config
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import pandas as pd
 from pandas.tseries import offsets
@@ -85,3 +86,84 @@ def get_file_path(path: Path, fn: str) -> Path:
 
 def filter_by_class_or_subclass(l, c):
     return [e for e in l if isinstance(e, c) or issubclass(e.__class__, c)]
+
+
+def split_backtesting_ranges(
+    time_series: pd.DataFrame,
+    test_window: int = 1,
+    train_window: Optional[int] = 1,
+    step_size: int = None,
+) -> List[Tuple[pd.DataFrame, pd.DataFrame]]:
+    """Generates time series partitions for backtesting.
+
+    Parameters
+    ----------
+    time_series: pd.DataFrame
+        Original data used for training and evaluation.
+    test_window: int
+        Time range steps to be extracted from the end of the original time series.
+    train_window: int, optional
+        Time range steps to be extracted before the test data.
+        If a value is passed then the sliding method will be used to select
+         the training data.
+        If `None` then the full time series will be used, the expanding window method.
+         It will start with the first train window of step_size size.
+    step_size: int
+        Distance between each successive step between the beginning of each forecasting
+         range. If None defaults to test_window.
+
+    Returns
+    -------
+    list of tuple of pd.DataFrame
+        A list of tuples, of train_set and test_set, to be used to train or evaluate
+         the model.
+
+    Notes
+    -------
+    The end of the split is going to be train_window plus a multiple of step_size. So
+     some of the last elements of the time series can be not used in the resulting
+     splits.
+
+    Raises
+    ------
+    IndexError
+        If the time series is empty, if the test_window or train_window are greater than
+         the time series length, or if the step size is lower than 1.
+
+    See Also
+    --------
+    For Theorical background read: documentation/references###Window_policies
+    """
+    if step_size is None:
+        step_size = test_window
+
+    raise_message = None
+    if time_series.empty:
+        raise_message = "The time series dataframe is empty."
+    elif 0 >= test_window or test_window >= len(time_series):
+        raise_message = "Inconsistent test window."
+    elif 0 >= step_size:
+        raise_message = "Step size should be greater than zero."
+    elif train_window is not None and (
+        0 >= train_window or train_window >= len(time_series)
+    ):
+        raise_message = "Inconsistent train window."
+    if raise_message:
+        raise IndexError(raise_message)
+
+    result_slices = []
+    for start_test_pos in range(
+        train_window or step_size, len(time_series) - test_window + 1, step_size
+    ):
+        result_slices.append(
+            (
+                time_series.iloc[
+                    start_test_pos - train_window
+                    if train_window
+                    else 0 : start_test_pos
+                ],
+                time_series.iloc[start_test_pos : start_test_pos + test_window],
+            )
+        )
+
+    return result_slices
