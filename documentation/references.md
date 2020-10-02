@@ -16,6 +16,20 @@ In our slack there is a channel #dev-soam, were we discuss project design
 details, libraries and issues. There are also some other project related
 documents pinned for you to read on.
 
+
+# Theorical background references
+
+## Backtesting
+### Window policies
+To do backtesting the data is splited in train and validation, there are two spliting
+methods:
+ - sliding: create a fixed size window for the training data that ends at the beginning
+ of the validation data.
+ - expanding: create the training data from remaining data since the start of the series
+ until the validation data.
+
+For more information review this document: https://eng.uber.com/backtesting-at-scale/
+
 # Core libraries references
 This section contains references to the different libraries and their
 associated project files.
