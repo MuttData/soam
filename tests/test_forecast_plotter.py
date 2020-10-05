@@ -1,4 +1,5 @@
 from copy import deepcopy
+import locale
 
 import numpy as np
 import pytest
@@ -13,6 +14,11 @@ from soam.constants import (
 )
 from soam.forecast_plotter import ForecastPlotterTask
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
+
+
+@pytest.fixture
+def set_time_locale():
+    locale.setlocale(locale.LC_TIME, ('en_US', 'UTF-8'))
 
 
 def perturb_ts(df, col, scale=1):
@@ -47,8 +53,8 @@ def run_standard_ForecastPlotterTask(tmp_path, time_series, prediction):
 
 @pytest.mark.mpl_image_compare
 def test_ForecastPlotterTask_simple(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+    tmp_path, sample_data_df, set_time_locale
+):  # pylint: disable=redefined-outer-name,unused-argument
     time_series = sample_data_df.iloc[:30]
     prediction = sample_data_df.iloc[30:]
     prediction = prediction.rename(columns={Y_COL: YHAT_COL})
@@ -59,8 +65,8 @@ def test_ForecastPlotterTask_simple(
 
 @pytest.mark.mpl_image_compare
 def test_ForecastPlotterTask_overlapping(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+    tmp_path, sample_data_df, set_time_locale
+):  # pylint: disable=redefined-outer-name,unused-argument
     time_series = sample_data_df
     prediction = sample_data_df.iloc[30:]
     prediction = prediction.rename(columns={Y_COL: YHAT_COL})
