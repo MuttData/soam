@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 class Forecaster(Step):
     def __init__(  # type: ignore
         self,
-        model: ForecastingModel,
+        model: Optional[ForecastingModel] = None,
         savers: "Optional[List[Saver]]" = None,
         output_length: int = 1,
         model_kwargs: Optional[Dict] = None,

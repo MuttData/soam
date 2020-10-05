@@ -100,16 +100,16 @@ def _base_10_tick_scaler(median_val: float) -> int:
 
 
 def _create_common_series(
-    df: pd.DataFrame, ds_col: str, sd=None, ed=None
+    df: pd.DataFrame, ds_col: str, start_date=None, end_date=None
 ) -> Tuple[pd.DataFrame, np.ndarray]:  # pylint:disable=unused-argument
     """Get series data for start/end date range.
 
     Return filtered values and dates."""
     window = df
-    if sd:
-        window = window.query(f"@sd <= {ds_col}")
-    if ed:
-        window = window.query(f"{ds_col} <= @ed")
+    if start_date:
+        window = window.query(f"@start_date <= {ds_col}")
+    if end_date:
+        window = window.query(f"{ds_col} <= @end_date")
     window_dates = window[ds_col].dt.to_pydatetime()
     return window, window_dates
 
@@ -127,26 +127,26 @@ def create_forecast_figure(
 
     plot_config_: Dict
     if plot_config is None:
-        plot_config_ = deepcopy(PLOT_CONFIG)["anomaly_plot"]
-    else:
-        plot_config_ = plot_config["anomaly_plot"]
+        plot_config_ = PLOT_CONFIG
+
+    plot_config_ = deepcopy(plot_config)["anomaly_plot"]  # type: ignore
 
     # plot_config_ = plot_config["anomaly_plot"]
     plot_time_conf: dict = plot_config_[time_granularity]
     color_conf: dict = plot_config_[COLORS]
     label_conf: dict = plot_config_[LABELS]
 
-    anomaly_sd = end_date - timedelta(days=(anomaly_window))
+    anomaly_start_date = end_date - timedelta(days=(anomaly_window))
     future_date = end_date + timedelta(days=forecast_window)
 
     # Note: we need to convert datetime values in series to pydatetime explicitly
     # See: https://stackoverflow.com/q/29329725/2149400
-    history, history_dates = _create_common_series(df, DS_COL, ed=future_date)
+    history, history_dates = _create_common_series(df, DS_COL, end_date=future_date)
     anomaly_win, anomaly_win_dates = _create_common_series(
-        df, DS_COL, sd=anomaly_sd, ed=end_date
+        df, DS_COL, start_date=anomaly_start_date, end_date=end_date
     )
     forecast, forecast_dates = _create_common_series(
-        df, DS_COL, sd=end_date, ed=future_date
+        df, DS_COL, start_date=end_date, end_date=future_date
     )
 
     date_format = plot_time_conf[DATE_FORMAT]
@@ -225,9 +225,8 @@ def create_forecast_figure(
     ax.set_xlabel(label_conf["xlabel"])
     ax.set_xlim([history_dates.min(), forecast_dates.max()])
 
-    # This seem to be broken.
+    # FIXME: This seems to break the label ticks.
     # fig, ax = _set_time_locator_interval(fig, ax, time_granularity, plot_time_conf)
-    # import pdb; pdb.set_trace()
     base_10_scale = _base_10_tick_scaler(df[Y_COL].median())
     ax.yaxis.set_major_formatter(
         FuncFormatter(lambda y, pos: f"{(y * (10 ** -base_10_scale)):g}")
@@ -241,7 +240,7 @@ def create_forecast_figure(
 
     if anomaly_window > 0:
         plot_type = "Anomaly"
-        start_date = anomaly_sd
+        start_date = anomaly_start_date
     else:
         plot_type = "Forecast"
         start_date = end_date + timedelta(days=1)
@@ -256,7 +255,7 @@ def create_forecast_figure(
     if time_granularity == HOURLY_TIME_GRANULARITY:
         title += f" {end_date:%H}hs"
     ax.set_title(title)
-    # ax.grid(True, which="major", c=color_conf["axis_grid"], ls="-", lw=1, alpha=0.2)
+    ax.grid(True, which="major", c=color_conf["axis_grid"], ls="-", lw=1, alpha=0.2)
     ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
     plt.tight_layout()
     return fig
