@@ -68,6 +68,7 @@ setuptools.setup(
             'pytest-cov',
             'pytest-html',
             'hypothesis',
+            'psycopg2',
         ],
     },
     python_requires="~=3.6",
