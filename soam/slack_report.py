@@ -14,7 +14,7 @@ import slack
 from slack.web.slack_response import SlackResponse
 
 from soam.cfg import get_slack_cred
-from soam.constants import FORECAST_DATE, YHAT_COL
+from soam.constants import DS_COL, YHAT_COL
 from soam.step import Step
 
 DEFAULT_GREETING_MESSAGE = "Hello everyone! Here are the results of the forecast for the *{metric_name}* metric:\n"
@@ -44,7 +44,7 @@ class SlackReport:
         summary_entries.append(greeting_message)
 
         for _, row in prediction.iterrows():
-            date = row[FORECAST_DATE].strftime('%Y-%b-%d')
+            date = row[DS_COL].strftime('%Y-%b-%d')
             value = "{:.2f}".format(row[YHAT_COL])
             summary_entries.append(f"• *[{date}]* {value}\n")
 

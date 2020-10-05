@@ -8,9 +8,10 @@ See Also
 --------
 forecast_plotter.py.ForecastPlotter : Postprocessor to plot the forecasts.
 """
+from copy import deepcopy
 from datetime import timedelta
 import logging
-from typing import Tuple
+from typing import Dict, Optional, Tuple
 
 from matplotlib.axes import Axes
 import matplotlib.dates as mdates
@@ -99,12 +100,14 @@ def _base_10_tick_scaler(median_val: float) -> int:
 
 
 def _create_common_series(
-    df: pd.DataFrame, ds_col: str, ed=None
+    df: pd.DataFrame, ds_col: str, sd=None, ed=None
 ) -> Tuple[pd.DataFrame, np.ndarray]:  # pylint:disable=unused-argument
     """Get series data for start/end date range.
 
     Return filtered values and dates."""
-    window = df.query(f"@sd <= {ds_col}")
+    window = df
+    if sd:
+        window = window.query(f"@sd <= {ds_col}")
     if ed:
         window = window.query(f"{ds_col} <= @ed")
     window_dates = window[ds_col].dt.to_pydatetime()
@@ -118,54 +121,65 @@ def create_forecast_figure(
     forecast_window,
     anomaly_window: int = 0,
     time_granularity: str = DAILY_TIME_GRANULARITY,
+    plot_config: Optional[Dict] = None,
 ) -> Figure:
     """Plot trend, forecast and anomalies with history, anomaly and forecast phases."""
 
-    PLOT_CONF: dict = PLOT_CONFIG["anomaly_plot"]
-    PLOT_TIME_CONF = PLOT_CONF[time_granularity]
-    COLOR_CONF = PLOT_CONF[COLORS]
-    LABEL_CONF = PLOT_CONF[LABELS]
-    future_window = forecast_window
+    plot_config_: Dict
+    if plot_config is None:
+        plot_config_ = deepcopy(PLOT_CONFIG)["anomaly_plot"]
+    else:
+        plot_config_ = plot_config["anomaly_plot"]
+
+    # plot_config_ = plot_config["anomaly_plot"]
+    plot_time_conf: dict = plot_config_[time_granularity]
+    color_conf: dict = plot_config_[COLORS]
+    label_conf: dict = plot_config_[LABELS]
 
     anomaly_sd = end_date - timedelta(days=(anomaly_window))
-    future_date = end_date + timedelta(days=future_window)
+    future_date = end_date + timedelta(days=forecast_window)
 
     # Note: we need to convert datetime values in series to pydatetime explicitly
     # See: https://stackoverflow.com/q/29329725/2149400
-    history, history_dates = _create_common_series(df, DS_COL, anomaly_sd)
-    anomaly_win, anomaly_win_dates = _create_common_series(df, DS_COL, end_date)
-    forecast, forecast_dates = _create_common_series(df, DS_COL, future_date)
+    history, history_dates = _create_common_series(df, DS_COL, ed=future_date)
+    anomaly_win, anomaly_win_dates = _create_common_series(
+        df, DS_COL, sd=anomaly_sd, ed=end_date
+    )
+    forecast, forecast_dates = _create_common_series(
+        df, DS_COL, sd=end_date, ed=future_date
+    )
 
-    date_format = PLOT_TIME_CONF[DATE_FORMAT]
-    fig_size = PLOT_TIME_CONF[FIG_SIZE]
+    date_format = plot_time_conf[DATE_FORMAT]
+    fig_size = plot_time_conf[FIG_SIZE]
 
     fig, ax = plt.subplots(figsize=fig_size)
     ax.plot(
         history_dates,
         history[Y_COL],
-        color=COLOR_CONF[HISTORY],
-        label=LABEL_CONF[HISTORY],
+        color=color_conf[HISTORY],
+        label=label_conf[HISTORY],
     )
     ax.plot(
         forecast_dates,
         forecast[YHAT_COL],
         ls="--",
-        color=COLOR_CONF[FORECAST],
-        label=LABEL_CONF[FORECAST],
+        lw=2,
+        color=color_conf[FORECAST],
+        label=label_conf[FORECAST],
     )
 
     if YHAT_LOWER_COL in df and YHAT_UPPER_COL in df:
         ax.plot(
             anomaly_win_dates,
             anomaly_win[Y_COL],
-            color=COLOR_CONF[ANOMALY_WIN],
-            label=LABEL_CONF[ANOMALY_WIN].format(anomaly_window=anomaly_window),
+            color=color_conf[ANOMALY_WIN],
+            label=label_conf[ANOMALY_WIN].format(anomaly_window=anomaly_window),
         )
         ax.fill_between(
             history_dates,
             history[YHAT_LOWER_COL],
             history[YHAT_UPPER_COL],
-            color=COLOR_CONF[HISTORY_FILL],
+            color=color_conf[HISTORY_FILL],
             alpha=0.2,
         )
 
@@ -173,7 +187,7 @@ def create_forecast_figure(
             anomaly_win_dates,
             anomaly_win[YHAT_LOWER_COL],
             anomaly_win[YHAT_UPPER_COL],
-            color=COLOR_CONF[ANOMALY_WIN_FILL],
+            color=color_conf[ANOMALY_WIN_FILL],
             alpha=0.6,
         )
 
@@ -181,7 +195,7 @@ def create_forecast_figure(
             forecast_dates,
             forecast[YHAT_LOWER_COL],
             forecast[YHAT_UPPER_COL],
-            color=COLOR_CONF[FORECAST],
+            color=color_conf[FORECAST],
             alpha=0.2,
         )
 
@@ -189,15 +203,15 @@ def create_forecast_figure(
             f"{DS_COL} >= @history_dates.min() & {OUTLIER_SIGN_COL} != 0"
         ).iterrows():
             o_ds = o[f"{DS_COL}"]
-            color = COLOR_CONF[OUTLIERS_HISTORY]
+            color = color_conf[OUTLIERS_HISTORY]
             o_label = ""
             if o_ds.to_pydatetime() in np.unique(anomaly_win_dates):
                 color = (
-                    COLOR_CONF[OUTLIERS_POSITIVE]
+                    color_conf[OUTLIERS_POSITIVE]
                     if o[OUTLIER_SIGN_COL] > 0
-                    else COLOR_CONF[OUTLIERS_NEGATIVE]
+                    else color_conf[OUTLIERS_NEGATIVE]
                 )
-                o_label = LABEL_CONF["outlier"].format(date=f"{o_ds:{date_format}}")
+                o_label = label_conf["outlier"].format(date=f"{o_ds:{date_format}}")
             ax.plot_date(
                 x=o_ds,
                 y=o[Y_COL],
@@ -208,17 +222,19 @@ def create_forecast_figure(
                 label=o_label,
             )
 
-    ax.set_xlabel(LABEL_CONF["xlabel"])
+    ax.set_xlabel(label_conf["xlabel"])
     ax.set_xlim([history_dates.min(), forecast_dates.max()])
-    fig, ax = _set_time_locator_interval(fig, ax, time_granularity, PLOT_TIME_CONF)
 
+    # This seem to be broken.
+    # fig, ax = _set_time_locator_interval(fig, ax, time_granularity, plot_time_conf)
+    # import pdb; pdb.set_trace()
     base_10_scale = _base_10_tick_scaler(df[Y_COL].median())
     ax.yaxis.set_major_formatter(
         FuncFormatter(lambda y, pos: f"{(y * (10 ** -base_10_scale)):g}")
     )
     base_10_scale_zeros = base_10_scale * "0"
     ax.set_ylabel(
-        LABEL_CONF["ylabel"].format(
+        label_conf["ylabel"].format(
             metric_name=metric_name, base_10_scale_zeros=base_10_scale_zeros
         )
     )
@@ -230,7 +246,7 @@ def create_forecast_figure(
         plot_type = "Forecast"
         start_date = end_date + timedelta(days=1)
         end_date = future_date
-    title = PLOT_CONF["title"].format(
+    title = plot_config_["title"].format(
         plot_type=plot_type,
         metric_name=metric_name,
         start_date=start_date,
@@ -240,7 +256,7 @@ def create_forecast_figure(
     if time_granularity == HOURLY_TIME_GRANULARITY:
         title += f" {end_date:%H}hs"
     ax.set_title(title)
-    ax.grid(True, which="major", c=COLOR_CONF["axis_grid"], ls="-", lw=1, alpha=0.2)
+    # ax.grid(True, which="major", c=color_conf["axis_grid"], ls="-", lw=1, alpha=0.2)
     ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
     plt.tight_layout()
     return fig

@@ -1,6 +1,7 @@
 import logging
 from typing import (  # pylint:disable=unused-import
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     List,
@@ -13,9 +14,10 @@ import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DS_COL
+from soam.forecast_plotter import ForecastPlotterTask
 from soam.forecaster import Forecaster
 from soam.step import Step
-from soam.transformer import Transformer
+from soam.transformer import DummyDataFrameTransformer, Transformer
 from soam.utils import split_backtesting_ranges
 
 if TYPE_CHECKING:
@@ -29,12 +31,14 @@ class Backetester(Step):
     def __init__(
         self,
         forecaster: Forecaster,
-        test_window: "Optional[int]" = 1,
         preprocessor: Transformer = None,
+        forecast_plotter: ForecastPlotterTask = None,
+        test_window: "Optional[int]" = 1,
         train_window: "Optional[int]" = 1,
+        step_size: "Optional[int]" = None,
         metrics: "Dict[str, Callable]" = None,
         savers: "Optional[List[Saver]]" = None,
-        **kwargs
+        **kwargs,
     ):
         """Class to perform backtesting.
 
@@ -57,27 +61,41 @@ class Backetester(Step):
         """
         super().__init__(**kwargs)
         if savers is not None:
-            for saver in savers:
-                self.state_handlers.append(saver.save_step)
+            for saver in savers:  # pylint: disable=unused-variable
+                pass
+                # self.state_handlers.append(saver.save_step)
+
+        if preprocessor is None:
+            preprocessor = DummyDataFrameTransformer()
 
         self.forecaster = forecaster
         self.preprocessor = preprocessor
+        self.forecast_plotter = forecast_plotter
         self.test_window = test_window
         self.train_window = train_window
+        self.step_size = step_size
         self.metrics = metrics
 
     @defaults_from_attrs(
-        'forecaster', 'preprocessor', 'test_window', 'train_window', 'metrics'
+        'forecaster',
+        'preprocessor',
+        'forecast_plotter',
+        'test_window',
+        'train_window',
+        'step_size',
+        'metrics',
     )
     def run(  # type: ignore
         self,
         time_series: pd.DataFrame,
-        preprocessor: Transformer = None,
         forecaster: Forecaster = None,
+        preprocessor: Transformer = None,
+        forecast_plotter: ForecastPlotterTask = None,
         test_window: pd.Timedelta = None,
-        train_window: Optional[pd.Timedelta] = None,
+        train_window: Optional[int] = None,
+        step_size: Optional[int] = None,
         metrics: "Dict[str, Callable]" = None,
-    ) -> Dict:
+    ) -> List[Dict[str, Tuple[Any, Any, Any]]]:
         """Train the model with past data and compute metrics.
 
         Parameters
@@ -86,32 +104,43 @@ class Backetester(Step):
             Data used to train and evaluate the data.
         """
         # TODO
-        # - If test_window is not passed we should use the forecaster ouput_lenght arg instead.
-        # - Decide wether to return a dict or a Maybe return a `dict` or a Datafram with metrics.
         # - What is the effect of reusing steps like this if they have saver set?
-        # - Implement Preprocessor. Should use the fit/transform API of sklearn.
-        # - Should we add a column to select the column that will be used as target (both for training and testing)?
-        #   => Better be consistent with the Forecaster.
+
+        if test_window is None:
+            test_window = forecaster.output_length  # type: ignore
 
         time_series_splits = split_backtesting_ranges(
-            time_series, test_window, train_window,
+            time_series, test_window, train_window, step_size,
         )
         rv = []
         for train_set, test_set in time_series_splits:
-            # At this point
-            fc = forecaster.copy()
-            preproc = preprocessor.copy()
+            slice_rv = {}
+
+            fc = forecaster.copy()  # type: ignore
+            preproc = preprocessor.copy()  # type: ignore
 
             ready_train_set, fitted_preproc = preproc.run(train_set)
             prediction, _, _ = fc.run(ready_train_set, test_window)
 
-            ready_test_set = fitted_preproc(test_set)
-            slice_metrics = compute_metrics(ready_test_set, prediction, metrics)
-
             train_start = train_set[DS_COL].min()
             train_end = train_set[DS_COL].max()
             test_end = train_set[DS_COL].max()
-            rv.append((train_start, train_end, test_end), slice_metrics)
+            slice_rv["ranges"] = (train_start, train_end, test_end)
+
+            ready_test_set = fitted_preproc(test_set)
+            slice_metrics = compute_metrics(ready_test_set, prediction, metrics)
+            slice_rv["metrics"] = slice_metrics
+
+            if forecast_plotter:
+                full_set = pd.concat([train_set, test_set], axis=1)
+                fcp = forecast_plotter.copy()
+                fcp.path = (
+                    fcp.path.parent
+                    / f"train_start={train_start}_train_end={train_end}_test_end={test_end}_{fcp.path.name}"
+                )
+                slice_rv["plots"] = fcp.run(prediction, full_set)
+
+            rv.append(slice_rv)
         return rv
 
 

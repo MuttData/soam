@@ -63,6 +63,7 @@ setuptools.setup(
         'test': [
             'nox',
             'pytest',
+            'pytest-mpl',
             'pytest-xdist',
             'pytest-cov',
             'pytest-html',

@@ -17,7 +17,7 @@ from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
-from soam.constants import DS_COL, FORECAST_DATE, YHAT_COL
+from soam.constants import DS_COL, YHAT_COL
 from soam.step import Step
 from soam.utils import sanitize_arg_empty_dict
 
@@ -101,7 +101,7 @@ class Forecaster(Step):
         self.prediction.reset_index(level=0, inplace=True)
         self.prediction.rename(
             columns={
-                self.prediction.columns[0]: FORECAST_DATE,
+                self.prediction.columns[0]: DS_COL,
                 self.prediction.columns[1]: YHAT_COL,
             },
             inplace=True,
