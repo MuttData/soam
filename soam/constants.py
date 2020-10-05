@@ -116,11 +116,11 @@ PLOT_CONFIG = {
             DATE_FORMAT: "%Y-%b",
         },
         COLORS: {
-            HISTORY: "k",
+            HISTORY: "orange",
             HISTORY_FILL: "gray",
             ANOMALY_WIN: "dodgerblue",
             ANOMALY_WIN_FILL: "lightskyblue",
-            FORECAST: "darkviolet",
+            FORECAST: "blue",
             OUTLIERS_HISTORY: "black",
             OUTLIERS_POSITIVE: "green",
             OUTLIERS_NEGATIVE: "red",

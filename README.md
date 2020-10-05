@@ -141,3 +141,16 @@ TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest tests/test_time_s
 ```
 
 Note that even though the example has a DB name during the tests a new database is created and dropped to ensure that no state is maintened between runs.
+
+
+### Testing plots
+
+To generate images for testing we use [pytest-mpl]([https://github.com/matplotlib/pytest-mpl]) as follows:
+```
+pytest --mpl-generate-path=tests/baseline
+```
+
+To run the image based tests:
+```
+pytest --mpl
+```
