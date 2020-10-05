@@ -1,6 +1,6 @@
 import os
 from os import listdir
-from os.path import isfile
+from pathlib import Path
 from typing import List, Tuple
 import unittest
 
@@ -8,14 +8,14 @@ import pandas as pd
 
 from soam.utils import split_backtesting_ranges
 
-ROOT_TEST_DIRECTORY = "resources/test_utils/"
+ROOT_TEST_DIRECTORY = Path(__file__).parent / "resources" / "test_utils"
 VALIDATION_PREFIX = "validation_"
 TRAIN_PREFIX = "train_"
 
 
 class TestSplitBacktestingRanges(unittest.TestCase):
     def setUp(self):
-        with open(ROOT_TEST_DIRECTORY + "initial_dataframe.csv") as df_stream:
+        with open(ROOT_TEST_DIRECTORY / "initial_dataframe.csv") as df_stream:
             self.initial_df = pd.read_csv(df_stream, index_col=0)
         self.initial_df_size = len(self.initial_df)
 
@@ -89,7 +89,7 @@ class TestSplitBacktestingRanges(unittest.TestCase):
         )
 
     def template_test_against_initial_df(
-        self, folder: str, error_message: str, **split_backtesting_ranges_kwarg
+        self, folder: Path, error_message: str, **split_backtesting_ranges_kwarg
     ):
         """
         Test the result of passing the initial dataframe to split_backtesting_ranges,
@@ -98,7 +98,7 @@ class TestSplitBacktestingRanges(unittest.TestCase):
 
         Parameters
         ----------
-        folder: str
+        folder: pathlib.Path
             Path to the directory to drawn train and validation dataframes.
         error_message: str
             Path to the directory to drawn train and validation dataframes.
@@ -113,7 +113,7 @@ class TestSplitBacktestingRanges(unittest.TestCase):
         output = split_backtesting_ranges(
             self.initial_df, **split_backtesting_ranges_kwarg
         )
-        expected_output = self.load_directory_dataframes(ROOT_TEST_DIRECTORY + folder)
+        expected_output = self.load_directory_dataframes(ROOT_TEST_DIRECTORY / folder)
         self.assertEqual(len(expected_output), len(output), error_message)
         for (
             [train_df_function, test_df_function],
@@ -123,7 +123,9 @@ class TestSplitBacktestingRanges(unittest.TestCase):
             self.assertTrue(test_df_function.equals(test_df_loaded), error_message)
 
     @staticmethod
-    def load_directory_dataframes(path: str) -> List[Tuple[pd.DataFrame, pd.DataFrame]]:
+    def load_directory_dataframes(
+        path: Path,
+    ) -> List[Tuple[pd.DataFrame, pd.DataFrame]]:
         """
         Loads splitted train-validation dataframes from a directory.
 
@@ -136,7 +138,7 @@ class TestSplitBacktestingRanges(unittest.TestCase):
 
         Parameters
         ----------
-        path: str
+        path: pathlib.Path
             Path to the directory to drawn train and validation dataframes.
 
         Returns
@@ -152,13 +154,13 @@ class TestSplitBacktestingRanges(unittest.TestCase):
                 VALIDATION_PREFIX, TRAIN_PREFIX
             )
             if (
-                isfile(path + train_file_name)
+                (path / train_file_name).is_file()
                 and len(splited_file_name) == 2
                 and VALIDATION_PREFIX in splited_file_name[0]
                 and splited_file_name[1] == ".csv"
             ):
-                with open(path + train_file_name) as train_stream, open(
-                    path + validation_file_name
+                with open(path / train_file_name) as train_stream, open(
+                    path / validation_file_name
                 ) as validation_stream:
                     directory_dataframes[validation_file_name] = (
                         pd.read_csv(train_stream, index_col=0),
