@@ -7,7 +7,7 @@ def tests(session):
     session.install(".")
     session.install(".[test]")
 
-    cmd = ["pytest", "-n", "auto"]
+    cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
     if session.posargs:
         cmd.extend(session.posargs)

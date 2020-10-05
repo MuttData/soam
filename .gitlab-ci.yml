@@ -3,6 +3,14 @@ image: python:3.7
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
+  # Configure postgres service (https://hub.docker.com/_/postgres/)
+  POSTGRES_DB: soam_db
+  POSTGRES_USER: soam_usr
+  POSTGRES_PASSWORD: soam_pass
+  TEST_DB_CONNSTR: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+
+services:
+  - postgres
 
 cache:
   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
@@ -11,20 +19,20 @@ cache:
     - .cache/pip
     - apt-cache/
     - ${PRE_COMMIT_HOME}
-  policy: pull
+  policy: pull-push
 
 before_script:
   - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
   - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" upgrade -y
   - pip install nox
 
-# test:
-#  script:
-#    - nox --sessions tests
+tests:
+  script:
+    - nox --sessions tests
 
 lint:
   script:
-  - nox --sessions lint
+    - nox --sessions lint
 
 bandit:
   script:
