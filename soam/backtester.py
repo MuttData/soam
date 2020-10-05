@@ -13,7 +13,7 @@ from typing import (  # pylint:disable=unused-import
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
-from soam.constants import DS_COL
+from soam.constants import DS_COL, Y_COL, YHAT_COL
 from soam.forecast_plotter import ForecastPlotterTask
 from soam.forecaster import Forecaster
 from soam.step import Step
@@ -120,25 +120,27 @@ class Backetester(Step):
             preproc = preprocessor.copy()  # type: ignore
 
             ready_train_set, fitted_preproc = preproc.run(train_set)
-            prediction, _, _ = fc.run(ready_train_set, test_window)
+            prediction, _, _ = fc.run(ready_train_set, output_length=test_window)
 
             train_start = train_set[DS_COL].min()
             train_end = train_set[DS_COL].max()
             test_end = train_set[DS_COL].max()
             slice_rv["ranges"] = (train_start, train_end, test_end)
 
-            ready_test_set = fitted_preproc(test_set)
-            slice_metrics = compute_metrics(ready_test_set, prediction, metrics)
+            ready_test_set = fitted_preproc.transform(test_set)
+            slice_metrics = compute_metrics(
+                ready_test_set[Y_COL], prediction[YHAT_COL], metrics
+            )
             slice_rv["metrics"] = slice_metrics
 
             if forecast_plotter:
-                full_set = pd.concat([train_set, test_set], axis=1)
+                full_set = pd.concat([ready_train_set, ready_test_set])
                 fcp = forecast_plotter.copy()
                 fcp.path = (
                     fcp.path.parent
                     / f"train_start={train_start}_train_end={train_end}_test_end={test_end}_{fcp.path.name}"
                 )
-                slice_rv["plots"] = fcp.run(prediction, full_set)
+                slice_rv["plot"] = fcp.run(full_set, prediction)
 
             rv.append(slice_rv)
         return rv

@@ -29,7 +29,7 @@ class Forecaster(Step):
     def __init__(  # type: ignore
         self,
         model: ForecastingModel,
-        savers: "Optional[List[Saver]]",
+        savers: "Optional[List[Saver]]" = None,
         output_length: int = 1,
         model_kwargs: Optional[Dict] = None,
         **kwargs
@@ -85,7 +85,6 @@ class Forecaster(Step):
             and the trained model.
         """
         # TODO: **kwargs should be a dedicated variable for model hyperparams.
-
         self.time_series = time_series.copy()  # type: ignore
         values_columns = self.time_series.columns.to_list()
         values_columns.remove(DS_COL)
