@@ -42,6 +42,10 @@ class Backetester(Step):
     ):
         """Class to perform backtesting.
 
+        Note: To run a single fold backtest, for example to validate the model
+        performance in the last run, pass a timeseries with the exact lenght of
+        train_window plus test_window.
+
         Parameters
         ----------
         forecaster : soam.Forecaster

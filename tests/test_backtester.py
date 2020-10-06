@@ -53,7 +53,9 @@ def assert_backtest_fold_result(rv, ranges=None, metrics=None, plots=None):
     assert tuple(rv) == ('ranges', 'metrics', 'plot')
     assert rv['ranges'] == ranges
     assert rv['plot'].name == plots
-    unittest.TestCase().assertDictEqual(rv['metrics'], metrics)
+    output_metrics = pd.Series(rv['metrics'])
+    expected_metrics = pd.Series(metrics)
+    pd.testing.assert_series_equal(output_metrics, expected_metrics, rtol=1e-4)
 
 
 def assert_backtest_all_folds_result(rvs, expected_values):
