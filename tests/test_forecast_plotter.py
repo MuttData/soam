@@ -18,7 +18,7 @@ from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 @pytest.fixture
 def set_time_locale():
-    locale.setlocale(locale.LC_TIME, ('en_US', 'UTF-8'))
+    locale.setlocale(locale.LC_TIME, (None, None))
 
 
 def perturb_ts(df, col, scale=1):
