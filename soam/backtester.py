@@ -124,7 +124,7 @@ class Backetester(Step):
 
             train_start = train_set[DS_COL].min()
             train_end = train_set[DS_COL].max()
-            test_end = train_set[DS_COL].max()
+            test_end = test_set[DS_COL].max()
             slice_rv["ranges"] = (train_start, train_end, test_end)
 
             ready_test_set = fitted_preproc.transform(test_set)
