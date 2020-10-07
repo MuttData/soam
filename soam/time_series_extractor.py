@@ -28,7 +28,6 @@ from soam.step import Step
 
 if TYPE_CHECKING:
     import muttlib
-    from muttlib import dbconn
 
 # Simple column selection templates.
 BASE_TEMPLATE = """
@@ -46,6 +45,10 @@ MAX_TEMPLATE = """
 """
 SUM_TEMPLATE = """
     SUM({{ column }})::float8 AS {{ alias }}
+"""
+
+JOIN_TEMPLATE = """
+    JOIN {{table}} ON {{condition}}
 """
 
 
@@ -105,6 +108,7 @@ class TimeSeriesExtractor(Step):
         extra_having_conditions=None,
         column_mappings=None,
         aggregated_column_mappings=None,
+        join=None,  # pylint: disable=unused-argument
     ) -> Tuple[str, Dict[str, Any]]:
         """Build the query to extract and aggregated dataset.
 

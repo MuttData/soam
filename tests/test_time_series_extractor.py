@@ -1,11 +1,11 @@
-"""Module to extract timeseries.
+"""Tests for TimeSeriesExtractor.
 """
 import os
 import unittest
 from unittest import main
 
 import pandas as pd
-from sqlalchemy import Column
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Float, Integer, String
 
 from soam.constants import TIMESTAMP_COL
@@ -39,6 +39,14 @@ class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
 
     # TODO: Add unique constraint for consistency sake.
     #       https://gitlab.com/mutt_data/tfg-adsplash/-/blob/master/adsplash/store/dataset.py#L442
+
+
+class ConcreteJoinTimeSeriesTable(AbstractTimeSeriesTable):
+    __tablename__ = "test_join_data"
+
+    country = Column(String(2))
+    state = Column(String(2))
+    aggregable_data = Column(Integer())
 
 
 column_mappings = {
@@ -118,6 +126,7 @@ class TestDatasetStore(PgTestCase):
         expected_values,
         extra_where_conditions=None,
         extra_having_conditions=None,
+        join=None,
     ):
         df = self.time_series_extractor.extract(
             build_query_kwargs=dict(
@@ -131,6 +140,7 @@ class TestDatasetStore(PgTestCase):
                 extra_having_conditions=extra_having_conditions,
                 column_mappings=column_mappings,
                 aggregated_column_mappings=aggregated_column_mappings,
+                join=join,
             )
         )
         # Fix for backwards compatible with original tests.
@@ -156,6 +166,26 @@ class TestDatasetStore(PgTestCase):
             end_date=None,
             order_by=[TIMESTAMP_COL, "impressions"],
             expected_values=values,
+        )
+
+    def test_join_load_basic_columns_order_by(self):
+        columns = [TIMESTAMP_COL, "country"]
+        # columns = [TIMESTAMP_COL, "country", "aggregable_data"]
+        values = [
+            ["2019-09-01", "us", 50],
+            ["2019-09-02", "ca", 90],
+            ["2019-09-02", "us", 20],
+            ["2019-09-03", "ca", 40],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=[TIMESTAMP_COL, "country", "impressions"],
+            expected_values=values,
+            join=("test_join_data", "country"),
         )
 
     def test_load_basic_columns_aggregation_order_by(self):
@@ -493,7 +523,13 @@ class TestDatasetStore(PgTestCase):
         cls.time_series_extractor = TimeSeriesExtractor(
             cls.db_client, ConcreteTimeSeriesTable
         )
+        cls.join_time_series_extractor = TimeSeriesExtractor(
+            cls.db_client, ConcreteJoinTimeSeriesTable
+        )
         ConcreteTimeSeriesTable.__table__.create(  # pylint:disable=no-member
+            cls.db_client.get_engine()
+        )
+        ConcreteJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
             cls.db_client.get_engine()
         )
         query = """
@@ -586,6 +622,58 @@ class TestDatasetStore(PgTestCase):
             )
         """
         cls.run_query(query)
+
+        query = """
+         INSERT INTO test_join_data
+           (timestamp,
+            country,
+            state,
+            aggregable_data
+            )
+         VALUES
+           ('2019-09-01',
+            'us',
+            'ny',
+            20
+            ),
+           ('2019-09-01',
+            'us',
+            'ny',
+            30
+            ),
+           ('2019-09-02',
+            'us',
+            'nv',
+            50
+            ),
+           ('2019-09-02',
+            'us',
+            'mi',
+            40
+            ),
+           ('2019-09-02',
+            'ca',
+            'nt',
+            20
+            ),
+           ('2019-09-03',
+            'ca',
+            'on',
+            30
+            ),
+           ('2019-09-03',
+            'ca',
+            'on',
+            10
+            )
+        """
+        cls.run_query(query)
+
+    __tablename__ = "test_join_data"
+
+    country = Column(String(2), ForeignKey(ConcreteTimeSeriesTable.country))
+    state = Column(String(2))
+    impressions = Column(Integer())
 
     @classmethod
     def tearDownClass(cls):

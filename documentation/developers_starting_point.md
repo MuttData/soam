@@ -24,6 +24,12 @@ soam init --output
 ```
 That should create the scaffold for a new project.
 
+Check that you have an up to date muttlib version or upgrade it:
+```bash
+pip install --upgrade git+https://gitlab.com/mutt_data/muttlib#egg=muttlib
+```
+[//comment]: # (TODO: Include what version we are using.)
+
 # Next Steps
 * If you already have the project running the last step before making your first commit is to review the
 [development pipeline](development_pipeline.md).
