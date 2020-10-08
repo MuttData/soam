@@ -169,8 +169,7 @@ class TestDatasetStore(PgTestCase):
         )
 
     def test_join_load_basic_columns_order_by(self):
-        columns = [TIMESTAMP_COL, "country"]
-        # columns = [TIMESTAMP_COL, "country", "aggregable_data"]
+        columns = [TIMESTAMP_COL, "country", "aggregable_data"]
         values = [
             ["2019-09-01", "us", 50],
             ["2019-09-02", "ca", 90],
@@ -522,9 +521,6 @@ class TestDatasetStore(PgTestCase):
         super().setUp(cls)
         cls.time_series_extractor = TimeSeriesExtractor(
             cls.db_client, ConcreteTimeSeriesTable
-        )
-        cls.join_time_series_extractor = TimeSeriesExtractor(
-            cls.db_client, ConcreteJoinTimeSeriesTable
         )
         ConcreteTimeSeriesTable.__table__.create(  # pylint:disable=no-member
             cls.db_client.get_engine()

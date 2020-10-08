@@ -163,6 +163,9 @@ class TimeSeriesExtractor(Step):
           SET extra_float_digits = 3;
           SELECT {{ columns | join(", ") }}
           FROM {{ table_name }}
+          {% if join_tables %}
+          NATURAL JOIN {{ join_tables }}
+          {% endif %}
           {% if where %}
           WHERE {{ where | join("AND ") }}
           {% endif %}
@@ -186,6 +189,7 @@ class TimeSeriesExtractor(Step):
         placeholders = {
             "columns": "*",
             "table_name": self.table_name,
+            "join_tables": "" if join is None else "test_join_data",
             "where": "",
             "group_by": "",
             "having": "",
