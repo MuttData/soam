@@ -9,7 +9,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.types import Float, Integer, String
 
 from soam.constants import TIMESTAMP_COL
-from soam.data_models import AbstractTimeSeriesTable
+from soam.data_models import AbstractIDBase, AbstractTimeSeriesTable
 from soam.time_series_extractor import TimeSeriesExtractor
 from tests.db_test_case import TEST_DB_CONNSTR, PgTestCase
 
@@ -41,12 +41,11 @@ class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
     #       https://gitlab.com/mutt_data/tfg-adsplash/-/blob/master/adsplash/store/dataset.py#L442
 
 
-class ConcreteJoinTimeSeriesTable(AbstractTimeSeriesTable):
+class ConcreteJoinTimeSeriesTable(AbstractIDBase):
     __tablename__ = "test_join_data"
 
-    country = Column(String(2))
-    state = Column(String(2))
-    aggregable_data = Column(Integer())
+    ad_network = Column(String(64))
+    ad_network_group = Column(String(64))
 
 
 column_mappings = {
@@ -126,7 +125,7 @@ class TestDatasetStore(PgTestCase):
         expected_values,
         extra_where_conditions=None,
         extra_having_conditions=None,
-        join=None,
+        inner_join=None,
     ):
         df = self.time_series_extractor.extract(
             build_query_kwargs=dict(
@@ -140,13 +139,14 @@ class TestDatasetStore(PgTestCase):
                 extra_having_conditions=extra_having_conditions,
                 column_mappings=column_mappings,
                 aggregated_column_mappings=aggregated_column_mappings,
-                join=join,
+                inner_join=inner_join,
             )
         )
         # Fix for backwards compatible with original tests.
         if TIMESTAMP_COL in df.columns and not df.empty:
             df[TIMESTAMP_COL] = df[TIMESTAMP_COL].dt.strftime("%Y-%m-%d")
         self.assertTrue(isinstance(df, pd.DataFrame))
+        columns = [c_name.split(".")[-1] for c_name in columns]
         self.assertEqual(df.columns.tolist(), columns)
         self.assertEqual(df.values.tolist(), expected_values)
 
@@ -169,12 +169,12 @@ class TestDatasetStore(PgTestCase):
         )
 
     def test_join_load_basic_columns_order_by(self):
-        columns = [TIMESTAMP_COL, "country", "aggregable_data"]
+        columns = [TIMESTAMP_COL, "opportunities", "tjd.ad_network", "ad_network_group"]
         values = [
-            ["2019-09-01", "us", 50],
-            ["2019-09-02", "ca", 90],
-            ["2019-09-02", "us", 20],
-            ["2019-09-03", "ca", 40],
+            ['2019-09-01', 1000, 'source1', 'source_group_B'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-02', 300, 'source2', 'source_group_A'],
         ]
         self._test_load(
             columns=columns,
@@ -182,9 +182,41 @@ class TestDatasetStore(PgTestCase):
             dimensions_values=None,
             start_date=None,
             end_date=None,
-            order_by=[TIMESTAMP_COL, "country", "impressions"],
+            order_by=[TIMESTAMP_COL, "tjd.ad_network"],
             expected_values=values,
-            join=("test_join_data", "country"),
+            inner_join=(
+                "test_join_data",
+                "tjd",
+                "tjd.ad_network = test_data.ad_network",
+            ),
+        )
+
+    def test_join_load_basic_columns_order_by_no_alias(self):
+        columns = [
+            TIMESTAMP_COL,
+            "opportunities",
+            "test_join_data.ad_network",
+            "ad_network_group",
+        ]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-02', 300, 'source2', 'source_group_A'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=[TIMESTAMP_COL, "test_join_data.ad_network"],
+            expected_values=values,
+            inner_join=(
+                "test_join_data",
+                None,
+                "test_join_data.ad_network = test_data.ad_network",
+            ),
         )
 
     def test_load_basic_columns_aggregation_order_by(self):
@@ -621,46 +653,18 @@ class TestDatasetStore(PgTestCase):
 
         query = """
          INSERT INTO test_join_data
-           (timestamp,
-            country,
-            state,
-            aggregable_data
+           (ad_network,
+            ad_network_group
             )
          VALUES
-           ('2019-09-01',
-            'us',
-            'ny',
-            20
+           ('source2',
+            'source_group_A'
             ),
-           ('2019-09-01',
-            'us',
-            'ny',
-            30
+           ('source1',
+            'source_group_B'
             ),
-           ('2019-09-02',
-            'us',
-            'nv',
-            50
-            ),
-           ('2019-09-02',
-            'us',
-            'mi',
-            40
-            ),
-           ('2019-09-02',
-            'ca',
-            'nt',
-            20
-            ),
-           ('2019-09-03',
-            'ca',
-            'on',
-            30
-            ),
-           ('2019-09-03',
-            'ca',
-            'on',
-            10
+           ('source3',
+            'source_group_B'
             )
         """
         cls.run_query(query)

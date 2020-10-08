@@ -13,7 +13,7 @@ Notes:
 - It would be interesting to implement unique counts
 [1] Ralph Kimball, Margy Ross - The Data Warehouse Toolkit (2013)
 """
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from jinja2 import Template
 import pandas as pd
@@ -28,6 +28,7 @@ from soam.step import Step
 
 if TYPE_CHECKING:
     import muttlib
+    import datetime as dt
 
 # Simple column selection templates.
 BASE_TEMPLATE = """
@@ -53,6 +54,9 @@ JOIN_TEMPLATE = """
 
 
 class TimeSeriesExtractor(Step):
+    db: "muttlib.dbconn.PgClient"
+    table_model: str
+
     def __init__(
         self, db: "muttlib.dbconn.PgClient", table_model: str, **kwargs: Dict[str, Any],
     ):
@@ -98,25 +102,25 @@ class TimeSeriesExtractor(Step):
     def build_query(
         self,
         columns=None,
-        dimensions=None,
-        dimensions_values=None,
-        timestamp_col=TIMESTAMP_COL,
-        start_date=None,
-        end_date=None,
-        order_by=None,
-        extra_where_conditions=None,
-        extra_having_conditions=None,
-        column_mappings=None,
-        aggregated_column_mappings=None,
-        join=None,  # pylint: disable=unused-argument
+        dimensions: List[str] = None,
+        dimensions_values: Union[str, List[str]] = None,
+        timestamp_col: str = TIMESTAMP_COL,
+        start_date: "dt.datetime" = None,
+        end_date: "dt.datetime" = None,
+        order_by: List[str] = None,
+        extra_where_conditions: List[str] = None,
+        extra_having_conditions: List[str] = None,
+        column_mappings: Dict = None,
+        aggregated_column_mappings: Dict = None,
+        inner_join: Optional[List[Tuple[str, str, str]]] = None,
     ) -> Tuple[str, Dict[str, Any]]:
         """Build the query to extract and aggregated dataset.
 
         Parameters
         ----------
-        columns:  list of str
+        columns: list of str
             The columns to retrieve.
-        dimensions:  list of str
+        dimensions: list of str
             The dimensions by which data will be partitioned / aggregated.
             E.g.: ['year', 'month', 'day', 'game', 'type'].
             If a dimension is prefixed with a "!", the dimensions values will
@@ -147,10 +151,20 @@ class TimeSeriesExtractor(Step):
             An inclusive end date to filter the rows.
         order_by:  list of str
             A list of column names to order by.
-        extra_where_conditions:  list of str or None
+        extra_where_conditions: list of str
             A list of conditions to be added to the "where" clause.
         extra_having_conditions:  list of str or None
-            A list of conditions to be added to the "hacing" clause.
+            A list of conditions to be added to the "having" clause.
+        column_mappings: TODO: missing doc
+        aggregated_column_mappings: TODO: missing doc
+        inner_join: list of tuple of int
+            A list of tables to join on, every tuple is expected to contain:
+            (table_name, table_alias, complete_condition).
+            The table_alias is optional.
+            For example:
+            [('table_a', 'at', 'initial_table_model.attr_1 = at.attr_1'),
+            ('table_b', 'BBB', 'initial_table_model.attr_2 = BBB.222'),
+            ('table_c', None, 'initial_table_model.attr_3 = table_c.attr_3')]
 
         Returns
         -------
@@ -164,7 +178,11 @@ class TimeSeriesExtractor(Step):
           SELECT {{ columns | join(", ") }}
           FROM {{ table_name }}
           {% if join_tables %}
-          NATURAL JOIN {{ join_tables }}
+          INNER JOIN {{ join_tables.0 }}
+          {% if join_tables.1 %}
+          AS  {{ join_tables.1 }}
+          {% endif %}
+           ON  {{ join_tables.2 }}
           {% endif %}
           {% if where %}
           WHERE {{ where | join("AND ") }}
@@ -189,7 +207,7 @@ class TimeSeriesExtractor(Step):
         placeholders = {
             "columns": "*",
             "table_name": self.table_name,
-            "join_tables": "" if join is None else "test_join_data",
+            "join_tables": inner_join,
             "where": "",
             "group_by": "",
             "having": "",
@@ -203,10 +221,12 @@ class TimeSeriesExtractor(Step):
         )
 
         # Columns
-        if dimensions is None or all(dont_aggregate_dimensions):
-            columns = [column_mappings.get(col, col) for col in columns]
-        else:
-            columns = [aggregated_column_mappings.get(col, col) for col in columns]
+        col_map = (
+            column_mappings
+            if dimensions is None or all(dont_aggregate_dimensions)
+            else aggregated_column_mappings
+        )
+        columns = [col_map.get(col, col) for col in columns]
 
         placeholders["columns"] = columns
 
@@ -223,7 +243,7 @@ class TimeSeriesExtractor(Step):
         kwargs.update(date_kwargs)
         where_conds.extend(date_conds)
         if extra_where_conditions:
-            where_conds.append(extra_where_conditions)
+            where_conds.extend(extra_where_conditions)
         if where_conds:
             placeholders["where"] = where_conds
 
