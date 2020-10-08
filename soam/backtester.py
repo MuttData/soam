@@ -56,6 +56,9 @@ class Backetester(Step):
             Time range on which the model will trained on each backtesting run.
             If a pd.Timedelta value is passed then the sliding method will be used to select the training data.
             If `None` then the full time series will be used. This is the expanding window method.
+        step_size: int
+            Distance between each successive step between the beginning of each forecasting
+            range. If None defaults to test_window.
         metrics: dict(str, callable)
             `dict` containing name of a metric and a callable to compute it.
             The callable must conform to the interface used by sklearn for regression metrics:
