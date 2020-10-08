@@ -5,7 +5,7 @@ import unittest
 from unittest import main
 
 import pandas as pd
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column
 from sqlalchemy.types import Float, Integer, String
 
 from soam.constants import TIMESTAMP_COL
@@ -41,11 +41,18 @@ class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
     #       https://gitlab.com/mutt_data/tfg-adsplash/-/blob/master/adsplash/store/dataset.py#L442
 
 
-class ConcreteJoinTimeSeriesTable(AbstractIDBase):
-    __tablename__ = "test_join_data"
+class ConcreteAdNetworkJoinTimeSeriesTable(AbstractIDBase):
+    __tablename__ = "test_ad_network_join_data"
 
     ad_network = Column(String(64))
     ad_network_group = Column(String(64))
+
+
+class ConcretePlacementIdJoinTimeSeriesTable(AbstractIDBase):
+    __tablename__ = "test_placement_id_join_data"
+
+    placement_id = Column(String(256))
+    placement_id_group = Column(String(64))
 
 
 column_mappings = {
@@ -184,18 +191,20 @@ class TestDatasetStore(PgTestCase):
             end_date=None,
             order_by=[TIMESTAMP_COL, "tjd.ad_network"],
             expected_values=values,
-            inner_join=(
-                "test_join_data",
-                "tjd",
-                "tjd.ad_network = test_data.ad_network",
-            ),
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                )
+            ],
         )
 
     def test_join_load_basic_columns_order_by_no_alias(self):
         columns = [
             TIMESTAMP_COL,
             "opportunities",
-            "test_join_data.ad_network",
+            "test_ad_network_join_data.ad_network",
             "ad_network_group",
         ]
         values = [
@@ -210,13 +219,52 @@ class TestDatasetStore(PgTestCase):
             dimensions_values=None,
             start_date=None,
             end_date=None,
-            order_by=[TIMESTAMP_COL, "test_join_data.ad_network"],
+            order_by=[TIMESTAMP_COL, "test_ad_network_join_data.ad_network"],
             expected_values=values,
-            inner_join=(
-                "test_join_data",
-                None,
-                "test_join_data.ad_network = test_data.ad_network",
-            ),
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    None,
+                    "test_ad_network_join_data.ad_network = test_data.ad_network",
+                )
+            ],
+        )
+
+    def test_multiple_join_load_basic_columns_order_by(self):
+        columns = [
+            TIMESTAMP_COL,
+            "opportunities",
+            "tjd.ad_network",
+            "ad_network_group",
+            "tpi.placement_id",
+            "placement_id_group",
+        ]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B', 'z', 'placement_group_1'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A', 'b', 'placement_group_2'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A', 'a', 'placement_group_1'],
+            ['2019-09-02', 300, 'source2', 'source_group_A', 'a', 'placement_group_1'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=[TIMESTAMP_COL, "tjd.ad_network"],
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                ),
+                (
+                    "test_placement_id_join_data",
+                    "tpi",
+                    "tpi.placement_id = test_data.placement_id",
+                ),
+            ],
         )
 
     def test_load_basic_columns_aggregation_order_by(self):
@@ -557,7 +605,10 @@ class TestDatasetStore(PgTestCase):
         ConcreteTimeSeriesTable.__table__.create(  # pylint:disable=no-member
             cls.db_client.get_engine()
         )
-        ConcreteJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
+        ConcreteAdNetworkJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
+            cls.db_client.get_engine()
+        )
+        ConcretePlacementIdJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
             cls.db_client.get_engine()
         )
         query = """
@@ -652,7 +703,7 @@ class TestDatasetStore(PgTestCase):
         cls.run_query(query)
 
         query = """
-         INSERT INTO test_join_data
+         INSERT INTO test_ad_network_join_data
            (ad_network,
             ad_network_group
             )
@@ -669,11 +720,23 @@ class TestDatasetStore(PgTestCase):
         """
         cls.run_query(query)
 
-    __tablename__ = "test_join_data"
-
-    country = Column(String(2), ForeignKey(ConcreteTimeSeriesTable.country))
-    state = Column(String(2))
-    impressions = Column(Integer())
+        query = """
+         INSERT INTO test_placement_id_join_data
+           (placement_id,
+            placement_id_group
+            )
+         VALUES
+           ('z',
+            'placement_group_1'
+            ),
+           ('a',
+            'placement_group_1'
+            ),
+           ('b',
+            'placement_group_2'
+            )
+        """
+        cls.run_query(query)
 
     @classmethod
     def tearDownClass(cls):

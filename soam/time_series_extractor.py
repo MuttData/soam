@@ -178,11 +178,13 @@ class TimeSeriesExtractor(Step):
           SELECT {{ columns | join(", ") }}
           FROM {{ table_name }}
           {% if join_tables %}
-          INNER JOIN {{ join_tables.0 }}
-          {% if join_tables.1 %}
-          AS  {{ join_tables.1 }}
+          {% for j_table in join_tables %}
+          INNER JOIN {{ j_table.0 }}
+          {% if j_table.1 %}
+          AS  {{ j_table.1 }}
           {% endif %}
-           ON  {{ join_tables.2 }}
+          ON  {{ j_table.2 }}
+          {% endfor %}
           {% endif %}
           {% if where %}
           WHERE {{ where | join("AND ") }}
