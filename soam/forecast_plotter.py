@@ -20,6 +20,22 @@ logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
 
 
 class ForecastPlotterTask(Step):
+    """Plot forecasts.
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        Path to which plots will be saved.
+    metric_name : str
+        Name of the metric to plot.
+    time_granularity : str
+        Time granularity used on the plot. Defaults to `DAILY_TIME_GRANULARITY`.
+    plot_config: dict
+        Misc configs passed to `create_forecast_figure`.
+    savefig_opts: dict
+        kwargs passed to `savefig`.
+    """
+
     def __init__(
         self,
         path: Union[Path, str],

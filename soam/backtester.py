@@ -28,6 +28,34 @@ logger = logging.getLogger(__name__)
 
 
 class Backetester(Step):
+    """Class to perform backtesting.
+
+    Note: To run a single fold backtest, for example to validate the model
+    performance in the last run, pass a timeseries with the exact lenght of
+    train_window plus test_window.
+
+    Parameters
+    ----------
+    forecaster : soam.Forecaster
+        Forecaster that will be fitted and execute the predictions.
+    test_window: pd.Timedelta
+        Time range to be extracted from the main timeseries on which the model will be evaluated on each backtesting run.
+        If `None` then `forecaster.output_length` is be used.
+    train_window: pd.Timedelta, optional
+        Time range on which the model will trained on each backtesting run.
+        If a pd.Timedelta value is passed then the sliding method will be used to select the training data.
+        If `None` then the full time series will be used. This is the expanding window method.
+    step_size: int
+        Distance between each successive step between the beginning of each forecasting
+        range. If None defaults to test_window.
+    metrics: dict(str, callable)
+        `dict` containing name of a metric and a callable to compute it.
+        The callable must conform to the interface used by sklearn for regression metrics:
+        https://scikit-learn.org/stable/modules/classes.html#regression-metrics
+    savers : list of soam.savers.Saver, optional
+        The saver to store the parameters and state changes.
+    """
+
     def __init__(
         self,
         forecaster: Forecaster,
@@ -40,33 +68,6 @@ class Backetester(Step):
         savers: "Optional[List[Saver]]" = None,
         **kwargs,
     ):
-        """Class to perform backtesting.
-
-        Note: To run a single fold backtest, for example to validate the model
-        performance in the last run, pass a timeseries with the exact lenght of
-        train_window plus test_window.
-
-        Parameters
-        ----------
-        forecaster : soam.Forecaster
-            Forecaster that will be fitted and execute the predictions.
-        test_window: pd.Timedelta
-            Time range to be extracted from the main timeseries on which the model will be evaluated on each backtesting run.
-            If `None` then `forecaster.output_length` is be used.
-        train_window: pd.Timedelta, optional
-            Time range on which the model will trained on each backtesting run.
-            If a pd.Timedelta value is passed then the sliding method will be used to select the training data.
-            If `None` then the full time series will be used. This is the expanding window method.
-        step_size: int
-            Distance between each successive step between the beginning of each forecasting
-            range. If None defaults to test_window.
-        metrics: dict(str, callable)
-            `dict` containing name of a metric and a callable to compute it.
-            The callable must conform to the interface used by sklearn for regression metrics:
-            https://scikit-learn.org/stable/modules/classes.html#regression-metrics
-        savers : list of soam.savers.Saver, optional
-            The saver to store the parameters and state changes.
-        """
         super().__init__(**kwargs)
         if savers is not None:
             for saver in savers:  # pylint: disable=unused-variable
