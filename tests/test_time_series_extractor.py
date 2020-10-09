@@ -1,4 +1,4 @@
-"""Module to extract timeseries.
+"""Tests for TimeSeriesExtractor.
 """
 import os
 import unittest
@@ -9,7 +9,7 @@ from sqlalchemy import Column
 from sqlalchemy.types import Float, Integer, String
 
 from soam.constants import TIMESTAMP_COL
-from soam.data_models import AbstractTimeSeriesTable
+from soam.data_models import AbstractIDBase, AbstractTimeSeriesTable
 from soam.time_series_extractor import TimeSeriesExtractor
 from tests.db_test_case import TEST_DB_CONNSTR, PgTestCase
 
@@ -39,6 +39,20 @@ class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
 
     # TODO: Add unique constraint for consistency sake.
     #       https://gitlab.com/mutt_data/tfg-adsplash/-/blob/master/adsplash/store/dataset.py#L442
+
+
+class ConcreteAdNetworkJoinTimeSeriesTable(AbstractIDBase):
+    __tablename__ = "test_ad_network_join_data"
+
+    ad_network = Column(String(64))
+    ad_network_group = Column(String(64))
+
+
+class ConcretePlacementIdJoinTimeSeriesTable(AbstractIDBase):
+    __tablename__ = "test_placement_id_join_data"
+
+    placement_id = Column(String(256))
+    placement_id_group = Column(String(64))
 
 
 column_mappings = {
@@ -118,6 +132,7 @@ class TestDatasetStore(PgTestCase):
         expected_values,
         extra_where_conditions=None,
         extra_having_conditions=None,
+        inner_join=None,
     ):
         df = self.time_series_extractor.extract(
             build_query_kwargs=dict(
@@ -131,12 +146,14 @@ class TestDatasetStore(PgTestCase):
                 extra_having_conditions=extra_having_conditions,
                 column_mappings=column_mappings,
                 aggregated_column_mappings=aggregated_column_mappings,
+                inner_join=inner_join,
             )
         )
         # Fix for backwards compatible with original tests.
         if TIMESTAMP_COL in df.columns and not df.empty:
             df[TIMESTAMP_COL] = df[TIMESTAMP_COL].dt.strftime("%Y-%m-%d")
         self.assertTrue(isinstance(df, pd.DataFrame))
+        columns = [c_name.split(".")[-1] for c_name in columns]
         self.assertEqual(df.columns.tolist(), columns)
         self.assertEqual(df.values.tolist(), expected_values)
 
@@ -156,6 +173,183 @@ class TestDatasetStore(PgTestCase):
             end_date=None,
             order_by=[TIMESTAMP_COL, "impressions"],
             expected_values=values,
+        )
+
+    def test_join_load_basic_columns_order_by(self):
+        columns = [TIMESTAMP_COL, "opportunities", "tjd.ad_network", "ad_network_group"]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-02', 300, 'source2', 'source_group_A'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=[TIMESTAMP_COL, "tjd.ad_network"],
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                )
+            ],
+        )
+
+    def test_join_load_basic_columns_order_by_no_alias(self):
+        columns = [
+            TIMESTAMP_COL,
+            "opportunities",
+            "test_ad_network_join_data.ad_network",
+            "ad_network_group",
+        ]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-02', 300, 'source2', 'source_group_A'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=[TIMESTAMP_COL, "test_ad_network_join_data.ad_network"],
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    None,
+                    "test_ad_network_join_data.ad_network = test_data.ad_network",
+                )
+            ],
+        )
+
+    def test_multiple_join_load_basic_columns_order_by(self):
+        columns = [
+            TIMESTAMP_COL,
+            "opportunities",
+            "tjd.ad_network",
+            "ad_network_group",
+            "tpi.placement_id",
+            "placement_id_group",
+        ]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B', 'z', 'placement_group_1'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A', 'b', 'placement_group_2'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A', 'a', 'placement_group_1'],
+            ['2019-09-02', 300, 'source2', 'source_group_A', 'a', 'placement_group_1'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=[TIMESTAMP_COL, "tjd.ad_network"],
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                ),
+                (
+                    "test_placement_id_join_data",
+                    "tpi",
+                    "tpi.placement_id = test_data.placement_id",
+                ),
+            ],
+        )
+
+    def test_join_aggregation_load_basic_columns_no_alias(self):
+        columns = ["opportunities", "ad_network_group"]
+        values = [[1000.0, 'source_group_A'], [1000.0, 'source_group_B']]
+        self._test_load(
+            columns=columns,
+            dimensions=["ad_network_group"],
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    None,
+                    "test_ad_network_join_data.ad_network = test_data.ad_network",
+                )
+            ],
+        )
+
+    def test_multiple_join_aggregation_basic_columns_order_by(self):
+        columns = [
+            "opportunities",
+            "ad_network_group",
+            "placement_id_group",
+        ]
+        values = [
+            [1000.0, 'source_group_B', 'placement_group_1'],
+            [1000.0, 'source_group_A', 'placement_group_1'],
+            [1000.0, 'source_group_A', 'placement_group_2'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=["ad_network_group", "placement_id_group"],
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                ),
+                (
+                    "test_placement_id_join_data",
+                    "tpi",
+                    "tpi.placement_id = test_data.placement_id",
+                ),
+            ],
+        )
+
+    def test_multiple_join_aggregation_basic_columns_filtered(self):
+        columns = [
+            "opportunities",
+            "ad_network_group",
+            "placement_id_group",
+        ]
+        values = [
+            [1000.0, 'source_group_A', 'placement_group_1'],
+            [1000.0, 'source_group_A', 'placement_group_2'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=["ad_network_group", "placement_id_group"],
+            dimensions_values=['source_group_A', None],
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                ),
+                (
+                    "test_placement_id_join_data",
+                    "tpi",
+                    "tpi.placement_id = test_data.placement_id",
+                ),
+            ],
         )
 
     def test_load_basic_columns_aggregation_order_by(self):
@@ -230,12 +424,6 @@ class TestDatasetStore(PgTestCase):
             "revenue",
         ]
         dimensions = columns[:7]
-        values = [
-            ["2019-09-01", 0, 1e3 * 20 / 100, 100 / 1000, 0.90],
-            ["2019-09-01", 1, 1e3 * 30 / 200, 200 / 1000, 0.70],
-            ["2019-09-01", 2, 1e3 * 40 / 300, 300 / 1000, 0.40],
-            ["2019-09-02", 0, 1e3 * 6 / 30, 30 / 300, 0.90],
-        ]
         values = [
             [
                 "2019-09-01",
@@ -493,8 +681,13 @@ class TestDatasetStore(PgTestCase):
         cls.time_series_extractor = TimeSeriesExtractor(
             cls.db_client, ConcreteTimeSeriesTable
         )
-        ConcreteTimeSeriesTable.__table__.create(  # pylint:disable=no-member
-            cls.db_client.get_engine()
+        engine = cls.db_client.get_engine()
+        ConcreteTimeSeriesTable.__table__.create(engine)  # pylint:disable=no-member
+        ConcreteAdNetworkJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
+            engine
+        )
+        ConcretePlacementIdJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
+            engine
         )
         query = """
          INSERT INTO test_data
@@ -583,6 +776,42 @@ class TestDatasetStore(PgTestCase):
             30,
             1,
             6
+            )
+        """
+        cls.run_query(query)
+
+        query = """
+         INSERT INTO test_ad_network_join_data
+           (ad_network,
+            ad_network_group
+            )
+         VALUES
+           ('source2',
+            'source_group_A'
+            ),
+           ('source1',
+            'source_group_B'
+            ),
+           ('source3',
+            'source_group_B'
+            )
+        """
+        cls.run_query(query)
+
+        query = """
+         INSERT INTO test_placement_id_join_data
+           (placement_id,
+            placement_id_group
+            )
+         VALUES
+           ('z',
+            'placement_group_1'
+            ),
+           ('a',
+            'placement_group_1'
+            ),
+           ('b',
+            'placement_group_2'
             )
         """
         cls.run_query(query)

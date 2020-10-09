@@ -127,7 +127,14 @@ To run the default testsuite run this:
 pytest
 ```
 
-The tests for the extractor currently depende on having a local Postgres database and the variable `TEST_DB_CONNSTR` set with it's connection string.
+To run the tests with nox:
+```bash
+nox --session tests
+```
+
+"pytest", "-v", "-n", "auto", "tests/test_time_series_extractor.py"]
+The tests for the extractor currently depends on having a local Postgres database and
+the variable `TEST_DB_CONNSTR` set with it's connection string.
 
 The easiest way to to this is as follows:
 ```
@@ -137,7 +144,12 @@ docker run --network=host \
     -e "POSTGRES_DB=soam" \
     --rm postgres
 
-TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest tests/test_time_series_extractor.py
+TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest
+```
+
+To run a specific test file:
+```bash
+TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest -v tests/test_file.py
 ```
 
 Note that even though the example has a DB name during the tests a new database is created and dropped to ensure that no state is maintened between runs.
