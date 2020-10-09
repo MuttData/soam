@@ -267,6 +267,59 @@ class TestDatasetStore(PgTestCase):
             ],
         )
 
+    def test_join_aggregation_load_basic_columns_no_alias(self):
+        columns = ["opportunities", "ad_network_group"]
+        values = [[1000.0, 'source_group_A'], [1000.0, 'source_group_B']]
+        self._test_load(
+            columns=columns,
+            dimensions=["ad_network_group"],
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    None,
+                    "test_ad_network_join_data.ad_network = test_data.ad_network",
+                )
+            ],
+        )
+
+    def test_multiple_join_aggregation_basic_columns_order_by(self):
+        columns = [
+            "opportunities",
+            "ad_network_group",
+            "placement_id_group",
+        ]
+        values = [
+            [1000.0, 'source_group_B', 'placement_group_1'],
+            [1000.0, 'source_group_A', 'placement_group_1'],
+            [1000.0, 'source_group_A', 'placement_group_2'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=["ad_network_group", "placement_id_group"],
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                ),
+                (
+                    "test_placement_id_join_data",
+                    "tpi",
+                    "tpi.placement_id = test_data.placement_id",
+                ),
+            ],
+        )
+
     def test_load_basic_columns_aggregation_order_by(self):
         columns = ["opportunities", "impressions", "revenue"]
         values = [
@@ -339,12 +392,6 @@ class TestDatasetStore(PgTestCase):
             "revenue",
         ]
         dimensions = columns[:7]
-        values = [
-            ["2019-09-01", 0, 1e3 * 20 / 100, 100 / 1000, 0.90],
-            ["2019-09-01", 1, 1e3 * 30 / 200, 200 / 1000, 0.70],
-            ["2019-09-01", 2, 1e3 * 40 / 300, 300 / 1000, 0.40],
-            ["2019-09-02", 0, 1e3 * 6 / 30, 30 / 300, 0.90],
-        ]
         values = [
             [
                 "2019-09-01",

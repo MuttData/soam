@@ -156,7 +156,9 @@ class TimeSeriesExtractor(Step):
         extra_having_conditions:  list of str or None
             A list of conditions to be added to the "having" clause.
         column_mappings: TODO: missing doc
-        aggregated_column_mappings: TODO: missing doc
+        aggregated_column_mappings: dict
+            Contains the aggregation functions and aliases to replace the column
+            values.
         inner_join: list of tuple of int
             A list of tables to join on, every tuple is expected to contain:
             (table_name, table_alias, complete_condition).
@@ -223,11 +225,10 @@ class TimeSeriesExtractor(Step):
         )
 
         # Columns
-        col_map = (
-            column_mappings
-            if dimensions is None or all(dont_aggregate_dimensions)
-            else aggregated_column_mappings
-        )
+        col_map = aggregated_column_mappings
+        if dimensions is None or all(dont_aggregate_dimensions):
+            col_map = column_mappings
+
         columns = [col_map.get(col, col) for col in columns]
 
         placeholders["columns"] = columns
