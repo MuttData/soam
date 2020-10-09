@@ -171,7 +171,7 @@ pytest --mpl
 
 This section contains some recommendations when working with SoaM to avoid common mistakes:
 
-* When possible reuse objects to preserve their configuration.  
+* When possible reuse objects to preserve their configuration.
   Eg: Transformations, forecasters, etc.
 * Use the same train-test windows when backtesting and training to deploy and on later usage.
 
