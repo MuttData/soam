@@ -320,6 +320,38 @@ class TestDatasetStore(PgTestCase):
             ],
         )
 
+    def test_multiple_join_aggregation_basic_columns_filtered(self):
+        columns = [
+            "opportunities",
+            "ad_network_group",
+            "placement_id_group",
+        ]
+        values = [
+            [1000.0, 'source_group_A', 'placement_group_1'],
+            [1000.0, 'source_group_A', 'placement_group_2'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=["ad_network_group", "placement_id_group"],
+            dimensions_values=['source_group_A', None],
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            inner_join=[
+                (
+                    "test_ad_network_join_data",
+                    "tjd",
+                    "tjd.ad_network = test_data.ad_network",
+                ),
+                (
+                    "test_placement_id_join_data",
+                    "tpi",
+                    "tpi.placement_id = test_data.placement_id",
+                ),
+            ],
+        )
+
     def test_load_basic_columns_aggregation_order_by(self):
         columns = ["opportunities", "impressions", "revenue"]
         values = [
