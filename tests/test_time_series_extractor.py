@@ -681,14 +681,13 @@ class TestDatasetStore(PgTestCase):
         cls.time_series_extractor = TimeSeriesExtractor(
             cls.db_client, ConcreteTimeSeriesTable
         )
-        ConcreteTimeSeriesTable.__table__.create(  # pylint:disable=no-member
-            cls.db_client.get_engine()
-        )
+        engine = cls.db_client.get_engine()
+        ConcreteTimeSeriesTable.__table__.create(engine)  # pylint:disable=no-member
         ConcreteAdNetworkJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
-            cls.db_client.get_engine()
+            engine
         )
         ConcretePlacementIdJoinTimeSeriesTable.__table__.create(  # pylint:disable=no-member
-            cls.db_client.get_engine()
+            engine
         )
         query = """
          INSERT INTO test_data
