@@ -4,16 +4,37 @@ Transformer
 ----------
 """
 
+import logging
 from typing import TYPE_CHECKING, List, Optional, Tuple  # pylint:disable=unused-import
 
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
+from sklearn.base import BaseEstimator, TransformerMixin
 
-from soam.helpers import BaseDataFrameTransformer
-from soam.step import Step
+from soam.core import Step
 
 if TYPE_CHECKING:
     from soam.savers import Saver
+
+
+logger = logging.getLogger(__name__)
+
+
+class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
+    """Provide an interface to transform pandas DataFrames."""
+
+    def fit(
+        self, X: pd.DataFrame, **fit_params  # pylint:disable=unused-argument
+    ) -> "BaseDataFrameTransformer":
+        """This fits the transformer to the passed data."""
+        logger.warning("Subclasses should implement this.")
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        raise NotImplementedError("Subclasses should implement this.")
+
+    def fit_transform(self, X: pd.DataFrame, **fit_params) -> pd.DataFrame:
+        return self.fit(X, **fit_params).transform(X)
 
 
 class DummyDataFrameTransformer(BaseDataFrameTransformer):

@@ -16,13 +16,13 @@ import smtplib
 from typing import List, Tuple, Union
 
 from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
-from soam.constants import PARENT_LOGGER, PROJECT_NAME
+from soam.constants import PROJECT_NAME
 from soam.step import Step
 
 DEFAULT_SUBJECT = "[{end_date}]Forecast report for {metric_name}"
 DEFAULT_SIGNATURE = PROJECT_NAME
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(__name__)
 
 
 class MailReport:

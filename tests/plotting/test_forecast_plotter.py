@@ -12,7 +12,7 @@ from soam.constants import (
     Y_COL,
     YHAT_COL,
 )
-from soam.forecast_plotter import ForecastPlotterTask
+from soam.plotting import ForecastPlotterTask
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 

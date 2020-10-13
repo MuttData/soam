@@ -18,8 +18,8 @@ import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DS_COL, YHAT_COL
-from soam.step import Step
-from soam.utils import sanitize_arg_empty_dict
+from soam.core import Step
+from soam.utilities.utils import sanitize_arg_empty_dict
 
 if TYPE_CHECKING:
     from soam.savers import Saver

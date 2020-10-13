@@ -24,7 +24,7 @@ from soam.constants import (
     TIMESTAMP_COL,
     regex_prefix_symbols,
 )
-from soam.step import Step
+from soam.core import Step
 
 if TYPE_CHECKING:
     import muttlib

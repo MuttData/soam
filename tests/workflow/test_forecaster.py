@@ -2,7 +2,7 @@ from darts.models import Theta
 import numpy as np
 import pandas as pd
 
-from soam.forecaster import Forecaster
+from soam.workflow import Forecaster
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 

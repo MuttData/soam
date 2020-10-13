@@ -2,7 +2,7 @@ from unittest import TestCase, main
 
 import pandas as pd
 
-from soam.slicer import Slicer
+from soam.workflow import Slicer
 
 
 class TestSlicer(TestCase):

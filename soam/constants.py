@@ -138,9 +138,6 @@ PLOT_CONFIG = {
     }
 }
 
-# Logger config
-PARENT_LOGGER = PROJECT_NAME
-
 # Saver Config
 FLOW_FILE_NAME = "flow_tasks.csv"
 LOCK_NAME = "flow.lock"

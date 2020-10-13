@@ -6,7 +6,6 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
-from soam.backtester import Backetester, compute_metrics
 from soam.constants import (
     ANOMALY_PLOT,
     DS_COL,
@@ -15,10 +14,14 @@ from soam.constants import (
     PLOT_CONFIG,
     Y_COL,
 )
-from soam.forecast_plotter import ForecastPlotterTask
-from soam.forecaster import Forecaster
-from soam.helpers import BaseDataFrameTransformer
-from soam.transformer import Transformer
+from soam.plotting import ForecastPlotterTask
+from soam.workflow import (
+    Backetester,
+    BaseDataFrameTransformer,
+    Forecaster,
+    Transformer,
+    compute_metrics,
+)
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 

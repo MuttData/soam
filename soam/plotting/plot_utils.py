@@ -44,7 +44,6 @@ from soam.constants import (
     OUTLIERS_HISTORY,
     OUTLIERS_NEGATIVE,
     OUTLIERS_POSITIVE,
-    PARENT_LOGGER,
     PLOT_CONFIG,
     Y_COL,
     YHAT_COL,
@@ -56,7 +55,7 @@ DAYLOCATOR = "DayLocator"
 
 pd.plotting.register_matplotlib_converters()
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(__name__)
 
 
 def _set_time_locator_interval(

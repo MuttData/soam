@@ -7,14 +7,13 @@ import pandas as pd
 from prefect import task
 
 from soam.cfg import get_db_cred
-from soam.constants import PARENT_LOGGER
 from soam.forecast_plotter import ForecastPlotterTask
 from soam.forecaster import Forecaster
 from soam.runner import SoamFlow
 from soam.savers import CSVSaver, DBSaver
 from soam.slack_report import SlackReportTask
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(__name__)
 
 URL = "notebook/data/revenue.csv"
 now = datetime.datetime.today()

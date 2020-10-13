@@ -15,7 +15,7 @@ from typing import (  # pylint:disable=unused-import
 
 import pandas as pd
 
-from soam.step import Step
+from soam.core import Step
 
 if TYPE_CHECKING:
     from soam.savers import Saver

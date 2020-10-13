@@ -159,7 +159,7 @@ Note that even though the example has a DB name during the tests a new database 
 
 To generate images for testing we use [pytest-mpl]([https://github.com/matplotlib/pytest-mpl]) as follows:
 ```
-pytest --mpl-generate-path=tests/baseline
+pytest --mpl-generate-path=tests/plotting/baseline
 ```
 
 To run the image based tests:

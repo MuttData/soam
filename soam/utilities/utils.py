@@ -12,9 +12,7 @@ from typing import List, Optional, Tuple
 import pandas as pd
 from pandas.tseries import offsets
 
-from soam.constants import PARENT_LOGGER
-
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(__name__)
 
 
 def range_datetime(

@@ -3,8 +3,7 @@ from unittest import TestCase
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from soam.helpers import BaseDataFrameTransformer
-from soam.transformer import Transformer
+from soam.workflow import BaseDataFrameTransformer, Transformer
 
 
 class SimpleProcessor(BaseDataFrameTransformer):

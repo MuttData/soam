@@ -14,13 +14,13 @@ import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DS_COL, Y_COL, YHAT_COL
-from soam.forecast_plotter import ForecastPlotterTask
-from soam.forecaster import Forecaster
-from soam.step import Step
-from soam.transformer import DummyDataFrameTransformer, Transformer
-from soam.utils import split_backtesting_ranges
+from soam.core import Step
+from soam.utilities.utils import split_backtesting_ranges
+from soam.workflow.forecaster import Forecaster
+from soam.workflow.transformer import DummyDataFrameTransformer, Transformer
 
 if TYPE_CHECKING:
+    from soam.plotting import ForecastPlotterTask
     from soam.savers import Saver
 
 
@@ -58,9 +58,9 @@ class Backetester(Step):
 
     def __init__(
         self,
-        forecaster: Forecaster,
-        preprocessor: Transformer = None,
-        forecast_plotter: ForecastPlotterTask = None,
+        forecaster: "Forecaster",
+        preprocessor: "Transformer" = None,
+        forecast_plotter: "ForecastPlotterTask" = None,
         test_window: "Optional[int]" = 1,
         train_window: "Optional[int]" = 1,
         step_size: "Optional[int]" = None,
@@ -99,7 +99,7 @@ class Backetester(Step):
         time_series: pd.DataFrame,
         forecaster: Forecaster = None,
         preprocessor: Transformer = None,
-        forecast_plotter: ForecastPlotterTask = None,
+        forecast_plotter: "ForecastPlotterTask" = None,
         test_window: pd.Timedelta = None,
         train_window: Optional[int] = None,
         step_size: Optional[int] = None,

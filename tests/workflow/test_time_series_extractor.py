@@ -10,7 +10,7 @@ from sqlalchemy.types import Float, Integer, String
 
 from soam.constants import TIMESTAMP_COL
 from soam.data_models import AbstractIDBase, AbstractTimeSeriesTable
-from soam.time_series_extractor import TimeSeriesExtractor
+from soam.workflow import TimeSeriesExtractor
 from tests.db_test_case import TEST_DB_CONNSTR, PgTestCase
 
 

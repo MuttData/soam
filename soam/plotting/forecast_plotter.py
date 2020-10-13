@@ -11,12 +11,12 @@ from typing import Any, Dict, Optional, Union
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
-from soam.constants import DAILY_TIME_GRANULARITY, DS_COL, PARENT_LOGGER
-from soam.plot_utils import create_forecast_figure
-from soam.step import Step
-from soam.utils import get_file_path
+from soam.constants import DAILY_TIME_GRANULARITY, DS_COL
+from soam.core.step import Step
+from soam.plotting.plot_utils import create_forecast_figure
+from soam.utilities.utils import get_file_path
 
-logger = logging.getLogger(f"{PARENT_LOGGER}.{__name__}")
+logger = logging.getLogger(__name__)
 
 
 class ForecastPlotterTask(Step):

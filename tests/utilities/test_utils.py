@@ -6,7 +6,7 @@ import unittest
 
 import pandas as pd
 
-from soam.utils import split_backtesting_ranges
+from soam.utilities.utils import split_backtesting_ranges
 
 ROOT_TEST_DIRECTORY = Path(__file__).parent / "resources" / "test_utils"
 VALIDATION_PREFIX = "validation_"
