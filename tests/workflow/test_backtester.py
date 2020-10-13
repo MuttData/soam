@@ -177,7 +177,7 @@ def test_integration_Backtester_multi_fold(
 
 # TODO: It maybe a good visual aggregation to include all metrics in one plot. This
 # TODO: is not possible with the current implementation.
-def test_integration_backtester_multi_fold_lambda_aggregation(
+def test_integration_backtester_multi_fold_default_aggregation(
     tmp_path, sample_data_df
 ):  # pylint: disable=redefined-outer-name
     train_data = pd.concat([sample_data_df] * 3)
@@ -227,7 +227,7 @@ def test_integration_backtester_multi_fold_lambda_aggregation(
     assert_backtest_all_folds_result(rvs, expected_values)
 
 
-def test_integration_backtester_multi_fold_custom_aggregation(
+def test_integration_backtester_multi_fold_custom_lambda_aggregation(
     tmp_path, sample_data_df
 ):  # pylint: disable=redefined-outer-name
     train_data = pd.concat([sample_data_df] * 3)
