@@ -173,3 +173,134 @@ def test_integration_Backtester_multi_fold(
         },
     ]
     assert_backtest_all_folds_result(rvs, expected_values)
+
+
+# TODO: It maybe a good visual aggregation to include all metrics in one plot. This
+# TODO: is not possible with the current implementation.
+def test_integration_backtester_multi_fold_lambda_aggregation(
+    tmp_path, sample_data_df
+):  # pylint: disable=redefined-outer-name
+    train_data = pd.concat([sample_data_df] * 3)
+    train_data[DS_COL] = pd.date_range(
+        train_data[DS_COL].min(), periods=len(train_data), freq='MS'
+    )
+    model = ExponentialSmoothing()
+    forecaster = Forecaster(model=model, output_length=10)
+    preprocessor = Transformer(SimpleProcessor())
+    plot_config = deepcopy(PLOT_CONFIG)
+    plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
+    forecast_plotter = ForecastPlotterTask(
+        path=tmp_path,
+        metric_name='test',
+        time_granularity=MONTHLY_TIME_GRANULARITY,
+        plot_config=plot_config,
+    )
+    metrics = {
+        "mae": mean_absolute_error,
+        "mse": mean_squared_error,
+    }
+
+    backtester = Backetester(
+        forecaster=forecaster,
+        preprocessor=preprocessor,
+        forecast_plotter=forecast_plotter,
+        test_window=30,
+        train_window=30,
+        metrics=metrics,
+        aggregation="default",
+    )
+    rvs = backtester.run(train_data)
+
+    expected_values = [
+        {
+            'range': (
+                pd.Timestamp('2013-02-01 00:00:00'),
+                pd.Timestamp('2023-01-01 00:00:00'),
+            ),
+            'metrics': {
+                'mae': {'avg': 1.078893555, 'max': 1.230252564, 'min': 0.826157784},
+                'mse': {'avg': 1.561097084, 'max': 2.824535720, 'min': 0.929377766},
+            },
+            'plots': '0_forecast_2018020100_2020080100_.png',
+        }
+    ]
+    assert_backtest_all_folds_result(rvs, expected_values)
+
+
+def test_integration_backtester_multi_fold_custom_aggregation(
+    tmp_path, sample_data_df
+):  # pylint: disable=redefined-outer-name
+    train_data = pd.concat([sample_data_df] * 3)
+    train_data[DS_COL] = pd.date_range(
+        train_data[DS_COL].min(), periods=len(train_data), freq='MS'
+    )
+    model = ExponentialSmoothing()
+    forecaster = Forecaster(model=model, output_length=10)
+    preprocessor = Transformer(SimpleProcessor())
+    plot_config = deepcopy(PLOT_CONFIG)
+    plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
+    forecast_plotter = ForecastPlotterTask(
+        path=tmp_path,
+        metric_name='test',
+        time_granularity=MONTHLY_TIME_GRANULARITY,
+        plot_config=plot_config,
+    )
+    metrics = {
+        "mae": mean_absolute_error,
+        "mse": mean_squared_error,
+    }
+    aggregation = {
+        "metrics": {
+            "weighted_begining": lambda metrics_list: (
+                sum(
+                    [
+                        3 * val if idx == 0 else val
+                        for idx, val in enumerate(metrics_list)
+                    ]
+                )
+                / (len(metrics_list) + 2)
+            ),
+            "weighted_ending": lambda metrics_list: (
+                sum(
+                    [
+                        3 * val if idx == len(metrics_list) - 1 else val
+                        for idx, val in enumerate(metrics_list)
+                    ]
+                )
+                / (len(metrics_list) + 2)
+            ),
+        },
+        "plot": 1,
+    }
+
+    backtester = Backetester(
+        forecaster=forecaster,
+        preprocessor=preprocessor,
+        forecast_plotter=forecast_plotter,
+        test_window=30,
+        train_window=30,
+        metrics=metrics,
+        aggregation=aggregation,
+    )
+    rvs = backtester.run(train_data)
+
+    expected_values = [
+        {
+            'range': (
+                pd.Timestamp('2013-02-01 00:00:00'),
+                pd.Timestamp('2023-01-01 00:00:00'),
+            ),
+            'metrics': {
+                'mae': {
+                    'weighted_begining': 1.139437159,
+                    'weighted_ending': 1.119444258,
+                },
+                'mse': {
+                    'weighted_begining': 2.279385923,
+                    'weighted_ending': 1.947149509,
+                },
+            },
+            'plots': '0_forecast_2015080100_2018020100_.png',
+        }
+    ]
+    assert_backtest_all_folds_result(rvs, expected_values)
