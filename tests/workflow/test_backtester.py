@@ -22,6 +22,7 @@ from soam.workflow import (
     Transformer,
     compute_metrics,
 )
+from soam.workflow.backtester import METRICS_KEYWORD, PLOT_KEYWORD, RANGES_KEYWORD
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 
@@ -53,10 +54,10 @@ class SimpleProcessor(BaseDataFrameTransformer):
 
 
 def assert_backtest_fold_result(rv, ranges=None, metrics=None, plots=None):
-    assert tuple(rv) == ('ranges', 'metrics', 'plot')
-    assert rv['ranges'] == ranges
-    assert rv['plot'].name == plots
-    output_metrics = pd.Series(rv['metrics'])
+    assert tuple(rv) == (RANGES_KEYWORD, METRICS_KEYWORD, PLOT_KEYWORD)
+    assert rv[RANGES_KEYWORD] == ranges
+    assert rv[PLOT_KEYWORD].name == plots
+    output_metrics = pd.Series(rv[METRICS_KEYWORD])
     expected_metrics = pd.Series(metrics)
     pd.testing.assert_series_equal(output_metrics, expected_metrics, rtol=1e-4)
 
@@ -98,12 +99,12 @@ def test_integration_Backtester_single_fold(
 
     expected_values = [
         {
-            'ranges': (
+            RANGES_KEYWORD: (
                 pd.Timestamp('2013-02-01 00:00:00'),
                 pd.Timestamp('2015-07-01 00:00:00'),
                 pd.Timestamp('2016-05-01 00:00:00'),
             ),
-            'metrics': {'mae': 0.7878291094308457, 'mse': 1.3658751092701222},
+            METRICS_KEYWORD: {'mae': 0.7878291094308457, 'mse': 1.3658751092701222},
             'plots': '0_forecast_2013020100_2015080100_.png',
         },
     ]
@@ -145,30 +146,30 @@ def test_integration_Backtester_multi_fold(
 
     expected_values = [
         {
-            'ranges': (
+            RANGES_KEYWORD: (
                 pd.Timestamp('2013-02-01 00:00:00'),
                 pd.Timestamp('2015-07-01 00:00:00'),
                 pd.Timestamp('2018-01-01 00:00:00'),
             ),
-            'metrics': {'mae': 1.2302525646461073, 'mse': 2.8245357205721384},
+            METRICS_KEYWORD: {'mae': 1.2302525646461073, 'mse': 2.8245357205721384},
             'plots': '0_forecast_2013020100_2015080100_.png',
         },
         {
-            'ranges': (
+            RANGES_KEYWORD: (
                 pd.Timestamp('2015-08-01 00:00:00'),
                 pd.Timestamp('2018-01-01 00:00:00'),
                 pd.Timestamp('2020-07-01 00:00:00'),
             ),
-            'metrics': {'mae': 0.8261577849244794, 'mse': 0.9293777664085056},
+            METRICS_KEYWORD: {'mae': 0.8261577849244794, 'mse': 0.9293777664085056},
             'plots': '0_forecast_2015080100_2018020100_.png',
         },
         {
-            'ranges': (
+            RANGES_KEYWORD: (
                 pd.Timestamp('2018-02-01 00:00:00'),
                 pd.Timestamp('2020-07-01 00:00:00'),
                 pd.Timestamp('2023-01-01 00:00:00'),
             ),
-            'metrics': {'mae': 1.1802703142819078, 'mse': 1.993944686736428},
+            METRICS_KEYWORD: {'mae': 1.1802703142819078, 'mse': 1.993944686736428},
             'plots': '0_forecast_2018020100_2020080100_.png',
         },
     ]
@@ -213,13 +214,21 @@ def test_integration_backtester_multi_fold_default_aggregation(
 
     expected_values = [
         {
-            'range': (
+            RANGES_KEYWORD: (
                 pd.Timestamp('2013-02-01 00:00:00'),
                 pd.Timestamp('2023-01-01 00:00:00'),
             ),
-            'metrics': {
-                'mae': {'avg': 1.078893555, 'max': 1.230252564, 'min': 0.826157784},
-                'mse': {'avg': 1.561097084, 'max': 2.824535720, 'min': 0.929377766},
+            METRICS_KEYWORD: {
+                'mae': {
+                    'avg': 1.0788936351761558,
+                    'max': 1.2302449602697856,
+                    'min': 0.8261656309767738,
+                },
+                'mse': {
+                    'avg': 1.9159537714659203,
+                    'max': 2.8245066880319296,
+                    'min': 0.9294099396294029,
+                },
             },
             'plots': '0_forecast_2018020100_2020080100_.png',
         }
@@ -227,7 +236,7 @@ def test_integration_backtester_multi_fold_default_aggregation(
     assert_backtest_all_folds_result(rvs, expected_values)
 
 
-def test_integration_backtester_multi_fold_custom_lambda_aggregation(
+def test_integration_backtester_multi_fold_custom_aggregations(
     tmp_path, sample_data_df
 ):  # pylint: disable=redefined-outer-name
     train_data = pd.concat([sample_data_df] * 3)
@@ -250,7 +259,7 @@ def test_integration_backtester_multi_fold_custom_lambda_aggregation(
         "mse": mean_squared_error,
     }
     aggregation = {
-        "metrics": {
+        METRICS_KEYWORD: {
             "weighted_begining": lambda metrics_list: (
                 sum(
                     [
@@ -270,7 +279,7 @@ def test_integration_backtester_multi_fold_custom_lambda_aggregation(
                 / (len(metrics_list) + 2)
             ),
         },
-        "plot": 1,
+        PLOT_KEYWORD: 1,
     }
 
     backtester = Backetester(
@@ -286,11 +295,11 @@ def test_integration_backtester_multi_fold_custom_lambda_aggregation(
 
     expected_values = [
         {
-            'range': (
+            RANGES_KEYWORD: (
                 pd.Timestamp('2013-02-01 00:00:00'),
                 pd.Timestamp('2023-01-01 00:00:00'),
             ),
-            'metrics': {
+            METRICS_KEYWORD: {
                 'mae': {
                     'weighted_begining': 1.139437159,
                     'weighted_ending': 1.119444258,
@@ -298,6 +307,145 @@ def test_integration_backtester_multi_fold_custom_lambda_aggregation(
                 'mse': {
                     'weighted_begining': 2.279385923,
                     'weighted_ending': 1.947149509,
+                },
+            },
+            'plots': '0_forecast_2015080100_2018020100_.png',
+        }
+    ]
+    assert_backtest_all_folds_result(rvs, expected_values)
+
+
+def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plot(
+    tmp_path, sample_data_df
+):  # pylint: disable=redefined-outer-name
+    train_data = pd.concat([sample_data_df] * 3)
+    train_data[DS_COL] = pd.date_range(
+        train_data[DS_COL].min(), periods=len(train_data), freq='MS'
+    )
+    model = ExponentialSmoothing()
+    forecaster = Forecaster(model=model, output_length=10)
+    preprocessor = Transformer(SimpleProcessor())
+    plot_config = deepcopy(PLOT_CONFIG)
+    plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
+    forecast_plotter = ForecastPlotterTask(
+        path=tmp_path,
+        metric_name='test',
+        time_granularity=MONTHLY_TIME_GRANULARITY,
+        plot_config=plot_config,
+    )
+    metrics = {
+        "mae": mean_absolute_error,
+        "mse": mean_squared_error,
+    }
+    aggregation = {
+        METRICS_KEYWORD: {
+            "weighted_begining": lambda metrics_list: (
+                sum(
+                    [
+                        3 * val if idx == 0 else val
+                        for idx, val in enumerate(metrics_list)
+                    ]
+                )
+                / (len(metrics_list) + 2)
+            ),
+            "weighted_ending": lambda metrics_list: (
+                sum(
+                    [
+                        3 * val if idx == len(metrics_list) - 1 else val
+                        for idx, val in enumerate(metrics_list)
+                    ]
+                )
+                / (len(metrics_list) + 2)
+            ),
+        }
+    }
+
+    backtester = Backetester(
+        forecaster=forecaster,
+        preprocessor=preprocessor,
+        forecast_plotter=forecast_plotter,
+        test_window=30,
+        train_window=30,
+        metrics=metrics,
+        aggregation=aggregation,
+    )
+    rvs = backtester.run(train_data)
+
+    expected_values = [
+        {
+            RANGES_KEYWORD: (
+                pd.Timestamp('2013-02-01 00:00:00'),
+                pd.Timestamp('2023-01-01 00:00:00'),
+            ),
+            METRICS_KEYWORD: {
+                'mae': {
+                    'weighted_begining': 1.139437159,
+                    'weighted_ending': 1.119444258,
+                },
+                'mse': {
+                    'weighted_begining': 2.279385923,
+                    'weighted_ending': 1.947149509,
+                },
+            },
+            'plots': '0_forecast_2018020100_2020080100_.png',
+        }
+    ]
+    assert_backtest_all_folds_result(rvs, expected_values)
+
+
+def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metric(
+    tmp_path, sample_data_df
+):  # pylint: disable=redefined-outer-name
+    train_data = pd.concat([sample_data_df] * 3)
+    train_data[DS_COL] = pd.date_range(
+        train_data[DS_COL].min(), periods=len(train_data), freq='MS'
+    )
+    model = ExponentialSmoothing()
+    forecaster = Forecaster(model=model, output_length=10)
+    preprocessor = Transformer(SimpleProcessor())
+    plot_config = deepcopy(PLOT_CONFIG)
+    plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
+    forecast_plotter = ForecastPlotterTask(
+        path=tmp_path,
+        metric_name='test',
+        time_granularity=MONTHLY_TIME_GRANULARITY,
+        plot_config=plot_config,
+    )
+    metrics = {
+        "mae": mean_absolute_error,
+        "mse": mean_squared_error,
+    }
+    aggregation = {
+        PLOT_KEYWORD: 1,
+    }
+
+    backtester = Backetester(
+        forecaster=forecaster,
+        preprocessor=preprocessor,
+        forecast_plotter=forecast_plotter,
+        test_window=30,
+        train_window=30,
+        metrics=metrics,
+        aggregation=aggregation,
+    )
+    rvs = backtester.run(train_data)
+
+    expected_values = [
+        {
+            RANGES_KEYWORD: (
+                pd.Timestamp('2013-02-01 00:00:00'),
+                pd.Timestamp('2023-01-01 00:00:00'),
+            ),
+            METRICS_KEYWORD: {
+                'mae': {
+                    'avg': 1.0788936351761558,
+                    'max': 1.2302449602697856,
+                    'min': 0.8261656309767738,
+                },
+                'mse': {
+                    'avg': 1.9159537714659203,
+                    'max': 2.8245066880319296,
+                    'min': 0.9294099396294029,
                 },
             },
             'plots': '0_forecast_2015080100_2018020100_.png',
