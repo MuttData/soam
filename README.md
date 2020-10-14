@@ -132,7 +132,8 @@ To run the tests with nox:
 nox --session tests
 ```
 
-"pytest", "-v", "-n", "auto", "tests/test_time_series_extractor.py"]
+### Testing data extraction
+
 The tests for the extractor currently depends on having a local Postgres database and
 the variable `TEST_DB_CONNSTR` set with it's connection string.
 
