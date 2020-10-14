@@ -251,13 +251,10 @@ def aggregate_rv(
         if PLOT_KEYWORD in aggregation:
             aggregated_plot = result_values[aggregation[PLOT_KEYWORD]][PLOT_KEYWORD]
 
-    metrics_to_aggregate = {}
+    metrics_to_aggregate: Dict[str, List] = {}
     for split_result in result_values:
         for metric, value in split_result[METRICS_KEYWORD].items():
-            if metric not in metrics_to_aggregate:
-                metrics_to_aggregate[metric] = [value]
-            else:
-                metrics_to_aggregate[metric].append(value)
+            metrics_to_aggregate.setdefault(metric, []).append(value)
 
     aggregated_metrics = {
         metric: {
