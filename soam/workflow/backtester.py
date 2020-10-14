@@ -71,6 +71,7 @@ class Backetester(Step):
         of the selected plot. METRICS_KEYWORD is expected to be another dictionary
         containing the name of the aggregation associated with the function to
         aggregate de list of values per metric.
+        If aggregation is set to False or None, no aggregation would be performed.
         #TODO: make PLOT_KEYWORD support tuples to pick slices.
     """
 
@@ -166,6 +167,7 @@ class Backetester(Step):
             of the selected plot. METRICS_KEYWORD is expected to be another dictionary
             containing the name of the aggregation associated with the function to
             aggregate de list of values per metric.
+            If aggregation is set to False or None, no aggregation would be performed.
             #TODO: make PLOT_KEYWORD support tuples to pick slices.
         """
         # TODO
