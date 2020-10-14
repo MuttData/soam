@@ -254,10 +254,7 @@ def aggregate_rv(
     metrics_to_aggregate = {}
     for split_result in result_values:
         for metric, value in split_result[METRICS_KEYWORD].items():
-            if metric not in metrics_to_aggregate:
-                metrics_to_aggregate[metric] = [value]
-            else:
-                metrics_to_aggregate[metric].append(value)
+            metrics_to_aggregate[metric] = metrics_to_aggregate.get(metric, []).append(value)
 
     aggregated_metrics = {
         metric: {
