@@ -91,21 +91,14 @@ class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-met
     id = Column(Identity, primary_key=True)
 
 
-class AbstractUUIDBase(Base):  # type: ignore # pylint: disable=too-few-public-methods
-    """Helper class to add primary keys."""
-
-    __abstract__ = True
-
-    id = Column(UUIDType(binary=False), primary_key=True)
-
-
-class SoamFlowRunSchema(AbstractUUIDBase):  # type: ignore
+class SoamFlowRunSchema(Base):  # type: ignore
 
     __tablename__ = SOAM_FLOW_RUN_TABLE
 
+    flow_run_id = Column(UUIDType(binary=False), primary_key=True)
     run_date = Column(DateTime, nullable=True)
-    start_time = Column(DateTime, nullable=True)
-    end_time = Column(DateTime, nullable=True)
+    start_datetime = Column(DateTime, nullable=True)
+    end_datetime = Column(DateTime, nullable=True)
 
 
 class StepTypeEnum(enum.Enum):
@@ -121,15 +114,18 @@ class StepTypeEnum(enum.Enum):
 # DROP TYPE steptypeenum;
 
 
-class SoamTaskRunSchema(AbstractUUIDBase):  # type: ignore
+class SoamTaskRunSchema(Base):  # type: ignore
 
     __tablename__ = SOAM_TASK_RUNS_TABLE
 
     params = Column(Text, nullable=False)
     params_hash = Column(Text, nullable=False)
 
+    task_run_id = Column(UUIDType(binary=False), primary_key=True)
     flow_run_id = Column(
-        UUIDType(binary=False), ForeignKey(f"{SOAM_FLOW_RUN_TABLE}.id"), nullable=True,
+        UUIDType(binary=False),
+        ForeignKey(f"{SOAM_FLOW_RUN_TABLE}.flow_run_id"),
+        nullable=True,
     )
     step_type = Column(Enum(StepTypeEnum), nullable=False)
 
@@ -140,7 +136,7 @@ class ForecastValues(AbstractIDBase):
 
     task_run_id = Column(
         UUIDType(binary=False),
-        ForeignKey(f"{SOAM_TASK_RUNS_TABLE}.id"),
+        ForeignKey(f"{SOAM_TASK_RUNS_TABLE}.task_run_id"),
         nullable=False,
     )
     forecast_date = Column(DateTime, nullable=False)

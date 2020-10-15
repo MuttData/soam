@@ -21,8 +21,8 @@ class SoamFlow(Flow):
     def __init__(self, saver: "Optional[Saver]", **kwargs):
         super().__init__(**kwargs)
         self.saver = saver
-        self.start_time: datetime
-        self.end_time: datetime
+        self.start_datetime: datetime
+        self.end_datetime: datetime
         if self.saver is not None:
             self.state_handlers.append(self.saver.save_flow_run)
 
