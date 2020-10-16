@@ -57,6 +57,16 @@ for example to
 
 [//comment]: # (the postprocessing supports custom outputs?)
 
+# Install extras
+The project contains some extra dependencies that are not included in the default installation to make it lightweight.
+
+If you want slack or prophet extensions use:
+```bash
+pip install -e ".[slack]"
+pip install -e ".[prophet]"
+```
+
+
 ## Examples
 
 * Forecaster : here is a [notebook](./notebook/examples/forecaster.ipynb) using and explaining the forecaster stage.
