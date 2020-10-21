@@ -8,14 +8,14 @@ Prefect Task and Flow states when they are updated.
 
 
 ##### Packages dependencies
-![project_classes](images/packages_dependencies.png)
+![project_classes](../images/packages_dependencies.png)
 
 ##### Whole project class diagram
-![project_classes](images/project_classes.png)
+![project_classes](../images/project_classes.png)
 
 
 ##### Forecasting class diagram
-![forecaster](images/Forecaster_class_diagram.png)
+![forecaster](../images/Forecaster_class_diagram.png)
 
 https://gitlab.com/mutt_data/onboarding/-/blob/master/docs/modern_python_apps.md#documentation
 
