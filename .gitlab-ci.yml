@@ -44,3 +44,18 @@ pyreverse:
     - apt-get -qq update
     - apt-get -qq install -y graphviz
     - nox --sessions pyreverse
+
+pages:
+  stage: deploy
+  script:
+  - pip install .[dev]
+  - cd documentation
+  - sphinx-apidoc -f -o source ../soam
+  - make html
+  - cd ..
+  - mv documentation/build/html/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

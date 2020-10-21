@@ -128,7 +128,7 @@ For more alembic commands visit the [documentation](https://alembic.sqlalchemy.o
 ## Developers guide
 
 If you are going to develop SoaM, you should checkout the documentation directory before adding code,
-you can start in the [project structure document](documentation/project_structure.md).
+you can start in the [project structure document](documentation/source/project_structure.md).
 
 ## Testing
 

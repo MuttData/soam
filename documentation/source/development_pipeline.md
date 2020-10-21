@@ -6,6 +6,32 @@
 [//comment]: # (TODO: Explain the setup to debug the project)
 
 
+# Documentation
+Code is documented following [numpydoc docstring](
+https://numpydoc.readthedocs.io/en/latest/format.html) guidelines.
+
+## Sphinx
+We are using [Sphinx](https://www.sphinx-doc.org/en/master/) to bundle the project
+documentation.
+
+We are using the following extensions:
+ - [napoleon](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html) to
+ create the rst files from the code documentation.
+ - [autodoc](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html) to
+ include the code documentation that napoleon generates.
+ - [m2r2](https://github.com/crossnox/m2r2) to easily include markdown files in the
+ documentation.
+
+To create the documentation locally. From the documentation dir:
+
+```bash
+sphinx-apidoc -f -o source ../soam # To create the modules documentation
+make html # To bundle the documentation
+```
+
+This documentation is created during CI using [GitLab Pages](
+https://docs.gitlab.com/ee/user/project/pages/).
+
 # CI
 
 To run the CI jobs locally you have to run it with [nox](https://nox.thea.codes/en/stable/):
