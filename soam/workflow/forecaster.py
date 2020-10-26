@@ -9,12 +9,13 @@ from typing import (  # pylint:disable=unused-import
     Dict,
     List,
     Optional,
-    Tuple,
+    Union,
 )
 
 from darts import TimeSeries
 from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
+from pandas.core.common import maybe_make_list
 from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DS_COL, YHAT_COL
@@ -32,7 +33,10 @@ class Forecaster(Step):
         savers: "Optional[List[Saver]]" = None,
         output_length: int = 1,
         model_kwargs: Optional[Dict] = None,
-        **kwargs
+        ds_col: str = DS_COL,
+        value_cols: Optional[Union[str, List]] = YHAT_COL,
+        drop_after: bool = False,
+        **kwargs,
     ):
         """Wraps a forecasting model to run it inside a pipeline.
 
@@ -45,6 +49,12 @@ class Forecaster(Step):
             Keyword arguments to be passed to the model when fitting.
         savers : list of soam.savers.Saver, optional
             The saver to store the parameters and state changes.
+        ds_col: str
+            Default DS_COL, label of the DateTime to use as Index
+        value_cols: str or list, optional
+            Default YHAT_COL, label of the columns to forecast
+        drop_after: bool
+            Default False, if True drop the output_length from the timeseries
         """
         super().__init__(**kwargs)
         if savers is not None:
@@ -57,6 +67,9 @@ class Forecaster(Step):
 
         self.time_series = pd.DataFrame()
         self.prediction = pd.DataFrame()
+        self.value_cols = maybe_make_list(value_cols)
+        self.ds_col = ds_col
+        self.drop_after = drop_after
 
     @defaults_from_attrs('output_length', 'model_kwargs')
     def run(  # type: ignore
@@ -86,12 +99,15 @@ class Forecaster(Step):
         """
         # TODO: **kwargs should be a dedicated variable for model hyperparams.
         self.time_series = time_series.copy()  # type: ignore
-        values_columns = self.time_series.columns.to_list()
-        values_columns.remove(DS_COL)
 
         time_series = TimeSeries.from_dataframe(
-            self.time_series, time_col=DS_COL, value_cols=values_columns
+            self.time_series, time_col=self.ds_col, value_cols=self.value_cols,
         )
+        if self.drop_after:
+            time_series = time_series.drop_after(
+                time_series.end_time()
+                - pd.Timedelta(output_length - 1, unit=time_series.freq_str())
+            )
 
         # TODO: fix Unexpected argument **kwargs in self.model.fit
         self.model.fit(time_series, **model_kwargs)  # type: ignore
@@ -100,8 +116,8 @@ class Forecaster(Step):
         self.prediction.reset_index(level=0, inplace=True)
         self.prediction.rename(
             columns={
-                self.prediction.columns[0]: DS_COL,
-                self.prediction.columns[1]: YHAT_COL,
+                self.prediction.columns[0]: self.ds_col,
+                self.prediction.columns[1]: self.value_cols[0],
             },
             inplace=True,
         )

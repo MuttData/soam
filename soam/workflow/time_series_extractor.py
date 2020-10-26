@@ -27,8 +27,9 @@ from soam.constants import (
 from soam.core import Step
 
 if TYPE_CHECKING:
-    import muttlib
     import datetime as dt
+
+    import muttlib
 
 # Simple column selection templates.
 BASE_TEMPLATE = """
@@ -54,17 +55,20 @@ JOIN_TEMPLATE = """
 
 
 class TimeSeriesExtractor(Step):
-    db: "muttlib.dbconn.PgClient"
-    table_model: str
+    db: "muttlib.dbconn.BaseClient"
+    table_name: str
 
     def __init__(
-        self, db: "muttlib.dbconn.PgClient", table_model: str, **kwargs: Dict[str, Any],
+        self,
+        db: "muttlib.dbconn.BaseClient",
+        table_name: str,
+        **kwargs: Dict[str, Any],
     ):
         """Class to handle the dataset retrieval from the PostgreSql database.
 
         Parameters
         ----------
-        db: muttlib.dbconn.PgClient
+        db: muttlib.dbconn.BaseClient
             The database connection to use.
         table_name: str
             The table's name.
@@ -72,11 +76,7 @@ class TimeSeriesExtractor(Step):
         super().__init__(**kwargs)
 
         self.db = db
-        self.table_model = table_model
-
-    @property
-    def table_name(self):
-        return self.table_model.__tablename__
+        self.table_name = table_name
 
     def extract(self, build_query_kwargs: Dict[str, Any],) -> pd.DataFrame:
         """Extracts aggregated data and return it as a pandas DataFrame.
@@ -176,7 +176,6 @@ class TimeSeriesExtractor(Step):
 
         # Template
         query = """
-          SET extra_float_digits = 3;
           SELECT {{ columns | join(", ") }}
           FROM {{ table_name }}
           {% if join_tables %}
@@ -189,13 +188,13 @@ class TimeSeriesExtractor(Step):
           {% endfor %}
           {% endif %}
           {% if where %}
-          WHERE {{ where | join("AND ") }}
+          WHERE {{ where | join(" AND ") }}
           {% endif %}
           {% if group_by %}
           GROUP BY {{ group_by | join(", ") }}
           {% endif %}
           {% if having %}
-          HAVING {{ having | join("AND ") }}
+          HAVING {{ having | join(" AND ") }}
           {% endif %}
           {% if order_by %}
           ORDER BY {{ order_by | join(", ") }}
@@ -248,25 +247,25 @@ class TimeSeriesExtractor(Step):
         if extra_where_conditions:
             where_conds.extend(extra_where_conditions)
         if where_conds:
-            placeholders["where"] = where_conds
+            placeholders["where"] = where_conds  # type: ignore
 
         # Having
         having_conds = []
         if extra_having_conditions:
             having_conds.append(extra_having_conditions)
         if having_conds:
-            placeholders["having"] = having_conds
+            placeholders["having"] = having_conds  # type: ignore
 
         # Group by
         if dimensions is not None:
             placeholders["group_by"] = [
-                dim
+                dim  # type: ignore
                 for dim, dont in zip(dimensions, dont_aggregate_dimensions)
                 if not dont
             ]
         # Order by
         if order_by is not None:
-            placeholders["order_by"] = order_by
+            placeholders["order_by"] = order_by  # type: ignore
 
         # Render
         sql = Template(query).render(**placeholders)
@@ -325,7 +324,7 @@ class TimeSeriesExtractor(Step):
           SELECT DISTINCT {{ columns | join(", ") }}
           FROM {{ table_name }}
           {% if where %}
-          WHERE {{ where | join("AND ") }}
+          WHERE {{ where | join(" AND ") }}
           {% endif %}
           {% if order_by %}
           ORDER BY {{ order_by | join(", ") }}

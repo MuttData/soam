@@ -10,10 +10,12 @@ from typing import (  # pylint:disable=unused-import
     Dict,
     List,
     Optional,
+    Tuple,
     Union,
 )
 
 import pandas as pd
+from pandas.core.common import maybe_make_list
 
 from soam.core import Step
 
@@ -25,7 +27,7 @@ class Slicer(Step):
     def __init__(
         self,
         dimensions: Union[str, List[str]],
-        savers: "Optional[List[Saver]]",
+        savers: "Optional[List[Saver]]" = None,
         **kwargs,
     ):
         """Slice the incoming data upon the given dimensions
@@ -45,9 +47,9 @@ class Slicer(Step):
                 # TODO modify saver to save step abstraction
                 # self.state_handlers.append(saver.save_sliced)
 
-        self.dimensions = dimensions
+        self.dimensions = maybe_make_list(dimensions)
 
-    def run(self, raw_df: pd.DataFrame) -> Dict[str, pd.DataFrame]:  # type: ignore
+    def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:  # type: ignore
         """
         Slice the given dataframe with the dimensions setted.
 
@@ -57,17 +59,17 @@ class Slicer(Step):
             A pandas DataFrame containing the raw data to slice
         Returns
         -------
-        dict of {tuple of str: pd.DataFrame}
+        list of (tuple of str: pd.DataFrame)
             key = dimmensions values,
             value = pandas DataFrame containing the sliced dataframes.
 
         """
 
-        dataframes_ret = {}
+        dataframes_ret = []
 
         if self._check_dimensions(raw_df.columns.tolist()):
             for key, group in raw_df.groupby(self.dimensions):
-                dataframes_ret[key] = group
+                dataframes_ret.append((key, group))
 
         return dataframes_ret
 
