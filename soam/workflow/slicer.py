@@ -7,7 +7,6 @@ A class to create dataframes for aggregations
 
 from typing import (  # pylint:disable=unused-import
     TYPE_CHECKING,
-    Dict,
     List,
     Optional,
     Tuple,
@@ -17,16 +16,24 @@ from typing import (  # pylint:disable=unused-import
 import pandas as pd
 from pandas.core.common import maybe_make_list
 
+from soam.constants import DS_COL
 from soam.core import Step
 
 if TYPE_CHECKING:
     from soam.savers import Saver
 
 
+COLUMN = "column"
+GROUP = "group"
+Mode = [GROUP, COLUMN]
+
+
 class Slicer(Step):
     def __init__(
         self,
         dimensions: Union[str, List[str]],
+        mode: str,
+        ds_col: str = DS_COL,
         savers: "Optional[List[Saver]]" = None,
         **kwargs,
     ):
@@ -48,8 +55,10 @@ class Slicer(Step):
                 # self.state_handlers.append(saver.save_sliced)
 
         self.dimensions = maybe_make_list(dimensions)
+        self.mode = mode
+        self.ds_col = ds_col
 
-    def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:  # type: ignore
+    def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:
         """
         Slice the given dataframe with the dimensions setted.
 
@@ -68,18 +77,26 @@ class Slicer(Step):
         dataframes_ret = []
 
         if self._check_dimensions(raw_df.columns.tolist()):
-            for key, group in raw_df.groupby(self.dimensions):
-                dataframes_ret.append((key, group))
+            if self.mode == GROUP:
+                for key, group in raw_df.groupby(self.dimensions):
+                    dataframes_ret.append((key, group))
+            elif self.mode == COLUMN:
+                for dimension in self.dimensions:
+                    dataframes_ret.append((dimension, raw_df[[self.ds_col, dimension]]))
+            else:
+                raise ValueError(f"Error unknown mode: {self.mode}, allowed: {Mode}")
 
         return dataframes_ret
 
     def _check_dimensions(self, columns: List[str]) -> bool:
         # flat_list = [item for sublist in for item in sublist]
         different_columns = set(self.dimensions) - set(columns)
+        different_columns.update(set(self.ds_col) - set(columns))
 
         if len(different_columns) > 0:
             raise ValueError(
-                f"Error unknown columns are setted in dimensions {different_columns}"
+                f"""Error unknown columns are setted in dimensions
+                or ds_col: {different_columns}"""
             )
 
         return True
