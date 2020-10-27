@@ -13,7 +13,6 @@ from typing import (  # pylint:disable=unused-import
 )
 
 # from pandas.core.common import maybe_make_list
-from darts import TimeSeries
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
 
@@ -101,15 +100,6 @@ class Forecaster(Step):
         # TODO Check for empty dates and fill them.
         self.time_series = time_series.copy()  # type: ignore
         self.time_series = self.time_series.sort_values(by=self.ds_col)
-
-        time_series = TimeSeries.from_dataframe(
-            self.time_series, time_col=self.ds_col, value_cols=self.value_cols,
-        )
-        if self.drop_after:
-            time_series = time_series.drop_after(
-                time_series.end_time()
-                - pd.Timedelta(output_length - 1, unit=time_series.freq_str())
-            )
 
         if self.drop_after:
             self.time_series = self.time_series[: -self.output_length]

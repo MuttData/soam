@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 COLUMN = "column"
 GROUP = "group"
-Mode = [GROUP, COLUMN]
+MODE = [GROUP, COLUMN]
 
 
 class Slicer(Step):
@@ -84,7 +84,7 @@ class Slicer(Step):
                 for dimension in self.dimensions:
                     dataframes_ret.append((dimension, raw_df[[self.ds_col, dimension]]))
             else:
-                raise ValueError(f"Error unknown mode: {self.mode}, allowed: {Mode}")
+                raise ValueError(f"Error unknown mode: {self.mode}, allowed: {MODE}")
 
         return dataframes_ret
 
