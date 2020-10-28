@@ -40,7 +40,7 @@ class Forecaster(Step):
         """Wraps a forecasting model to run it inside a pipeline.
 
         Parameters
-        model : darts.models.forecasting_model.ForecastingModel
+        model : soam.models.base
             The model that will be fitted and execute the predictions.
         output_length : int
             The length of the output to predict.
@@ -113,7 +113,7 @@ class Forecaster(Step):
         # TODO: fix Unexpected argument **kwargs in self.model.fit
         y_col = set(self.time_series.columns) - set(self.keep_cols)
         y_col = y_col - set([self.ds_col])
-        print(y_col)
+
         self.model.fit(self.time_series, y=y_col.pop(), **self.model_kwargs)  # type: ignore
         self.prediction = self.model.predict(future)  # type: ignore
 
