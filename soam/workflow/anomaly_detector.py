@@ -1,4 +1,3 @@
-# anomaly_detector.py
 """
 Anomaly Detector
 ----------
@@ -6,13 +5,14 @@ Anomaly Detector
 
 from typing import (  # pylint:disable=unused-import
     TYPE_CHECKING,
-    Dict,
     List,
     Optional,
+    Tuple,
     Union,
 )
 
 import pandas as pd
+from pandas.core.common import maybe_make_list
 
 from soam.constants import DS_COL
 from soam.core import Step
@@ -26,6 +26,7 @@ class Anomaly(Step):
         self,
         savers: "Optional[List[Saver]]" = None,
         ds_col: str = DS_COL,
+        keep_cols: Union[str, List[str]] = [],
         value_cols: List = [],
         **kwargs,
     ):
@@ -47,10 +48,11 @@ class Anomaly(Step):
         self.time_series = pd.DataFrame()
         self.prediction = pd.DataFrame()
         self.value_cols = value_cols
+        self.keep_cols = maybe_make_list(keep_cols)
         self.ds_col = ds_col
 
     def run(  # type: ignore
-        self, time_series: pd.DataFrame, prediction: pd.DataFrame, metric: str
+        self, forecasted: Tuple[pd.DataFrame, pd.DataFrame]
     ) -> pd.DataFrame:
         """
         Detect anomaly with forecasted boundaries
@@ -65,32 +67,44 @@ class Anomaly(Step):
             containing as minimum the first column
             with DataTime values, and the boundaries columns defined by
             value_cols
-        metric: str
-            metric analyzing
 
         Returns
         -------
         pandas.DataFrame
             A pandas DataFrame with the outliers columns.
         """
+        time_series = forecasted[1]
+        prediction = forecasted[0]
 
         prediction = prediction[[self.ds_col, *self.value_cols]]
         prediction[self.ds_col] = prediction[self.ds_col].astype("datetime64[ns]")
 
-        time_series = time_series.iloc[-len(prediction) :][[self.ds_col, metric]]
+        metric = set(time_series.columns) - set(self.keep_cols)
+        metric = metric - set([self.ds_col])
+        if len(metric) != 1:
+            raise ValueError(
+                f"Bad configuration on Anomaly object: many columns for analyze {metric}"
+            )
+        metric = metric.pop()
+
+        time_series = time_series.iloc[-len(prediction) :]
         time_series[self.ds_col] = time_series[self.ds_col].astype("datetime64[ns]")
         outlier = pd.merge_asof(time_series, prediction, on=self.ds_col)
         outlier["default"] = False
-        outlier["outlier_lower"] = outlier.default.where(
+        outlier[f"outlier_lower_{metric}"] = outlier.default.where(
             outlier[self.value_cols[0]] < outlier[metric], True
         )
-        outlier["outlier_upper"] = outlier.default.where(
+        outlier["outlier_lower_{metric}"] = outlier.default.where(
             outlier[self.value_cols[1]] > outlier[metric], True
         )
         del outlier["default"]
 
-        outlier.columns = [f"{str(col)}_{metric}" for col in outlier.columns]
-        outlier = outlier.rename({f"{self.ds_col}_{metric}": self.ds_col}, axis=1)
-        outlier = outlier.rename({f"{metric}_{metric}": self.ds_col}, axis=1)
+        # outlier.columns = [f"{str(col)}_{metric}" for col in outlier.columns]
+        outlier = outlier.rename(
+            {f"{self.value_cols[0]}_{metric}": self.value_cols[0]}, axis=1
+        )
+        outlier = outlier.rename(
+            {f"{self.value_cols[1]}_{metric}": self.value_cols[1]}, axis=1
+        )
 
         return outlier
