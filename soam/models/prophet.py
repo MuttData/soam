@@ -35,7 +35,7 @@ def as_np_vector(y):
     return y
 
 
-class SkProphet(Prophet, BaseModel):
+class SkProphet(BaseModel):
     DS = "ds"
 
     def __init__(
@@ -64,12 +64,13 @@ class SkProphet(Prophet, BaseModel):
         prophet_kwargs: dict
             Keyword arguments to forward to Prophet.
         """
-        super().__init__(**prophet_kwargs)
+        super().__init__()
         self.date_column = date_column
         self.yhat_only = yhat_only
         self.extra_regressors = extra_regressors
         self.prophet_kwargs = prophet_kwargs
         self._set_my_extra_regressors()
+        self.model = None
 
     def fit(self, X, y=None, copy=True, **fit_params):
         """Scikit learn's like fit on the Prophet model.
@@ -111,8 +112,8 @@ class SkProphet(Prophet, BaseModel):
                 X = X.rename({y: 'y'}, axis=1)
             else:
                 X['y'] = as_np_vector(y)
-
-        return super().fit(X, **fit_params)
+        self.model = Prophet(**self.prophet_kwargs)
+        return self.model.fit(X, **fit_params)
 
     def predict(self, X):
         """Scikit learn's predict (returns predicted values).
@@ -131,7 +132,7 @@ class SkProphet(Prophet, BaseModel):
         """
         if self.date_column != self.DS and self.date_column in X.columns:
             X = X.rename({self.date_column: self.DS}, axis=1)
-        predictions = super().predict(X)
+        predictions = self.model.predict(X)
         if self.yhat_only:
             predictions = predictions.yhat.values
 
@@ -202,9 +203,9 @@ class SkProphet(Prophet, BaseModel):
             self.extra_regressors = self.extra_regressors.__class__()
             for regressor in self.extra_regressors:
                 if isinstance(regressor, str):
-                    self.add_regressor(regressor)
+                    self.model.add_regressor(regressor)
                 elif isinstance(regressor, dict):
-                    self.add_regressor(**regressor)
+                    self.model.add_regressor(**regressor)
                 else:
                     raise TypeError(
                         'Invalid extra_regressor in SkProphet.'
