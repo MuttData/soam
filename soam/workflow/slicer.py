@@ -31,9 +31,10 @@ MODE = [GROUP, COLUMN]
 class Slicer(Step):
     def __init__(
         self,
-        dimensions: Union[str, List[str]],
-        mode: str,
+        dimensions: Union[str, List[str]] = [],
+        metrics: Union[str, List[str]] = [],
         ds_col: str = DS_COL,
+        keeps: Union[str, List[str]] = [],
         savers: "Optional[List[Saver]]" = None,
         **kwargs,
     ):
@@ -55,8 +56,9 @@ class Slicer(Step):
                 # self.state_handlers.append(saver.save_sliced)
 
         self.dimensions = maybe_make_list(dimensions)
-        self.mode = mode
+        self.metrics = maybe_make_list(metrics)
         self.ds_col = ds_col
+        self.keeps = maybe_make_list(keeps)
 
     def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:
         """
@@ -77,21 +79,37 @@ class Slicer(Step):
         dataframes_ret = []
 
         if self._check_dimensions(raw_df.columns.tolist()):
-            if self.mode == GROUP:
-                for key, group in raw_df.groupby(self.dimensions):
-                    dataframes_ret.append((key, group))
-            elif self.mode == COLUMN:
+            raw_df = raw_df.sort_values(by=self.ds_col)
+
+            if self.dimensions:
                 for dimension in self.dimensions:
-                    dataframes_ret.append((dimension, raw_df[[self.ds_col, dimension]]))
+                    dimension = maybe_make_list(dimension)
+                    for _, group in raw_df.groupby(self.dimensions):
+                        if self.metrics:
+                            for metric in self.metrics:
+                                metric = maybe_make_list(metric)
+                                cols = [
+                                    self.ds_col,
+                                    *dimension,
+                                    *metric,
+                                    *self.keeps,
+                                ]
+                                dataframes_ret.append(group[cols])
+                        else:
+                            dataframes_ret.append(group)
+            elif self.metrics:
+                for metric in self.metrics:
+                    cols = [self.ds_col, metric, *self.keeps]
+                    dataframes_ret.append(raw_df[cols])
             else:
-                raise ValueError(f"Error unknown mode: {self.mode}, allowed: {MODE}")
+                raise ValueError("Error no dimension neither metric")
 
         return dataframes_ret
 
     def _check_dimensions(self, columns: List[str]) -> bool:
         # flat_list = [item for sublist in for item in sublist]
         different_columns = set(self.dimensions) - set(columns)
-        different_columns.update(set(self.ds_col) - set(columns))
+        different_columns.update(set([self.ds_col]) - set(columns))
 
         if len(different_columns) > 0:
             raise ValueError(
