@@ -94,17 +94,17 @@ class Anomaly(Step):
         outlier[f"outlier_lower_{metric}"] = outlier.default.where(
             outlier[self.value_cols[0]] < outlier[metric], True
         )
-        outlier["outlier_lower_{metric}"] = outlier.default.where(
+        outlier[f"outlier_lower_{metric}"] = outlier.default.where(
             outlier[self.value_cols[1]] > outlier[metric], True
         )
         del outlier["default"]
 
         # outlier.columns = [f"{str(col)}_{metric}" for col in outlier.columns]
         outlier = outlier.rename(
-            {f"{self.value_cols[0]}_{metric}": self.value_cols[0]}, axis=1
+            columns={self.value_cols[0]: f"{self.value_cols[0]}_{metric}"}
         )
         outlier = outlier.rename(
-            {f"{self.value_cols[1]}_{metric}": self.value_cols[1]}, axis=1
+            columns={self.value_cols[1]: f"{self.value_cols[1]}_{metric}"}
         )
 
         return outlier
