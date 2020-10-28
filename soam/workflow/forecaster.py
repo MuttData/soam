@@ -14,9 +14,9 @@ from typing import (  # pylint:disable=unused-import
 
 # from pandas.core.common import maybe_make_list
 import pandas as pd
-from prefect.utilities.tasks import defaults_from_attrs
+from pandas.core.common import maybe_make_list
 
-from soam.constants import DS_COL, YHAT_COL
+from soam.constants import DS_COL
 from soam.core import Step
 from soam.models.base import BaseModel
 from soam.utilities.utils import sanitize_arg_empty_dict
@@ -33,7 +33,7 @@ class Forecaster(Step):
         output_length: int = 1,
         model_kwargs: Optional[Dict] = None,
         ds_col: str = DS_COL,
-        value_cols: Optional[str] = YHAT_COL,
+        keep_cols: Union[str, List[str]] = [],
         drop_after: bool = False,
         **kwargs,
     ):
@@ -66,13 +66,12 @@ class Forecaster(Step):
 
         self.time_series = pd.DataFrame()
         self.prediction = pd.DataFrame()
-        self.value_cols = value_cols
+        self.keep_cols = maybe_make_list(keep_cols)
         self.ds_col = ds_col
         self.drop_after = drop_after
 
-    @defaults_from_attrs('output_length', 'model_kwargs')
     def run(  # type: ignore
-        self, time_series: pd.DataFrame, output_length=None, model_kwargs=None,
+        self, time_series: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Execute fit and predict with Darts models,
@@ -112,7 +111,10 @@ class Forecaster(Step):
             )
 
         # TODO: fix Unexpected argument **kwargs in self.model.fit
-        self.model.fit(self.time_series, y=self.value_cols, **model_kwargs)  # type: ignore
+        y_col = set(self.time_series.columns) - set(self.keep_cols)
+        y_col = y_col - set([self.ds_col])
+        print(y_col)
+        self.model.fit(self.time_series, y=y_col.pop(), **self.model_kwargs)  # type: ignore
         self.prediction = self.model.predict(future)  # type: ignore
 
         # self.prediction.reset_index(level=0, inplace=True)
