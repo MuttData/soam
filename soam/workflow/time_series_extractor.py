@@ -99,14 +99,15 @@ class TimeSeriesExtractor(Step):
         conn.close()
         return df
 
+    # maybe define class type all this arguments?
     def build_query(
         self,
         columns=None,
         dimensions: List[str] = None,
-        dimensions_values: Union[str, List[str]] = None,
+        dimensions_values: List[str] = None,
         timestamp_col: str = TIMESTAMP_COL,
-        start_date: "dt.datetime" = None,
-        end_date: "dt.datetime" = None,
+        start_date: Union["dt.datetime", str] = None,
+        end_date: Union["dt.datetime", str] = None,
         order_by: List[str] = None,
         extra_where_conditions: List[str] = None,
         extra_having_conditions: List[str] = None,
@@ -173,6 +174,11 @@ class TimeSeriesExtractor(Step):
         tuple of (str, dict of {str: obj})
             Renderd SQL query to extract data.
         """
+
+        args_maybe_dt = [start_date, end_date]
+
+        for arg in args_maybe_dt:
+            arg = pd.to_datetime(arg)
 
         # Template
         query = """

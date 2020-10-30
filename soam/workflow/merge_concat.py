@@ -43,7 +43,7 @@ class MergeConcat(Step):
         self.keys = maybe_make_list(keys)
         self.complete_df = pd.DataFrame(columns=self.keys)
 
-    def run(self, in_df: List[pd.DataFrame]) -> pd.DataFrame:
+    def run(self, in_df: List[pd.DataFrame]) -> pd.DataFrame:  # type: ignore
         """
         If values of keys exist on in_df and complete_df will
         merge and add the in_df columns

@@ -60,7 +60,7 @@ class Slicer(Step):
         self.ds_col = ds_col
         self.keeps = maybe_make_list(keeps)
 
-    def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:
+    def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:  # type: ignore
         """
         Slice the given dataframe with the dimensions setted.
 
