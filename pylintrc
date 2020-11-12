@@ -8,18 +8,10 @@ disable =
     # Disable conventions and refactors warnings
     C,
     R,
-    # Errors
-    import-error,
-    no-name-in-module,
     # Warnings:
-    broad-except,
-    dangerous-default-value,
     fixme,
     logging-format-interpolation,
     logging-fstring-interpolation,
-    lost-exception,
-    using-constant-test,
-    W0221,
 
 [FORMAT]
 
