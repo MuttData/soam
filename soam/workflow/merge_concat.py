@@ -1,27 +1,19 @@
-# merge_concat.py
 """
 MergeConcat
 ----------
 A class to merge or concat dataframes
 """
 
-from typing import TYPE_CHECKING, List, Optional, Union  # pylint:disable=unused-import
+from typing import List, Union
 
 import pandas as pd
 from pandas.core.common import maybe_make_list
-
-from soam.core import Step
-
-if TYPE_CHECKING:
-    from soam.savers import Saver
+from pomopt.search.soam.core import Step
 
 
 class MergeConcat(Step):
     def __init__(
-        self,
-        keys: Union[str, List[str]] = [],
-        savers: "Optional[List[Saver]]" = None,
-        **kwargs,
+        self, keys: Union[str, List[str]] = [], **kwargs,
     ):
         """Merge on concat dataframes dependending on the keys
 
@@ -29,16 +21,8 @@ class MergeConcat(Step):
         ----------
         keys:
             str or list of str labels of columns to merge on
-        savers:
-            list of soam.savers.Saver, optional
-            The saver to store the parameters and state changes.
         """
         super().__init__(**kwargs)
-        if savers is not None:
-            for saver in savers:
-                self.state_handlers.append(saver.save_forecast)
-                # TODO modify saver to save step abstraction
-                # self.state_handlers.append(saver.save_sliced)
 
         self.keys = maybe_make_list(keys)
         self.complete_df = pd.DataFrame(columns=self.keys)
@@ -57,6 +41,18 @@ class MergeConcat(Step):
         -------
         A pandas DataFrame
             with merged or concateneted data
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> from pomopt.search.soam.workflow import MergeConcat
+        >>> df1 = pd.DataFrame({"date": [1], "metric1": [512]})
+        >>> df2 = pd.DataFrame({"date": [1], "metric2": [328]})
+        >>> df3 = pd.DataFrame({"date": [2], "metric1": [238]})
+        >>> mc = MergeConcat(keys="date")
+        >>> mc.run([df1,df2,df3])
+        date	metric1	metric2
+        1	    512.0	328.0
+        2	    238.0	NaN
         """
         complete_df = pd.DataFrame(columns=self.keys)
         for df in in_df:
