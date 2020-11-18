@@ -8,7 +8,8 @@ from typing import List, Union
 
 import pandas as pd
 from pandas.core.common import maybe_make_list
-from pomopt.search.soam.core import Step
+
+from soam.core import Step
 
 
 class MergeConcat(Step):
@@ -44,7 +45,7 @@ class MergeConcat(Step):
         Examples
         --------
         >>> import pandas as pd
-        >>> from pomopt.search.soam.workflow import MergeConcat
+        >>> from soam.workflow import MergeConcat
         >>> df1 = pd.DataFrame({"date": [1], "metric1": [512]})
         >>> df2 = pd.DataFrame({"date": [1], "metric2": [328]})
         >>> df3 = pd.DataFrame({"date": [2], "metric1": [238]})
@@ -54,17 +55,21 @@ class MergeConcat(Step):
         1	    512.0	328.0
         2	    238.0	NaN
         """
-        complete_df = pd.DataFrame(columns=self.keys)
+        # self.complete_df = pd.DataFrame(columns=self.keys)
         for df in in_df:
-            if self._check_keys(df, complete_df):
-                if set(df).issubset(set(complete_df.columns)):
-                    complete_df = complete_df.combine_first(df)
+            if self._check_keys(df, self.complete_df):
+                if set(df).issubset(set(self.complete_df.columns)):
+                    self.complete_df = self.complete_df.combine_first(df)
                 else:
-                    complete_df = complete_df.merge(df, how="right", on=self.keys)
+                    self.complete_df = self.complete_df.merge(
+                        df, how="right", on=self.keys
+                    )
             else:
-                complete_df = pd.concat([complete_df, df])
+                # print(df)
+                # print(self.complete_df)
+                self.complete_df = pd.concat([self.complete_df, df])
 
-        return complete_df
+        return self.complete_df
 
     def _check_keys(self, in_df: pd.DataFrame, complete_df: pd.DataFrame) -> bool:
         """

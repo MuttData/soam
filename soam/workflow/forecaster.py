@@ -12,7 +12,6 @@ from typing import (  # pylint:disable=unused-import
     Union,
 )
 
-# from pandas.core.common import maybe_make_list
 import pandas as pd
 from pandas.core.common import maybe_make_list
 
@@ -49,7 +48,7 @@ class Forecaster(Step):
         savers : list of soam.savers.Saver, optional
             The saver to store the parameters and state changes.
         ds_col: str
-            Default DS_COL, label of the DateTime to use as Index
+            Default DS_COL, label of the DateTime
         value_cols: str, optional
             Default YHAT_COL, label of the columns to forecast
         drop_after: bool
@@ -101,7 +100,6 @@ class Forecaster(Step):
         self.time_series = self.time_series.sort_values(by=self.ds_col)
 
         if self.drop_after:
-            self.time_series = self.time_series[: -self.output_length]
             future = self.time_series[-self.output_length :][[self.ds_col]]
         else:
             future = pd.date_range(
@@ -110,19 +108,14 @@ class Forecaster(Step):
                 name=self.ds_col,
             )
 
-        # TODO: fix Unexpected argument **kwargs in self.model.fit
         y_col = set(self.time_series.columns) - set(self.keep_cols)
         y_col = y_col - set([self.ds_col])
-
-        self.model.fit(self.time_series, y=y_col.pop(), **self.model_kwargs)  # type: ignore
-        self.prediction = self.model.predict(future)  # type: ignore
-
-        # self.prediction.reset_index(level=0, inplace=True)
-        # self.prediction.rename(
-        #    columns={
-        #        self.prediction.columns[0]: self.ds_col,
-        #    },
-        #    inplace=True,
-        # )
+        try:
+            self.model.fit(self.time_series[: -self.output_length], y=y_col.pop(), **self.model_kwargs)  # type: ignore
+            self.prediction = self.model.predict(future)  # type: ignore
+            return self.prediction, self.time_series, self.model
+        except Exception:
+            self.prediction = pd.DataFrame(columns=["tim_day", "campaign_id"])
+            return self.prediction, self.time_series, self.model
 
         return self.prediction, self.time_series, self.model

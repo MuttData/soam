@@ -44,6 +44,8 @@ class Slicer(Step):
         ----------
         dimensions:
             str or list of str labels of categorical columns to slices
+        ds_col: str
+            Default DS_COL, label of the DateTime
         savers:
             list of soam.savers.Saver, optional
             The saver to store the parameters and state changes.
@@ -116,5 +118,76 @@ class Slicer(Step):
                 f"""Error unknown columns are setted in dimensions
                 or ds_col: {different_columns}"""
             )
+
+        return True
+
+
+class SlicerDateTime(Step):
+    def __init__(
+        self,
+        dimensions: Union[str, List[str]] = [],
+        metrics: Union[str, List[str]] = [],
+        ds_col: str = DS_COL,
+        keeps: Union[str, List[str]] = [],
+        savers: "Optional[List[Saver]]" = None,
+        max_dfs: int = 1,
+        step: int = 1,
+        **kwargs,
+    ):
+        """Slice the incoming data in a datetime range
+
+        Parameters
+        ----------
+        dimensions:
+            str or list of str labels of categorical columns to slices
+        ds_col: str
+            Default DS_COL, label of the DateTime
+        savers:
+            list of soam.savers.Saver, optional
+            The saver to store the parameters and state changes.
+        """
+        super().__init__(**kwargs)
+        if savers is not None:
+            for saver in savers:
+                self.state_handlers.append(saver.save_forecast)
+                # TODO modify saver to save step abstraction
+                # self.state_handlers.append(saver.save_sliced)
+
+        self.dimensions = maybe_make_list(dimensions)
+        self.metrics = maybe_make_list(metrics)
+        self.ds_col = ds_col
+        self.max_dfs = max_dfs
+        self.step = step
+        self.keeps = maybe_make_list(keeps)
+
+    def run(self, raw_df: pd.DataFrame) -> List[Tuple[str, pd.DataFrame]]:  # type: ignore
+        """
+        Slice the given dataframe with the dimensions setted.
+
+        Parameters
+        ----------
+        raw_df
+            A pandas DataFrame containing the raw data to slice
+        Returns
+        -------
+        list of (tuple of str: pd.DataFrame)
+            key = dimmensions values,
+            value = pandas DataFrame containing the sliced dataframes.
+
+        """
+
+        dataframes_ret = []
+        if self._check_ds_col(raw_df):
+            for i in range(
+                len(raw_df) - (self.step * self.max_dfs), len(raw_df), self.step
+            ):
+                df_step = raw_df[:i]
+                dataframes_ret.append(df_step)
+        return dataframes_ret
+
+    def _check_ds_col(self, df: pd.DataFrame) -> bool:
+
+        if len(df) != df[self.ds_col].unique():
+            raise ValueError("Error different amount of rows and unique ds_col values")
 
         return True
