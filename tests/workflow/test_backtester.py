@@ -59,7 +59,7 @@ def assert_backtest_fold_result(rv, ranges=None, metrics=None, plots=None):
     assert rv[PLOT_KEYWORD].name == plots
     output_metrics = pd.Series(rv[METRICS_KEYWORD])
     expected_metrics = pd.Series(metrics)
-    pd.testing.assert_series_equal(output_metrics, expected_metrics, rtol=1e-3)
+    pd.testing.assert_series_equal(output_metrics, expected_metrics, rtol=1e-2)
 
 
 def assert_backtest_all_folds_result(rvs, expected_values):
