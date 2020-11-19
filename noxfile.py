@@ -22,6 +22,7 @@ def lint(session):
     session.install(".")
     session.install(".[dev]")
     session.install(".[test]")
+    session.install(".[slack]")
 
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
