@@ -1,4 +1,4 @@
-from soam.workflow.anomaly_detector import Anomaly
+from soam.workflow.anomaly_detector import AnomalyBounds
 from soam.workflow.backtester import Backetester, compute_metrics
 from soam.workflow.forecaster import Forecaster
 from soam.workflow.merge_concat import MergeConcat

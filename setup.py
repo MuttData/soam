@@ -69,6 +69,7 @@ setuptools.setup(
         ],
         'slack': ["slackclient",],
         'prophet': ["fbprophet",],
+        'orbit': ["orbit-ml",],
     },
     python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},

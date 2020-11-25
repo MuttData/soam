@@ -98,11 +98,4 @@ class AnomalyBounds(Step):
                 columns={keep_col: f"{keep_col}_{metric}"}, inplace=True,
             )
 
-        logger.info(  # pylint: disable=logging-format-interpolation
-            f"""Anomalies calculated for campaign_id: {outlier.campaign_id.iloc[0]}
-            and metric {metric} with values: y={outlier[metric].iloc[0]:.3f},
-            prediction_lower={outlier[metric_lower].iloc[0]:.3f},
-            prediction_upper={outlier[metric_upper].iloc[0]:.3f}"""
-        )
-
         return outlier

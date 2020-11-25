@@ -17,32 +17,31 @@ class TestSlicer(TestCase):
     ]
     df = pd.DataFrame(data=values, columns=columns)
 
-    def _test_slices(
-        self, dimensions, length, value, check_keys=False, keys_check=None
-    ):
+    def _test_slices(self, dimensions, length, value):
 
-        slicer_test = Slicer(dimensions, None)
+        slicer_test = Slicer(
+            dimensions=dimensions, metrics="opportunities", ds_col="date"
+        )
         dataframes = slicer_test.run(self.df)
 
-        if not check_keys:
-            self.assertEqual(len(dataframes), length)
-            for dataframe in dataframes.values():
-                self.assertTrue(isinstance(dataframe, pd.DataFrame))
-                self.assertEqual(dataframe.columns.tolist(), self.columns)
+        self.assertEqual(len(dataframes), length)
+        for dataframe in dataframes:
+            self.assertIsInstance(dataframe, pd.DataFrame)
+            self.assertIn(
+                dataframe.columns.tolist(),
+                [
+                    ['date', 'letter', 'opportunities'],
+                    ['date', 'move', 'opportunities'],
+                ],
+            )
 
-            self.assertEqual(sum(list(dataframes.values())[0].opportunities), value)
-
-        if check_keys:
-            self.assertEqual(list(dataframes.keys())[0], keys_check)
+        self.assertEqual(dataframes[0].opportunities.sum(), value)
 
     def test_slice_one_column(self):
-        self._test_slices(["letter"], 2, 1600)
+        self._test_slices("letter", 2, 1600)
 
     def test_slice_two_column(self):
-        self._test_slices(["letter", "move"], 4, 1400)
-
-    def test_slice_keys(self):
-        self._test_slices(["letter", "move"], 6, 1400, True, ("A", "down"))
+        self._test_slices(["letter", "move"], 8, 1400)
 
     def test_slice_bad_dimension(self):
         with self.assertRaises(ValueError):
