@@ -13,9 +13,11 @@ Notes:
 - It would be interesting to implement unique counts
 [1] Ralph Kimball, Margy Ross - The Data Warehouse Toolkit (2013)
 """
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+import datetime as dt
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from jinja2 import Template
+from muttlib.dbconn import BaseClient
 import pandas as pd
 
 from soam.constants import (
@@ -25,11 +27,6 @@ from soam.constants import (
     regex_prefix_symbols,
 )
 from soam.core import Step
-
-if TYPE_CHECKING:
-    import datetime as dt
-
-    import muttlib
 
 # Simple column selection templates.
 BASE_TEMPLATE = """
@@ -55,14 +52,11 @@ JOIN_TEMPLATE = """
 
 
 class TimeSeriesExtractor(Step):
-    db: "muttlib.dbconn.BaseClient"
+    db: BaseClient
     table_name: str
 
     def __init__(
-        self,
-        db: "muttlib.dbconn.BaseClient",
-        table_name: str,
-        **kwargs: Dict[str, Any],
+        self, db: BaseClient, table_name: str, **kwargs: Dict[str, Any],
     ):
         """Class to handle the dataset retrieval from the PostgreSql database.
 
@@ -93,7 +87,7 @@ class TimeSeriesExtractor(Step):
         """
         query, kwargs = self.build_query(**build_query_kwargs)
         conn = self.db._connect()  # pylint: disable=protected-access
-        df = self.db.to_frame(query, connection=conn, **kwargs)
+        df = self.db.to_frame(query, client=conn, params=kwargs)
         if df.empty:
             df = pd.DataFrame(columns=build_query_kwargs["columns"])
         conn.close()
@@ -106,8 +100,8 @@ class TimeSeriesExtractor(Step):
         dimensions: List[str] = None,
         dimensions_values: List[str] = None,
         timestamp_col: str = TIMESTAMP_COL,
-        start_date: Union["dt.datetime", str] = None,
-        end_date: Union["dt.datetime", str] = None,
+        start_date: Union[dt.datetime, str] = None,
+        end_date: Union[dt.datetime, str] = None,
         order_by: List[str] = None,
         extra_where_conditions: List[str] = None,
         extra_having_conditions: List[str] = None,
@@ -173,6 +167,22 @@ class TimeSeriesExtractor(Step):
         -------
         tuple of (str, dict of {str: obj})
             Renderd SQL query to extract data.
+        Examples
+        --------
+        >>> from soam.workflow import TimeSeriesExtractor
+        >>> from pomopt.data.dbconn import BigQueryCli
+        >>> bqcli = BigQueryCli(auth_file="auth.json", project= "project")
+        >>> tsstep = TimeSeriesExtractor(bqcli, "project.db.table")
+        >>> build_query_kwargs = {
+                "columns": ["date", "metric", "country"],
+                "timestamp_col": "date",
+                "start_date": "2020-07-10",
+            }
+        >>> tsstep.build_query(**build_query_kwargs)[0]
+            SELECT date, metric,
+                        country
+            FROM project.db.table
+            WHERE date >= '2020-07-10'
         """
 
         args_maybe_dt = [start_date, end_date]

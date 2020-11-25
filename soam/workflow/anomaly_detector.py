@@ -3,13 +3,8 @@ Anomaly Detector
 ----------
 """
 
-from typing import (  # pylint:disable=unused-import
-    TYPE_CHECKING,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+import logging
+from typing import List, Tuple, Union  # pylint:disable=unused-import
 
 import pandas as pd
 from pandas.core.common import maybe_make_list
@@ -17,38 +12,34 @@ from pandas.core.common import maybe_make_list
 from soam.constants import DS_COL
 from soam.core import Step
 
-if TYPE_CHECKING:
-    from soam.savers import Saver
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
-class Anomaly(Step):
+class AnomalyBounds(Step):
     def __init__(  # type: ignore
         self,
-        savers: "Optional[List[Saver]]" = None,
         ds_col: str = DS_COL,
-        keep_cols: Union[str, List[str]] = [],
+        keep_cols_pred: Union[str, List[str]] = [],
+        keep_cols_ts: Union[str, List[str]] = [],
         value_cols: List = [],
         **kwargs,
     ):
         """Detect anomaly of given value and its boundaries
 
         Parameters
-        savers : list of soam.savers.Saver, optional
-            The saver to store the parameters and state changes.
         ds_col: str
             Default DS_COL, label of the DateTime to use as Index
         value_cols: list
             label of the boundaries columns
         """
         super().__init__(**kwargs)
-        if savers is not None:
-            for saver in savers:
-                self.state_handlers.append(saver.save_forecast)
 
         self.time_series = pd.DataFrame()
         self.prediction = pd.DataFrame()
         self.value_cols = value_cols
-        self.keep_cols = maybe_make_list(keep_cols)
+        self.keep_cols_pred = maybe_make_list(keep_cols_pred)
+        self.keep_cols_ts = maybe_make_list(keep_cols_ts)
         self.ds_col = ds_col
 
     def run(  # type: ignore
@@ -75,11 +66,10 @@ class Anomaly(Step):
         """
         time_series = forecasted[1]
         prediction = forecasted[0]
+        prediction = prediction[[self.ds_col, *self.value_cols, *self.keep_cols_pred]]
+        prediction = prediction.astype({self.ds_col: "datetime64[ns]"})
 
-        prediction = prediction[[self.ds_col, *self.value_cols]]
-        prediction[self.ds_col] = prediction[self.ds_col].astype("datetime64[ns]")
-
-        metric = set(time_series.columns) - set(self.keep_cols)
+        metric = set(time_series.columns) - set(self.keep_cols_ts)
         metric = metric - set([self.ds_col])
         if len(metric) != 1:
             raise ValueError(
@@ -88,7 +78,7 @@ class Anomaly(Step):
         metric = metric.pop()
 
         time_series = time_series.iloc[-len(prediction) :]
-        time_series[self.ds_col] = time_series[self.ds_col].astype("datetime64[ns]")
+        time_series = time_series.astype({self.ds_col: "datetime64[ns]"})
         outlier = pd.merge_asof(time_series, prediction, on=self.ds_col)
         outlier["default"] = False
         outlier[f"outlier_lower_{metric}"] = outlier.default.where(
@@ -99,12 +89,20 @@ class Anomaly(Step):
         )
         del outlier["default"]
 
-        # outlier.columns = [f"{str(col)}_{metric}" for col in outlier.columns]
-        outlier = outlier.rename(
-            columns={self.value_cols[0]: f"{self.value_cols[0]}_{metric}"}
-        )
-        outlier = outlier.rename(
-            columns={self.value_cols[1]: f"{self.value_cols[1]}_{metric}"}
+        metric_lower = f"{self.value_cols[0]}_{metric}"
+        metric_upper = f"{self.value_cols[1]}_{metric}"
+        outlier = outlier.rename(columns={self.value_cols[0]: metric_lower})
+        outlier = outlier.rename(columns={self.value_cols[1]: metric_upper})
+        for keep_col in self.keep_cols_pred:
+            outlier.rename(
+                columns={keep_col: f"{keep_col}_{metric}"}, inplace=True,
+            )
+
+        logger.info(  # pylint: disable=logging-format-interpolation
+            f"""Anomalies calculated for campaign_id: {outlier.campaign_id.iloc[0]}
+            and metric {metric} with values: y={outlier[metric].iloc[0]:.3f},
+            prediction_lower={outlier[metric_lower].iloc[0]:.3f},
+            prediction_upper={outlier[metric_upper].iloc[0]:.3f}"""
         )
 
         return outlier

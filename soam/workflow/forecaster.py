@@ -1,16 +1,11 @@
-# forecaster.py
 """
 Forecaster
 ----------
+Soam Module to run forecasts with any model.
 """
 
-from typing import (  # pylint:disable=unused-import
-    TYPE_CHECKING,
-    Dict,
-    List,
-    Optional,
-    Union,
-)
+import logging
+from typing import Dict, List, Optional, Union  # pylint:disable=unused-import
 
 import pandas as pd
 from pandas.core.common import maybe_make_list
@@ -18,17 +13,16 @@ from pandas.core.common import maybe_make_list
 from soam.constants import DS_COL
 from soam.core import Step
 from soam.models.base import BaseModel
-from soam.utilities.utils import sanitize_arg_empty_dict
+from soam.utilities.utils import sanitize_arg_empty_dict, suppress_stdout_stderr
 
-if TYPE_CHECKING:
-    from soam.savers import Saver
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class Forecaster(Step):
     def __init__(  # type: ignore
         self,
         model: Optional[BaseModel] = None,
-        savers: "Optional[List[Saver]]" = None,
         output_length: int = 1,
         model_kwargs: Optional[Dict] = None,
         ds_col: str = DS_COL,
@@ -45,20 +39,14 @@ class Forecaster(Step):
             The length of the output to predict.
         model_kwargs : dict
             Keyword arguments to be passed to the model when fitting.
-        savers : list of soam.savers.Saver, optional
-            The saver to store the parameters and state changes.
         ds_col: str
-            Default DS_COL, label of the DateTime
+            Default DS_COL, label of the DateTime to use as Index
         value_cols: str, optional
             Default YHAT_COL, label of the columns to forecast
         drop_after: bool
             Default False, if True drop the output_length from the timeseries
         """
         super().__init__(**kwargs)
-        if savers is not None:
-            for saver in savers:
-                self.state_handlers.append(saver.save_forecast)
-
         self.model = model
         self.output_length = output_length
         self.model_kwargs = sanitize_arg_empty_dict(model_kwargs)
@@ -94,8 +82,7 @@ class Forecaster(Step):
             a tuple containing a pandas DataFrame with the predicted values
             and the trained model.
         """
-        # TODO: **kwargs should be a dedicated variable for model hyperparams.
-        # TODO Check for empty dates and fill them.
+
         self.time_series = time_series.copy()  # type: ignore
         self.time_series = self.time_series.sort_values(by=self.ds_col)
 
@@ -110,12 +97,10 @@ class Forecaster(Step):
 
         y_col = set(self.time_series.columns) - set(self.keep_cols)
         y_col = y_col - set([self.ds_col])
-        try:
-            self.model.fit(self.time_series[: -self.output_length], y=y_col.pop(), **self.model_kwargs)  # type: ignore
+        metric = y_col.pop()
+
+        with suppress_stdout_stderr():
+            self.model.fit(self.time_series[: -self.output_length], y=metric, **self.model_kwargs)  # type: ignore
             self.prediction = self.model.predict(future)  # type: ignore
-            return self.prediction, self.time_series, self.model
-        except Exception:
-            self.prediction = pd.DataFrame(columns=["tim_day", "campaign_id"])
-            return self.prediction, self.time_series, self.model
 
         return self.prediction, self.time_series, self.model

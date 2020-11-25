@@ -49,6 +49,7 @@ REGRESSOR_PREFIX = "regr_"
 
 # TIME values
 YESTERDAY = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+NOW = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
 # Aggregated mail report constants
 AGGREGATED_MAIL_IMAGES = ["aggregated_summary"]
