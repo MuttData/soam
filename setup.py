@@ -33,14 +33,13 @@ setuptools.setup(
         "Cython<0.29.18,>=0.29",
         "sqlalchemy",
         "sqlalchemy_utils",
-        "u8darts",
         "alembic",
         "python-decouple",
         "prefect",
         "filelock",
         "click",
         "cookiecutter",
-        "muttlib @ git+https://gitlab.com/mutt_data/muttlib#egg=muttlib",
+        "muttlib>0.20, <1.0",
     ],
     extras_require={
         'dev': [
