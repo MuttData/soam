@@ -53,10 +53,14 @@ class SimpleProcessor(BaseDataFrameTransformer):
         return df_X
 
 
-def assert_backtest_fold_result(rv, ranges=None, metrics=None, plots=None):
+def assert_backtest_fold_result_common_checks(rv, ranges=None, plots=None):
     assert tuple(rv) == (RANGES_KEYWORD, METRICS_KEYWORD, PLOT_KEYWORD)
     assert rv[RANGES_KEYWORD] == ranges
     assert rv[PLOT_KEYWORD].name == plots
+
+
+def assert_backtest_fold_result(rv, ranges=None, metrics=None, plots=None):
+    assert_backtest_fold_result_common_checks(rv, ranges=ranges, plots=plots)
     output_metrics = pd.Series(rv[METRICS_KEYWORD])
     expected_metrics = pd.Series(metrics)
     pd.testing.assert_series_equal(output_metrics, expected_metrics, rtol=1e-2)
@@ -66,6 +70,19 @@ def assert_backtest_all_folds_result(rvs, expected_values):
     assert len(rvs) == len(expected_values)
     for rv, evs in zip(rvs, expected_values):
         assert_backtest_fold_result(rv, **evs)
+
+
+def assert_backtest_fold_result_aggregated(rv, ranges=None, metrics=None, plots=None):
+    assert_backtest_fold_result_common_checks(rv, ranges=ranges, plots=plots)
+    output_metrics = pd.DataFrame(rv[METRICS_KEYWORD])
+    expected_metrics = pd.DataFrame(metrics)
+    pd.testing.assert_frame_equal(output_metrics, expected_metrics, rtol=1e-2)
+
+
+def assert_backtest_all_folds_result_aggregated(rvs, expected_values):
+    assert len(rvs) == len(expected_values)
+    for rv, evs in zip(rvs, expected_values):
+        assert_backtest_fold_result_aggregated(rv, **evs)
 
 
 def test_integration_Backtester_single_fold(
@@ -233,7 +250,7 @@ def test_integration_backtester_multi_fold_default_aggregation(
             'plots': '0_forecast_2018020100_2020080100_.png',
         }
     ]
-    assert_backtest_all_folds_result(rvs, expected_values)
+    assert_backtest_all_folds_result_aggregated(rvs, expected_values)
 
 
 def test_integration_backtester_multi_fold_custom_aggregations(
@@ -312,7 +329,7 @@ def test_integration_backtester_multi_fold_custom_aggregations(
             'plots': '0_forecast_2015080100_2018020100_.png',
         }
     ]
-    assert_backtest_all_folds_result(rvs, expected_values)
+    assert_backtest_all_folds_result_aggregated(rvs, expected_values)
 
 
 def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plot(
@@ -390,7 +407,7 @@ def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plo
             'plots': '0_forecast_2018020100_2020080100_.png',
         }
     ]
-    assert_backtest_all_folds_result(rvs, expected_values)
+    assert_backtest_all_folds_result_aggregated(rvs, expected_values)
 
 
 def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metric(
@@ -451,4 +468,4 @@ def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metri
             'plots': '0_forecast_2015080100_2018020100_.png',
         }
     ]
-    assert_backtest_all_folds_result(rvs, expected_values)
+    assert_backtest_all_folds_result_aggregated(rvs, expected_values)
