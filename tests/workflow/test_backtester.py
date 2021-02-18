@@ -16,7 +16,7 @@ from soam.constants import (
 )
 from soam.plotting import ForecastPlotterTask
 from soam.workflow import (
-    Backetester,
+    Backtester,
     BaseDataFrameTransformer,
     Forecaster,
     Transformer,
@@ -104,7 +104,7 @@ def test_integration_Backtester_single_fold(
         "mse": mean_squared_error,
     }
 
-    backtester = Backetester(
+    backtester = Backtester(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
@@ -113,7 +113,6 @@ def test_integration_Backtester_single_fold(
         metrics=metrics,
     )
     rvs = backtester.run(train_data)
-
     expected_values = [
         {
             RANGES_KEYWORD: (
@@ -151,7 +150,7 @@ def test_integration_Backtester_multi_fold(
         "mse": mean_squared_error,
     }
 
-    backtester = Backetester(
+    backtester = Backtester(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
@@ -218,7 +217,7 @@ def test_integration_backtester_multi_fold_default_aggregation(
         "mse": mean_squared_error,
     }
 
-    backtester = Backetester(
+    backtester = Backtester(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
@@ -299,7 +298,7 @@ def test_integration_backtester_multi_fold_custom_aggregations(
         PLOT_KEYWORD: 1,
     }
 
-    backtester = Backetester(
+    backtester = Backtester(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
@@ -377,7 +376,7 @@ def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plo
         }
     }
 
-    backtester = Backetester(
+    backtester = Backtester(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
@@ -436,7 +435,7 @@ def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metri
         PLOT_KEYWORD: 1,
     }
 
-    backtester = Backetester(
+    backtester = Backtester(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,

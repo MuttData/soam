@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Union
 
 from filelock import FileLock
-from muttlib.utils import get_file_path, make_dirs
+from muttlib.utils import make_dirs
 import pandas as pd
 from prefect import Task, context
 from prefect.engine.state import State
@@ -10,6 +10,7 @@ from prefect.engine.state import State
 from soam.constants import FLOW_FILE_NAME, LOCK_NAME
 from soam.core import SoamFlow
 from soam.savers import Saver
+from soam.utilities.utils import get_file_path
 
 
 class CSVSaver(Saver):
@@ -69,7 +70,7 @@ class CSVSaver(Saver):
         """
         if new_state.is_successful():
             flow_run_file = self.flow_file_path
-            lock = FileLock(self.flow_run_lock)
+            lock = FileLock(str(self.flow_run_lock))
 
             with lock.acquire(timeout=5):
                 read_df = pd.read_csv(flow_run_file)

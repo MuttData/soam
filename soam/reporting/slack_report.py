@@ -15,7 +15,7 @@ from slack.web.slack_response import SlackResponse
 
 from soam.cfg import get_slack_cred
 from soam.constants import DS_COL, YHAT_COL
-from soam.step import Step
+from soam.core.step import Step
 
 DEFAULT_GREETING_MESSAGE = "Hello everyone! Here are the results of the forecast for the *{metric_name}* metric:\n"
 DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
