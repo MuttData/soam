@@ -36,7 +36,7 @@ DEFAULT_METRIC_AGGREGATION = {
 }
 
 
-class Backetester(Step):
+class Backtester(Step):
     """Class to perform backtesting.
 
     Note: To run a single fold backtest, for example to validate the model
@@ -188,7 +188,6 @@ class Backetester(Step):
 
             ready_train_set, fitted_preproc = preproc.run(train_set)
             prediction, _, _ = fc.run(ready_train_set, output_length=test_window)
-
             train_start = train_set[DS_COL].min()
             train_end = train_set[DS_COL].max()
             test_end = test_set[DS_COL].max()

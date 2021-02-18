@@ -13,13 +13,13 @@ from prefect.engine.state import State
 
 from soam.core import SoamFlow
 from soam.data_models import StepTypeEnum
-from soam.forecaster import Forecaster
+from soam.workflow import Forecaster
 
 logger = logging.getLogger(__name__)
 
 
 class Saver(ABC):  # pylint:disable=abstract-method
-    """ The base class for all savers objects.
+    """The base class for all savers objects.
 
     All implementations of Saver have to implement the state_handler of Prefect.
     Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)
