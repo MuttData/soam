@@ -1,6 +1,7 @@
 [MASTER]
 
 jobs = 0
+ignore=notebook/examples
 
 [MESSAGES CONTROL]
 
@@ -9,6 +10,7 @@ disable =
     C,
     R,
     # Warnings:
+    arguments-differ,
     fixme,
     logging-format-interpolation,
     logging-fstring-interpolation,

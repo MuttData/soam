@@ -14,7 +14,7 @@ from soam.core import Step
 
 class MergeConcat(Step):
     def __init__(
-        self, keys: Union[str, List[str]] = [], **kwargs,
+        self, keys: Union[str, List[str], None] = None, **kwargs,
     ):
         """Merge on concat dataframes dependending on the keys
 
@@ -25,6 +25,8 @@ class MergeConcat(Step):
         """
         super().__init__(**kwargs)
 
+        if keys is None:
+            keys = []
         self.keys = maybe_make_list(keys)
         self.complete_df = pd.DataFrame(columns=self.keys)
 
