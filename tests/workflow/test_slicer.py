@@ -17,36 +17,135 @@ class TestSlicer(TestCase):
     ]
     df = pd.DataFrame(data=values, columns=columns)
 
-    def _test_slices(
-        self, dimensions, length, value, check_keys=False, keys_check=None
-    ):
+    def _test_slices(self, dimensions, metrics, length, dfs):
 
-        slicer_test = Slicer(dimensions, None)
+        slicer_test = Slicer(dimensions=dimensions, metrics=metrics, ds_col="date")
         dataframes = slicer_test.run(self.df)
 
-        if not check_keys:
-            self.assertEqual(len(dataframes), length)
-            for dataframe in dataframes.values():
-                self.assertTrue(isinstance(dataframe, pd.DataFrame))
-                self.assertEqual(dataframe.columns.tolist(), self.columns)
-
-            self.assertEqual(sum(list(dataframes.values())[0].opportunities), value)
-
-        if check_keys:
-            self.assertEqual(list(dataframes.keys())[0], keys_check)
+        self.assertEqual(len(dataframes), length)
+        for df_returned, df_passed in zip(dataframes, dfs):
+            df_returned.reset_index(inplace=True, drop=True)
+            df_passed.reset_index(inplace=True, drop=True)
+            pd.testing.assert_frame_equal(
+                df_returned, df_passed, check_index_type=False, check_like=True
+            )
 
     def test_slice_one_column(self):
-        self._test_slices(["letter"], 2, 1600)
+        columns = ["date", "letter", "opportunities"]
+        df1 = pd.DataFrame(
+            columns=columns,
+            data=[
+                ["2019-09-01", "A", 1000],
+                ["2019-09-02", "A", 400],
+                ["2019-09-03", "A", 200],
+            ],
+        )
+        df2 = pd.DataFrame(
+            columns=columns,
+            data=[
+                ["2019-09-01", "B", 500],
+                ["2019-09-02", "B", 300],
+                ["2019-09-03", "B", 700],
+            ],
+        )
+        dfs = [df1, df2]
+        self._test_slices("letter", "opportunities", 2, dfs)
 
     def test_slice_two_column(self):
-        self._test_slices(["letter", "move"], 4, 1400)
+        columns1 = ["date", "letter", "opportunities"]
+        columns2 = ["date", "move", "opportunities"]
+        df1 = pd.DataFrame(
+            columns=columns1,
+            data=[
+                ["2019-09-01", "A", 1000],
+                ["2019-09-02", "A", 400],
+                ["2019-09-03", "A", 200],
+            ],
+        )
+        df2 = pd.DataFrame(
+            columns=columns1,
+            data=[
+                ["2019-09-01", "B", 500],
+                ["2019-09-02", "B", 300],
+                ["2019-09-03", "B", 700],
+            ],
+        )
+        df3 = pd.DataFrame(
+            columns=columns2,
+            data=[
+                ["2019-09-01", "down", 1000],
+                ["2019-09-01", "down", 500],
+                ["2019-09-02", "down", 400],
+            ],
+        )
+        df4 = pd.DataFrame(
+            columns=columns2,
+            data=[
+                ["2019-09-02", "up", 300],
+                ["2019-09-03", "up", 200],
+                ["2019-09-03", "up", 700],
+            ],
+        )
+        dfs = [df1, df2, df3, df4]
+        self._test_slices(["letter", "move"], "opportunities", 4, dfs)
 
-    def test_slice_keys(self):
-        self._test_slices(["letter", "move"], 6, 1400, True, ("A", "down"))
+    def test_slice_two_dimensions(self):
+        columns = ["date", "letter", "move", "opportunities"]
+        df1 = pd.DataFrame(
+            columns=columns,
+            data=[["2019-09-01", "A", "down", 1000], ["2019-09-02", "A", "down", 400],],
+        )
+
+        df2 = pd.DataFrame(columns=columns, data=[["2019-09-03", "A", "up", 200],])
+        df3 = pd.DataFrame(columns=columns, data=[["2019-09-01", "B", "down", 500],])
+        df4 = pd.DataFrame(
+            columns=columns,
+            data=[["2019-09-02", "B", "up", 300], ["2019-09-03", "B", "up", 700],],
+        )
+        dfs = [df1, df2, df3, df4]
+        self._test_slices([["letter", "move"]], "opportunities", 4, dfs)
+
+    def test_slice_two_metrics(self):
+        columns1 = ["date", "letter", "opportunities"]
+        columns2 = ["date", "letter", "impressions"]
+        df1 = pd.DataFrame(
+            columns=columns1,
+            data=[
+                ["2019-09-01", "A", 1000],
+                ["2019-09-02", "A", 400],
+                ["2019-09-03", "A", 200],
+            ],
+        )
+        df3 = pd.DataFrame(
+            columns=columns1,
+            data=[
+                ["2019-09-01", "B", 500],
+                ["2019-09-02", "B", 300],
+                ["2019-09-03", "B", 700],
+            ],
+        )
+        df2 = pd.DataFrame(
+            columns=columns2,
+            data=[
+                ["2019-09-01", "A", 100],
+                ["2019-09-02", "A", 300],
+                ["2019-09-03", "A", 10],
+            ],
+        )
+        df4 = pd.DataFrame(
+            columns=columns2,
+            data=[
+                ["2019-09-01", "B", 68],
+                ["2019-09-02", "B", 35],
+                ["2019-09-03", "B", 30],
+            ],
+        )
+        dfs = [df1, df2, df3, df4]
+        self._test_slices("letter", ["opportunities", "impressions"], 4, dfs)
 
     def test_slice_bad_dimension(self):
         with self.assertRaises(ValueError):
-            self._test_slices(["letter", "mover"], 0, 0)
+            self._test_slices("lette", "opportunities", 0, 0)
 
 
 if __name__ == "__main__":
