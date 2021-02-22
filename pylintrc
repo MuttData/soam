@@ -1,7 +1,7 @@
 [MASTER]
 
 jobs = 0
-ignore=notebook/examples
+ignore=notebook/examples/*
 
 [MESSAGES CONTROL]
 
