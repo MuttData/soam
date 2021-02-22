@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class SoamFlow(Flow):
-    def __init__(self, saver: "Optional[Saver]", **kwargs):
+    def __init__(self, saver: "Optional[Saver]" = None, **kwargs):
         super().__init__(**kwargs)
         self.saver = saver
         self.start_datetime: datetime
