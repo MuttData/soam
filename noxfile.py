@@ -1,11 +1,12 @@
 import nox
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, python="3.7")
 def tests(session):
     """Run all tests."""
     session.install(".")
     session.install(".[test]")
+    session.install(".[slack]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -15,19 +16,20 @@ def tests(session):
     session.run(*cmd)
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, python="3.7")
 def lint(session):
     """Run all pre-commit hooks."""
 
     session.install(".")
     session.install(".[dev]")
     session.install(".[test]")
+    session.install(".[slack]")
 
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, python="3.7")
 def bandit(session):
     """Run all pre-commit hooks."""
     session.install("bandit")
@@ -35,7 +37,7 @@ def bandit(session):
     session.run("bandit", "-r", "soam/", "-ll", "-c", "bandit.yaml")
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, python="3.7")
 def pyreverse(session):
     """Create class diagrams."""
     session.install("pylint")

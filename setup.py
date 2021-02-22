@@ -64,6 +64,7 @@ setuptools.setup(
             'pytest-xdist',
             'pytest-cov',
             'pytest-html',
+            'pytest-mock',
             'hypothesis',
             'psycopg2',
         ],

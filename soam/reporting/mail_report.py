@@ -17,7 +17,7 @@ from typing import List, Tuple, Union
 
 from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
 from soam.constants import PROJECT_NAME
-from soam.step import Step
+from soam.core.step import Step
 
 DEFAULT_SUBJECT = "[{end_date}]Forecast report for {metric_name}"
 DEFAULT_SIGNATURE = PROJECT_NAME
@@ -94,7 +94,7 @@ class MailReport:
         mime_image_list: List[MIMEImage],
         attachments: List[str],
     ):
-        """ Send a report email.
+        """Send a report email.
         TODO: review method, may be static
 
         Parameters

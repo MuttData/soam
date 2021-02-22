@@ -1,3 +1,3 @@
-from soam.savers.csv_saver import CSVSaver
-from soam.savers.db_saver import DBSaver
-from soam.savers.savers import Saver
+from soam.savers.savers import Saver  # isort:skip
+from soam.savers.csv_saver import CSVSaver  # isort:skip
+from soam.savers.db_saver import DBSaver  # isort:skip
