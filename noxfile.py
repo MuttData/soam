@@ -40,6 +40,8 @@ def bandit(session):
 @nox.session(reuse_venv=True, python="3.7")
 def pyreverse(session):
     """Create class diagrams."""
+    session.install(".")
+    session.install(".[slack]")
     session.install("pylint")
 
     # TODO: create smaller diagrams with portions of the project.
