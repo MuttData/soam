@@ -1,4 +1,3 @@
-# forecast_plotter.py
 """
 Forecast Plotter
 ----------
