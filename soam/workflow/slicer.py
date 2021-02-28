@@ -48,7 +48,7 @@ class Slicer(Step):
             dimensions = []
         if metrics is None:
             metrics = []
-        if dimensions is None:
+        if keeps is None:
             keeps = []
         super().__init__(**kwargs)
 
