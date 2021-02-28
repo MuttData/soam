@@ -25,10 +25,10 @@ logger.setLevel(logging.INFO)
 class Slicer(Step):
     def __init__(
         self,
-        dimensions: Union[str, List[str]] = [],
-        metrics: Union[str, List[str]] = [],
+        dimensions: Union[str, List[str], None] = None,
+        metrics: Union[str, List[str], None] = None,
         ds_col: str = DS_COL,
-        keeps: Union[str, List[str]] = [],
+        keeps: Union[str, List[str], None] = None,
         **kwargs,
     ):
         """Slice the incoming data upon the given dimensions
@@ -44,6 +44,12 @@ class Slicer(Step):
         keeps:
             str or list of str labels of columns to keep.
         """
+        if dimensions is None:
+            dimensions = []
+        if metrics is None:
+            metrics = []
+        if keeps is None:
+            keeps = []
         super().__init__(**kwargs)
 
         self.dimensions = maybe_make_list(dimensions)

@@ -7,11 +7,11 @@ import pandas as pd
 from prefect import task
 
 from soam.cfg import get_db_cred
-from soam.forecast_plotter import ForecastPlotterTask
-from soam.forecaster import Forecaster
-from soam.runner import SoamFlow
+from soam.core import SoamFlow
+from soam.plotting import ForecastPlotterTask
+from soam.reporting import SlackReportTask
 from soam.savers import CSVSaver, DBSaver
-from soam.slack_report import SlackReportTask
+from soam.workflow import Forecaster
 
 logger = logging.getLogger(__name__)
 

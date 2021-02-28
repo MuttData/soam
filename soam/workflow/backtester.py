@@ -1,4 +1,4 @@
-from collections import Mapping
+from collections.abc import Mapping
 import logging
 from typing import (  # pylint:disable=unused-import
     TYPE_CHECKING,
