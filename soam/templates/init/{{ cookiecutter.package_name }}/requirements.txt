@@ -1,4 +1,4 @@
-git+https://gitlab.com/mutt_data/muttlib.git
+muttlib==0.35.4
 pandas
 python-decouple
 scikit-learn

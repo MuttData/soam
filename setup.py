@@ -40,7 +40,7 @@ setuptools.setup(
         "filelock",
         "click",
         "cookiecutter",
-        "muttlib @ git+https://gitlab.com/mutt_data/muttlib#egg=muttlib",
+        "muttlib==0.35.4",
     ],
     extras_require={
         'dev': [
