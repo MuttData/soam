@@ -1,7 +1,7 @@
 # runner.py
 """
 SoamFlow Class
-----------
+--------------
 A class that can execute the pipeline steps and keep track of the whole run
 data
 

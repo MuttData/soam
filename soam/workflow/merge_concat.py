@@ -1,6 +1,6 @@
 """
 MergeConcat
-----------
+-----------
 A class to merge or concat dataframes
 """
 

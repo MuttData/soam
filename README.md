@@ -4,8 +4,8 @@ SoaM is library created by [Mutt](https://muttdata.ai/).
 Its goal is to create a forecasting framework, this tool is developed with conjunctions of experience on previous
 projects. There come the name: Son of a Mutt = SoaM
 
+## SoaM pipeline
 
-### SoaM pipeline
 
 ![soam_pipeline](documentation/images/SoaM_diagram.png)
 
@@ -58,6 +58,7 @@ for example to
 [//comment]: # (the postprocessing supports custom outputs?)
 
 # Install extras
+
 The project contains some extra dependencies that are not included in the default installation to make it lightweight.
 
 If you want slack or prophet extensions use:
@@ -66,7 +67,6 @@ pip install -e ".[slack]"
 pip install -e ".[prophet]"
 ```
 
-
 ## Examples
 
 * Forecaster : here is a [notebook](./notebook/examples/forecaster.ipynb) using and explaining the forecaster stage.
@@ -74,29 +74,24 @@ pip install -e ".[prophet]"
 [//comment]: # (this can be a more accurate example in a separated repository)
 
 ## SoaM CLI
+
 After installing SoaM locally (for example with `pip install soam`), there are some commands available:
 
-* `soam init --output`, scaffolding for a project ready to use SoaM. `cookiecutter` will then ask for parameters
-via prompt.
+* `soam init --output`, scaffolding for a project ready to use SoaM. `cookiecutter` will then ask for parameters via prompt.
 
 ## Database management
+
 For database storing there are complementary tools:
 * [muttlib.dbcon](https://gitlab.com/mutt_data/muttlib/) for database connections.
 
-* [Decouple](https://github.com/henriquebastos/python-decouple) storing the
- database information in a separated file.
- With a [`settings.ini`](soam/settings.ini) file to store the database
- credentials and general configurations, when modifying it don't change
- the keys names
+* [Decouple](https://github.com/henriquebastos/python-decouple) storing the database information in a separated file.  With a [settings.ini](soam/settings.ini) file to store the database credentials and general configurations, when modifying it don't change the keys names.
 
-* [Alembic](https://alembic.sqlalchemy.org/en/latest/) to create the database migrations.
-A brief description is below
+* [Alembic](https://alembic.sqlalchemy.org/en/latest/) to create the database migrations. A brief description is below.
 
-* [SQLAlchemy](https://docs.sqlalchemy.org/en/) as an ORM, the schemas of the tables are defined in
- [data_models](soam/data_models.py)
-
+* [SQLAlchemy](https://docs.sqlalchemy.org/en/) as an ORM, the schemas of the tables are defined in[data_models](soam/data_models.py).
 
 ### Alembic
+
 This package uses alembic and expects you to use it!
 
 Alembic is a database migration tool for usage with SQLAlchemy.
@@ -107,6 +102,7 @@ Alembic is set up to use the credentials from the `settings.ini` file and get th
 Be aware that alembic needs this package installed to run!
 
 When making any change of the data models you need them to impact into the database for this you will have to run:
+
 ```bash
 alembic revision --autogenerate
 alembic upgrade head
@@ -148,6 +144,7 @@ The tests for the extractor currently depends on having a local Postgres databas
 the variable `TEST_DB_CONNSTR` set with it's connection string.
 
 The easiest way to to this is as follows:
+
 ```
 docker run --network=host \
     -e "POSTGRES_USER=soam" \
@@ -159,6 +156,7 @@ TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest
 ```
 
 To run a specific test file:
+
 ```bash
 TEST_DB_CONNSTR="postgresql://soam:soam@localhost/soam" pytest -v tests/test_file.py
 ```
@@ -168,12 +166,14 @@ Note that even though the example has a DB name during the tests a new database 
 
 ### Testing plots
 
-To generate images for testing we use [pytest-mpl]([https://github.com/matplotlib/pytest-mpl]) as follows:
+To generate images for testing we use [pytest-mpl](https://github.com/matplotlib/pytest-mpl) as follows:
+
 ```
 pytest --mpl-generate-path=tests/plotting/baseline
 ```
 
 To run the image based tests:
+
 ```
 pytest --mpl
 ```

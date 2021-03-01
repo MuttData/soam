@@ -1,7 +1,7 @@
 # utils.py
 """
 Utils
-----------
+-----
 Utility functions for the whole project.
 """
 from copy import deepcopy
