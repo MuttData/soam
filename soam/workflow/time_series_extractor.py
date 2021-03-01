@@ -1,5 +1,4 @@
-"""
-Module to extract and aggregate time series.
+"""Module to extract and aggregate time series.
 
 # General TODOs:
 - Make quantiles great again:
@@ -10,9 +9,9 @@ Notes:
 - Dimensional hierarchy can be implemented via snowflake schema [1].
     We could implement this idea via "virtual dimensions" that are really the values we get from
     joining higher in the hierarchy.
-- It would be interesting to implement unique counts
-[1] Ralph Kimball, Margy Ross - The Data Warehouse Toolkit (2013)
-"""
+- It would be interesting to implement unique counts.
+
+[1] Ralph Kimball, Margy Ross - The Data Warehouse Toolkit (2013)."""
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from jinja2 import Template

@@ -1,6 +1,6 @@
 """
 Forecast Plotter
-----------
+----------------
 Postprocess to plot the model forecasts.
 """
 import logging
