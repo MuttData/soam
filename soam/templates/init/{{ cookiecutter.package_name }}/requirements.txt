@@ -1,4 +1,4 @@
-muttlib==0.35.4
+muttlib>=1.0,<2
 pandas
 python-decouple
 scikit-learn
