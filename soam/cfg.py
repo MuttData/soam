@@ -9,7 +9,7 @@ import tempfile
 from typing import Optional
 
 from decouple import AutoConfig
-from muttlib.utils import make_dirs, template
+from muttlib.utils import get_default_jinja_template, make_dirs
 from pkg_resources import resource_string
 
 SQLITE = "sqlite"
@@ -58,7 +58,7 @@ EXTRACT_VALUES_TABLE = f"{table_name_preffix}{EXTRACT_VALUES_TABLE_BASENAME}"
 
 
 # Mail report
-MAIL_TEMPLATE = template(
+MAIL_TEMPLATE = get_default_jinja_template(
     resource_string(__name__, MAIL_REPORT).decode(UTF_ENCODING)
 ).module
 

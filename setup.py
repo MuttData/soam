@@ -40,7 +40,7 @@ setuptools.setup(
         "filelock",
         "click",
         "cookiecutter",
-        "muttlib==0.35.4",
+        "muttlib>=1.0,<2",
     ],
     extras_require={
         'dev': [
