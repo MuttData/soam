@@ -10,6 +10,10 @@ def tests(session):
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
+    session.run(
+        "python", "-m", "pytest", "--nbval-lax", "notebook/examples", "--current-env"
+    )
+
     if session.posargs:
         cmd.extend(session.posargs)
 

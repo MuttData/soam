@@ -22,7 +22,7 @@ EXTRACT_VALUES_TABLE_BASENAME = "extract_values"
 
 # Setup paths
 # _p = Path("/tmp/soam/")
-_p = tempfile.mkdtemp(dir="soam/")
+_p = tempfile.mkdtemp(dir=Path(__file__).resolve().parent)
 SQL_DIR = make_dirs(Path(_p, "resources"))
 LOG_DIR = make_dirs(Path(_p, "tmp", "logs"))
 DATA_DIR = make_dirs(Path(_p, "tmp", "data"))
