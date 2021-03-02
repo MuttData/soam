@@ -10,14 +10,14 @@ def tests(session):
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
-    session.run(
-        "python", "-m", "pytest", "--nbval-lax", "notebook/examples", "--current-env"
-    )
-
     if session.posargs:
         cmd.extend(session.posargs)
 
     session.run(*cmd)
+
+    session.run(
+        "python", "-m", "pytest", "--nbval-lax", "notebook/examples/", "--current-env"
+    )
 
 
 @nox.session(reuse_venv=True, python="3.7")
