@@ -75,7 +75,7 @@ class IpynbToPDF(Step):
         _ = pm.execute_notebook(str(report_nb), str(run_nb), parameters=nb_params,)
 
         pdfexp = PDFExporter(
-            template_file=resource_filename("pomopt.soam", "resources/hidecode.tpl")
+            template_file=resource_filename("soam", "resources/pdf_report.tpl")
         )
 
         pdf_data, _ = pdfexp.from_filename(run_nb)
