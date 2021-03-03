@@ -41,6 +41,9 @@ setuptools.setup(
         "click",
         "cookiecutter",
         "muttlib>=1.0,<2",
+        "jupytext",
+        "papermill",
+        "nbconvert",
     ],
     extras_require={
         'dev': [
