@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from dateutil.parser import parse
 import pdftotext
 import pytest
@@ -53,13 +51,10 @@ def remove_extra_lines_from_first_page(page_text):
 
 
 def test_run_fails_if_path_is_not_file():
-    with patch("soam.reporting.pdf_report.Path") as path_mock:
-        path_mock.return_value.is_file.return_value = False
-        reporter = IpynbToPDF("base_path")
-        test_path = "test"
-        with pytest.raises(ValueError, match=r".*file*"):
-            reporter.run(test_path, {})
-        path_mock.assert_called_with(test_path)
+    reporter = IpynbToPDF("/not_a_real_file.txt")
+    test_path = "test"
+    with pytest.raises(ValueError, match=r".*file*"):
+        reporter.run(test_path, {})
 
 
 @pytest.mark.parametrize('source', [[]])

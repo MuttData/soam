@@ -7,6 +7,7 @@ def tests(session):
     session.install(".")
     session.install(".[test]")
     session.install(".[slack]")
+    session.install(".[pdf_report]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
