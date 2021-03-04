@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from PyPDF2 import PdfFileReader
+from dateutil.parser import parse
 import pytest
 
 from soam.reporting import IpynbToPDF
@@ -56,10 +57,13 @@ def test_run_fails_if_path_is_not_file():
 
 
 def test_run_empty_notebook(empty_notebook_template, tmp_path):
-    test_file = tmp_path / "empty_notebook.ipynb"
+    base_file_name = 'empty_notebook'
+    test_file = tmp_path / f"{base_file_name}.ipynb"
     test_file.write_text(empty_notebook_template)
     reporter = IpynbToPDF(tmp_path)
     outfile = reporter.run(test_file, {})
+    assert base_file_name in outfile
+    parse(outfile.split("/")[-1], fuzzy=True)
     pdf = PdfFileReader(outfile)
     assert pdf.getNumPages() == 1
     assert pdf.getPage(0).extractText().strip() == ""
