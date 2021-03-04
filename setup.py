@@ -41,9 +41,6 @@ setuptools.setup(
         "click",
         "cookiecutter",
         "muttlib>=1.0,<2",
-        "jupytext",
-        "papermill",
-        "nbconvert==5.6",
     ],
     extras_require={
         'dev': [
@@ -71,10 +68,11 @@ setuptools.setup(
             'hypothesis',
             'psycopg2-binary',
             'nbval',
-            'PyPDF2',
+            'pdftotext',
         ],
         'slack': ["slackclient",],
         'prophet': ["fbprophet",],
+        'pdf_report': ["jupytext", "papermill", "nbconvert==5.6",],
     },
     python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},
