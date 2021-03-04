@@ -48,6 +48,7 @@ def pyreverse(session):
     session.install(".")
     session.install(".[slack]")
     session.install("pylint")
+    session.install(".[pdf_report]")
 
     # TODO: create smaller diagrams with portions of the project.
     session.run("pyreverse", "soam", "-o", "png")
