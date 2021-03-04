@@ -43,7 +43,7 @@ setuptools.setup(
         "muttlib>=1.0,<2",
         "jupytext",
         "papermill",
-        "nbconvert",
+        "nbconvert==5.6",
     ],
     extras_require={
         'dev': [
@@ -71,6 +71,7 @@ setuptools.setup(
             'hypothesis',
             'psycopg2-binary',
             'nbval',
+            'PyPDF2',
         ],
         'slack': ["slackclient",],
         'prophet': ["fbprophet",],
