@@ -6,20 +6,9 @@ import pytest
 from soam.reporting import IpynbToPDF
 
 
-def test_run_fails_if_path_is_not_file():
-    with patch("soam.reporting.pdf_report.Path") as path_mock:
-        path_mock.return_value.is_file.return_value = False
-        reporter = IpynbToPDF("base_path")
-        test_path = "test"
-        with pytest.raises(ValueError, match=r".*file*"):
-            reporter.run(test_path, {})
-        path_mock.assert_called_with(test_path)
-
-
-def test_run_empty_notebook(tmp_path):
-    test_file = tmp_path / "empty_notebook.ipynb"
-    test_file.write_text(
-        """
+@pytest.fixture(name='empty_notebook_template')
+def fixture_empty_notebook_template():
+    return """
     {
         "cells": [
         {
@@ -54,7 +43,21 @@ def test_run_empty_notebook(tmp_path):
         "nbformat_minor": 5
     }
     """
-    )
+
+
+def test_run_fails_if_path_is_not_file():
+    with patch("soam.reporting.pdf_report.Path") as path_mock:
+        path_mock.return_value.is_file.return_value = False
+        reporter = IpynbToPDF("base_path")
+        test_path = "test"
+        with pytest.raises(ValueError, match=r".*file*"):
+            reporter.run(test_path, {})
+        path_mock.assert_called_with(test_path)
+
+
+def test_run_empty_notebook(empty_notebook_template, tmp_path):
+    test_file = tmp_path / "empty_notebook.ipynb"
+    test_file.write_text(empty_notebook_template)
     reporter = IpynbToPDF(tmp_path)
     outfile = reporter.run(test_file, {})
     pdf = PdfFileReader(outfile)
