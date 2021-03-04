@@ -25,7 +25,9 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    setup_requires=["wheel"],
+    setup_requires=["pytest-runner", "wheel"],
+    tests_require=["pytest", "pytest-cov", "pytest-html", "betamax"],
+    test_suite='test',
     install_requires=[
         "jinja2",
         "pandas>=1.0.0",
@@ -68,8 +70,12 @@ setuptools.setup(
             'hypothesis',
             'psycopg2',
         ],
-        'slack': ["slackclient",],
-        'prophet': ["fbprophet",],
+        'slack': [
+            "slackclient",
+        ],
+        'prophet': [
+            "fbprophet",
+        ],
     },
     python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},
