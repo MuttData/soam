@@ -15,6 +15,10 @@ def tests(session):
 
     session.run(*cmd)
 
+    session.run(
+        "python", "-m", "pytest", "--nbval-lax", "notebook/examples/", "--current-env"
+    )
+
 
 @nox.session(reuse_venv=True, python="3.7")
 def lint(session):
