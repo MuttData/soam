@@ -24,7 +24,7 @@ cache:
 before_script:
   - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
   - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" upgrade -y
-  - apt-get install texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev
+  - apt-get install texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev -y
   - pip install nox
 
 tests:
