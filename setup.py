@@ -71,12 +71,8 @@ setuptools.setup(
             'psycopg2-binary',
             'nbval',
         ],
-        'slack': [
-            "slackclient",
-        ],
-        'prophet': [
-            "fbprophet",
-        ],
+        'slack': ["slackclient",],
+        'prophet': ["fbprophet",],
     },
     python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},
