@@ -1,6 +1,7 @@
 [MASTER]
 
 jobs = 0
+extension-pkg-whitelist=pdftotext
 
 [MESSAGES CONTROL]
 
