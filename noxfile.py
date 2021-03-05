@@ -16,7 +16,13 @@ def tests(session):
     session.run(*cmd)
 
     session.run(
-        "python", "-m", "pytest", "--nbval-lax", "notebook/examples/", "--current-env"
+        "python",
+        "-m",
+        "pytest",
+        "--nbval-lax",
+        "notebook/examples/",
+        "--current-env",
+        "--no-cov",
     )
 
 
