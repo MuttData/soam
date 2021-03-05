@@ -67,7 +67,12 @@ If you want slack or prophet extensions use:
 ```bash
 pip install -e ".[slack]"
 pip install -e ".[prophet]"
+pip install -e ".[pdf_report]"
 ```
+
+_Note_: The `pdf_report` extra might need to run the following command before installation ([More info](https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex))
+
+  $ `apt-get install texlive-xetex texlive-fonts-recommended`
 
 ## Examples
 

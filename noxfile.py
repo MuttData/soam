@@ -7,6 +7,7 @@ def tests(session):
     session.install(".")
     session.install(".[test]")
     session.install(".[slack]")
+    session.install(".[pdf_report]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -47,9 +48,10 @@ def pyreverse(session):
     session.install(".")
     session.install(".[slack]")
     session.install("pylint")
+    session.install(".[pdf_report]")
 
     # TODO: create smaller diagrams with portions of the project.
-    session.run("pyreverse", "soam", "-o", "png")
+    session.run("pyreverse", "soam", "-o", "png", "--ignore", "pdf_report.py")
 
     session.run(
         "mv",
