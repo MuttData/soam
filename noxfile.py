@@ -51,7 +51,7 @@ def pyreverse(session):
     session.install(".[pdf_report]")
 
     # TODO: create smaller diagrams with portions of the project.
-    session.run("pyreverse", "soam", "-o", "png")
+    session.run("pyreverse", "soam", "-o", "png", "--ignore", "pdf_report.py")
 
     session.run(
         "mv",
