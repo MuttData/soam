@@ -1,5 +1,7 @@
 # SoaM
 
+[![pipeline status](https://gitlab.com/mutt_data/soam/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [![coverage report](https://gitlab.com/mutt_data/soam/badges/master/coverage.svg)](https://gitlab.com/mutt_data/soam/-/commits/master)
+
 SoaM is library created by [Mutt](https://muttdata.ai/).
 Its goal is to create a forecasting framework, this tool is developed with conjunctions of experience on previous
 projects. There come the name: Son of a Mutt = SoaM
