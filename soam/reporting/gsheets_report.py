@@ -1,35 +1,49 @@
+import logging
 from pathlib import Path
 
 from muttlib.gsheetsconn import GSheetsClient
 
 from soam.core import Step
 
-
-class TimeSeriesToGSheets:
-    """Export time_series data to GSheets."""
-
-    def __init__(self, config_json_path: str, **kwargs):
-        """Merge on concat dataframes dependending on the keys.
-
-        Parameters
-        ----------
-        config_json_path:
-            str with the path to Google Sheets secrets json.
-        """
-        config_path = Path(config_json_path)
-
-        if not config_path.is_file():
-            raise ValueError("Config path does not point to a file.")
-
-        self.client = GSheetsClient(config_path, **kwargs)
+logger = logging.getLogger(__name__)
 
 
-class GSheetsReportTask(Step, TimeSeriesToGSheets):
+class GSheetsReportTask(Step):
+    """Task to report to GSheets spreadsheet
+    """
+
     def __init__(
         self, config_json_path: str, gsheets_kwargs: dict = {}, **kwargs
     ):  # pylint: disable=dangerous-default-value
+        """Parameters
+        ----------
+        config_json_path: str
+            Path to GSheets config json
+        gsheets_kwargs: dict
+            Extra args to pass to muttlib.gsheetsconn.GSheetsClient
+        kwargs:
+            Extra args to pass to soam.core.Step
+        """
         Step.__init__(self, **kwargs)  # type: ignore
-        TimeSeriesToGSheets.__init__(self, config_json_path, **gsheets_kwargs)
+        config_path = Path(config_json_path)
+        if not config_path.is_file():
+            raise ValueError("Config path does not point to a file.")
+        self.client = GSheetsClient(config_path, **gsheets_kwargs)
 
-    def run(self):
-        raise NotImplementedError
+    def run(self, df, spreadsheet, **kwargs):
+        """Save df to a GSheets spreadsheet
+
+        Parameters
+        ----------
+        df: pd.DataFrame
+            A pandas DataFrame containing the data for the step
+        spreadsheet: str
+            Spreadsheet id or name as in Drive.
+        kwargs:
+            Extra args to pass to muttlib.gsheetsconn.GSheetsClient.insert_from_frame
+        """
+
+        if df.empty:
+            logger.warning("Exporting empty DataFrame")
+
+        return self.client.insert_from_frame(df, spreadsheet, **kwargs)
