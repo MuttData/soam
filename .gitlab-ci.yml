@@ -73,6 +73,22 @@ pyreverse:
       - merge_requests
       - master
 
+pages:
+  stage: deploy_stage
+  script:
+  - pip install .[dev]
+  - cd documentation
+  - sphinx-apidoc -f -o source ../soam
+  - make html
+  - cd ..
+  - mv documentation/build/html/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    refs:
+      - master
+
 tag_release_version:
   stage: version_stage
   script:
@@ -132,19 +148,3 @@ check_changelog:
       - merge_requests
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-
-pages:
-  stage: deploy_stage
-  script:
-  - pip install .[dev]
-  - cd documentation
-  - sphinx-apidoc -f -o source ../soam
-  - make html
-  - cd ..
-  - mv documentation/build/html/ public/
-  artifacts:
-    paths:
-      - public
-  only:
-    refs:
-      - master
