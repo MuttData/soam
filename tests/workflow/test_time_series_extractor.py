@@ -155,7 +155,7 @@ class TestDatasetStore(PgTestCase):
         self.assertTrue(isinstance(df, pd.DataFrame))
         columns = [c_name.split(".")[-1] for c_name in columns]
         self.assertEqual(df.columns.tolist(), columns)
-        self.assertEqual(df.values.tolist(), expected_values)
+        self.assertEqual(sorted(df.values.tolist()), sorted(expected_values))
 
     def test_load_basic_columns_order_by(self):
         columns = [TIMESTAMP_COL, "opportunities", "impressions", "revenue"]
@@ -675,11 +675,37 @@ class TestDatasetStore(PgTestCase):
         ]
         self.assertEqual(ret, expected)
 
+    def test_builded_query(self):
+        columns = [
+            "timestamp",
+            "game",
+            "country",
+            "ad_network",
+            "ad_type",
+            "placement_id",
+        ]
+        prequery = "SET extra_float_digits = 3;"
+        order_by = ["ad_type"]
+        start_date = "2019-09-01"
+        end_date = "2019-09-02"
+
+        query = self.time_series_extractor.build_query(
+            columns=columns,
+            prequery=prequery,
+            start_date=start_date,
+            end_date=end_date,
+            order_by=order_by,
+        )
+        # remove empty spaces and new lines
+        returned_query = " ".join(query[0].split())
+        return_query = "SET extra_float_digits = 3; SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' ORDER BY ad_type"
+        self.assertEqual(returned_query, return_query)
+
     @classmethod
     def setUpClass(cls):
         super().setUp(cls)
         cls.time_series_extractor = TimeSeriesExtractor(
-            cls.db_client, ConcreteTimeSeriesTable
+            cls.db_client, ConcreteTimeSeriesTable.__tablename__
         )
         engine = cls.db_client.get_engine()
         ConcreteTimeSeriesTable.__table__.create(engine)  # pylint:disable=no-member
