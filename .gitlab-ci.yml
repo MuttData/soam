@@ -73,6 +73,22 @@ pyreverse:
       - merge_requests
       - master
 
+pages:
+  stage: deploy_stage
+  script:
+  - pip install .[dev]
+  - cd documentation
+  - sphinx-apidoc -f -o source ../soam
+  - make html
+  - cd ..
+  - mv documentation/build/html/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    refs:
+      - master
+
 # Deploy from master to package registry
 # If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
 # package registry, thus using the required variables to do so
@@ -150,19 +166,3 @@ check_changelog:
       - merge_requests
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-
-pages:
-  stage: deploy_stage
-  script:
-  - pip install .[dev]
-  - cd documentation
-  - sphinx-apidoc -f -o source ../soam
-  - make html
-  - cd ..
-  - mv documentation/build/html/ public/
-  artifacts:
-    paths:
-      - public
-  only:
-    refs:
-      - master
