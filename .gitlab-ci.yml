@@ -73,20 +73,18 @@ pyreverse:
       - merge_requests
       - master
 
-# Deploy from master to package registry
-# If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
-# package registry, thus using the required variables to do so
-# The package will be uploaded to PYPI_URL, which can be overrided
-# not to upload to gitlab's PYPI
-deploy:
+pages:
   stage: deploy_stage
   script:
-    - pip install twine
-    - python setup.py sdist bdist_wheel
-    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
-    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
-    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
-    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
+  - pip install .[dev]
+  - cd documentation
+  - sphinx-apidoc -f -o source ../soam
+  - make html
+  - cd ..
+  - mv documentation/build/html/ public/
+  artifacts:
+    paths:
+      - public
   only:
     refs:
       - master
@@ -150,19 +148,3 @@ check_changelog:
       - merge_requests
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-
-pages:
-  stage: deploy_stage
-  script:
-  - pip install .[dev]
-  - cd documentation
-  - sphinx-apidoc -f -o source ../soam
-  - make html
-  - cd ..
-  - mv documentation/build/html/ public/
-  artifacts:
-    paths:
-      - public
-  only:
-    refs:
-      - master
