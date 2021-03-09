@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2021-03-08
 
-- Added this CHANGELOG file.
-- Updated CI to check version update.
-- Include semver to include versioning in SoaM.
+### Added
+- CHANGELOG.md file.
+- Check version update in CI config.
+- Include TAGs release.
+- Upload SoaM package to Pypi from CI job.
+
+### Changed
+- Update CI configuration file to use stages.
