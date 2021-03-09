@@ -5,7 +5,10 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[all]")
+    session.install(".[test]")
+    session.install(".[slack]")
+    session.install(".[pdf_report]")
+    session.install(".[gsheets_report]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -30,7 +33,12 @@ def lint(session):
     """Run all pre-commit hooks."""
 
     session.install(".")
-    session.install(".[all]")
+    session.install(".[dev]")
+    session.install(".[test]")
+    session.install(".[slack]")
+    session.install(".[pdf_report]")
+    session.install(".[gsheets_report]")
+
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
 
@@ -47,8 +55,10 @@ def bandit(session):
 def pyreverse(session):
     """Create class diagrams."""
     session.install(".")
-    session.install(".[all]")
+    session.install(".[slack]")
     session.install("pylint")
+    session.install(".[pdf_report]")
+    session.install(".[gsheets_report]")
 
     # TODO: create smaller diagrams with portions of the project.
     session.run("pyreverse", "soam", "-o", "png", "--ignore", "pdf_report.py")
