@@ -34,7 +34,7 @@ class GSheetsReportTask(Step):
             gsheets_kwargs = {}
         self.client = GSheetsClient(config_path, **gsheets_kwargs)
 
-    def run(self, df: pd.DataFrame, spreadsheet: str, **insert_kwargs):
+    def run(self, df: pd.DataFrame, spreadsheet: str, **insert_kwargs):  # type: ignore[override]
         """Save df to a GSheets spreadsheet
 
         Parameters
