@@ -1,7 +1,9 @@
 import logging
 from pathlib import Path
+from typing import Mapping
 
 from muttlib.gsheetsconn import GSheetsClient
+import pandas as pd
 
 from soam.core import Step
 
@@ -13,7 +15,7 @@ class GSheetsReportTask(Step):
     """
 
     def __init__(
-        self, config_json_path: str, gsheets_kwargs: dict = {}, **kwargs
+        self, config_json_path: str, gsheets_kwargs: Mapping = None, **kwargs
     ):  # pylint: disable=dangerous-default-value
         """Parameters
         ----------
@@ -28,9 +30,11 @@ class GSheetsReportTask(Step):
         config_path = Path(config_json_path)
         if not config_path.is_file():
             raise ValueError("Config path does not point to a file.")
+        if not gsheets_kwargs:
+            gsheets_kwargs = {}
         self.client = GSheetsClient(config_path, **gsheets_kwargs)
 
-    def run(self, df, spreadsheet, **kwargs):
+    def run(self, df: pd.DataFrame, spreadsheet: str, **insert_kwargs):
         """Save df to a GSheets spreadsheet
 
         Parameters
@@ -46,4 +50,4 @@ class GSheetsReportTask(Step):
         if df.empty:
             logger.warning("Exporting empty DataFrame")
 
-        return self.client.insert_from_frame(df, spreadsheet, **kwargs)
+        return self.client.insert_from_frame(df, spreadsheet, **insert_kwargs)
