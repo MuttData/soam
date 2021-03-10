@@ -31,7 +31,6 @@ setuptools.setup(
     install_requires=[
         "jinja2",
         "pandas>=1.0.0",
-        "statsmodels<0.12,>=0.11",
         "Cython<0.29.18,>=0.29",
         "sqlalchemy",
         "sqlalchemy_utils",
