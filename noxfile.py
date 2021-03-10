@@ -5,7 +5,7 @@ import nox
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[all]")
+    session.install(".[test]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -30,7 +30,8 @@ def lint(session):
     """Run all pre-commit hooks."""
 
     session.install(".")
-    session.install(".[all]")
+    session.install(".[test]")
+    session.install(".[dev]")
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
 

@@ -42,11 +42,18 @@ extra_dependencies = {
     'gsheets_report': ["muttlib[gsheets]>=1.0,<2"],
 }
 
-# create 'all' extras
+# create 'all' and 'report' extras
 all_extras = []
-for extra_dep in extra_dependencies.values():
+report_extras = []
+for key, extra_dep in extra_dependencies.items():
     if not extra_dep in all_extras:
         all_extras += extra_dep
+    if key == 'slack' or 'report' in key and not extra_dep in report_extras:
+        report_extras += extra_dep
+extra_dependencies.update({'report': report_extras})
+extra_dependencies['test'] = list(
+    set(extra_dependencies['test'] + extra_dependencies['report'])
+)
 extra_dependencies.update({'all': all_extras})
 
 setuptools.setup(
