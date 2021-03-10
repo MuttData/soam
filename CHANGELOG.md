@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CHANGELOG.md file.
 - Check version update in CI config.
 - Include TAGs release.
-- Upload SoaM package to Pypi from CI job.
+- Upload SoaM package to PyPI from CI job.
 - Pypi badge for current version.
 
 ### Changed
