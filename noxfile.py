@@ -8,6 +8,7 @@ def tests(session):
     session.install(".[test]")
     session.install(".[slack]")
     session.install(".[pdf_report]")
+    session.install(".[gsheets_report]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -36,6 +37,7 @@ def lint(session):
     session.install(".[test]")
     session.install(".[slack]")
     session.install(".[pdf_report]")
+    session.install(".[gsheets_report]")
 
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
@@ -56,6 +58,7 @@ def pyreverse(session):
     session.install(".[slack]")
     session.install("pylint")
     session.install(".[pdf_report]")
+    session.install(".[gsheets_report]")
 
     # TODO: create smaller diagrams with portions of the project.
     session.run("pyreverse", "soam", "-o", "png", "--ignore", "pdf_report.py")

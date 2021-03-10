@@ -76,6 +76,7 @@ setuptools.setup(
         'slack': ["slackclient",],
         'prophet': ["fbprophet",],
         'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
+        'gsheets_report': ["muttlib[gsheets]>=1.0,<2"],
     },
     python_requires="~=3.6",
     entry_points={'console_scripts': ['soam = soam.console:cli']},
