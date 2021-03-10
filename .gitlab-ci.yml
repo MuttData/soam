@@ -118,7 +118,6 @@ tag_release_version:
     - ''
   only:
     refs:
-      - merge_requests
       - master
 
 release:
@@ -136,7 +135,6 @@ release:
     - ''
   only:
     refs:
-      - merge_requests
       - master
 
 check_version:
