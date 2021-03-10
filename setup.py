@@ -71,6 +71,7 @@ setuptools.setup(
             'psycopg2-binary',
             'nbval',
             'pdftotext==2.1.5',
+            'statsmodels<0.12,>=0.11',
         ],
         'slack': ["slackclient",],
         'prophet': ["fbprophet",],
