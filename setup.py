@@ -51,9 +51,6 @@ for key, extra_dep in extra_dependencies.items():
     if key == 'slack' or 'report' in key and not extra_dep in report_extras:
         report_extras += extra_dep
 extra_dependencies.update({'report': report_extras})
-extra_dependencies['test'] = list(
-    set(extra_dependencies['test'] + extra_dependencies['report'])
-)
 extra_dependencies.update({'all': all_extras})
 
 setuptools.setup(

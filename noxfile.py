@@ -6,6 +6,7 @@ def tests(session):
     """Run all tests."""
     session.install(".")
     session.install(".[test]")
+    session.install(".[report]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -31,6 +32,7 @@ def lint(session):
 
     session.install(".")
     session.install(".[test]")
+    session.install(".[report]")
     session.install(".[dev]")
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
