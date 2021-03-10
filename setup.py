@@ -22,7 +22,7 @@ setuptools.setup(
     package_data={"soam": ["resources/*.html", "templates/*", "db_migrations"]},
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
     setup_requires=["pytest-runner", "wheel"],
@@ -49,6 +49,7 @@ setuptools.setup(
             'flake8-bugbear',
             'flake8-docstrings',
             'bump',
+            'bump2version',
             'sphinx',
             'sphinx_rtd_theme',
             'm2r2',
