@@ -12,7 +12,7 @@ extra_dependencies = {
     'dev': [
         'flake8-bugbear',
         'flake8-docstrings',
-        'bump',
+        'bump2version',
         'sphinx',
         'sphinx_rtd_theme',
         'm2r2',
