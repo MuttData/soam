@@ -15,12 +15,10 @@ from soam.core import Step
 logger = logging.getLogger(__name__)
 
 
-class IpynbToPDF(Step):
+class PDFReport:
     """Generate PDF from IPython Notebook."""
 
-    def __init__(
-        self, base_path: str, **kwargs,
-    ):
+    def __init__(self, base_path: str):
         """Merge on concat dataframes dependending on the keys.
 
         Parameters
@@ -28,11 +26,9 @@ class IpynbToPDF(Step):
         keys:
             str or list of str labels of columns to merge on
         """
-        super().__init__(**kwargs)
-
         self.base_path = Path(base_path)
 
-    def run(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore
+    def export_notebook_to_pdf(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore
         """Run notebook, convert, save and return PDF path.
 
         Parameters
@@ -93,3 +89,12 @@ class IpynbToPDF(Step):
             if isinstance(value, pd.DataFrame):
                 nb_params[key] = value.to_csv(index=False)
         return nb_params
+
+
+class PDFReportTask(Step, PDFReport):
+    def __init__(self, base_path: str):
+        Step.__init__(self)
+        PDFReport.__init__(self, base_path)
+
+    def run(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore[override]
+        return self.export_notebook_to_pdf(nb_path, nb_params)
