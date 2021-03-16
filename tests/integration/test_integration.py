@@ -1,7 +1,5 @@
 from copy import deepcopy
 
-from darts.models import ExponentialSmoothing, Prophet
-from darts.timeseries import TimeSeries
 import pandas as pd
 import pytest
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -15,6 +13,7 @@ from soam.constants import (
     YHAT_COL,
 )
 from soam.core import SoamFlow
+from soam.models import SkProphet
 from soam.plotting import ForecastPlotterTask
 from soam.reporting import SlackReportTask
 from soam.reporting.slack_report import (
@@ -22,6 +21,7 @@ from soam.reporting.slack_report import (
     DEFAULT_GREETING_MESSAGE,
 )
 from soam.savers import CSVSaver
+from soam.utilities.utils import add_future_dates
 from soam.workflow import Backtester, Forecaster, Transformer
 from soam.workflow.backtester import METRICS_KEYWORD, RANGES_KEYWORD
 from tests.helpers import sample_data_df  # noqa pylint:disable=unused-import
@@ -69,37 +69,32 @@ def assert_saved_data(path, prefix):
 @pytest.fixture
 def expected_predictions() -> pd.DataFrame:
     pred = {
-        DS_COL: pd.date_range("2016-06-01", "2017-01-01", freq="M"),
+        DS_COL: pd.date_range("2016-06-01", periods=7, freq="MS"),
         "yhat": [
-            470271.76,
-            463427.89,
-            471309.20,
-            452983.13,
-            452273.99,
-            467814.56,
-            528948.24,
+            453990.93,
+            461908.61,
+            482625.56,
+            438345.63,
+            458133.30,
+            467090.52,
+            508706.42,
         ],
     }
     return pd.DataFrame(pred)
 
 
 def test_integration_forecast(
-    mocker, sample_data_df, expected_predictions, tmp_path  # noqa: F811
+    sample_data_df, expected_predictions, tmp_path  # noqa: F811
 ):
     """Test simple prediction workflow."""
     # TODO: Test adding saver to flow
     test_run_name = "test_integration_forecasting"
     saver_data = CSVSaver(tmp_path)
-    my_model = Prophet(weekly_seasonality=True, daily_seasonality=False)
-    mocker.patch.object(my_model, 'fit')
-    my_model.fit.return_value = my_model
-    mocker.patch.object(my_model, 'predict')
-    my_model.predict.return_value = TimeSeries.from_dataframe(
-        expected_predictions, time_col=DS_COL, value_cols="yhat"
-    )
-    forecaster = Forecaster(my_model, savers=[saver_data])
+    my_model = SkProphet()
+    sample_data_df = add_future_dates(sample_data_df, 7)
+    forecaster = Forecaster(my_model, output_length=7, savers=[saver_data])
     with SoamFlow(name=test_run_name, saver=None) as f:  # noqa
-        preds_model = forecaster(time_series=sample_data_df, output_length=7)
+        preds_model = forecaster(time_series=sample_data_df)
 
     fs = f.run()
 
@@ -118,12 +113,13 @@ def test_integration_backtest(
     """Test backtest run."""
     # TODO: Add savers assertions once integrated with Backtest
     test_run_name = "test_integration_backtesting"
+    test_window = 30
     train_data = pd.concat([sample_data_df] * 3)
     train_data[DS_COL] = pd.date_range(
         train_data[DS_COL].min(), periods=len(train_data), freq='MS'
     )
-    model = ExponentialSmoothing()
-    forecaster = Forecaster(model=model, output_length=10)
+    model = SkProphet()
+    forecaster = Forecaster(model=model, output_length=test_window)
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
     forecast_plotter = ForecastPlotterTask(
@@ -141,7 +137,7 @@ def test_integration_backtest(
         forecaster=forecaster,
         preprocessor=Transformer(SimpleProcessor()),
         forecast_plotter=forecast_plotter,
-        test_window=30,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
         aggregation="default",
@@ -160,14 +156,14 @@ def test_integration_backtest(
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 1.0788936351761558,
-                    'max': 1.230244804563136,
-                    'min': 0.8261656309767738,
+                    'avg': 1.9589288335569606,
+                    'max': 3.1358162976127217,
+                    'min': 1.140921182444867,
                 },
                 'mse': {
-                    'avg': 1.9159537714659203,
-                    'max': 2.8245066880319296,
-                    'min': 0.9294099396294029,
+                    'avg': 6.503755107101683,
+                    'max': 12.666965373730687,
+                    'min': 2.4605768804352675,
                 },
             },
             'plots': '0_forecast_2018020100_2020080100_.png',
@@ -184,20 +180,13 @@ def test_integration_forecast_and_report(
     # TODO: Test adding saver to flow
     test_run_name = "test_integration_forecast_and_report"
     saver_data = CSVSaver(tmp_path)
-    my_model = Prophet(weekly_seasonality=True, daily_seasonality=False)
-    mocker.patch.object(my_model, 'fit')
-    my_model.fit.return_value = my_model
-    mocker.patch.object(my_model, 'predict')
-    my_model.predict.return_value = TimeSeries.from_dataframe(
-        expected_predictions, time_col=DS_COL, value_cols="yhat"
-    )
-    forecaster = Forecaster(my_model, savers=[saver_data])
+    my_model = SkProphet()
+    sample_data_df = add_future_dates(sample_data_df, 7)
+    forecaster = Forecaster(my_model, output_length=7, savers=[saver_data])
 
     setting_path = create_settings_file(tmp_path, "[settings]\nSLACK_TOKEN=token")
-
     slack_report = SlackReportTask("channel_id", "mae", setting_path)
     slack_report.slack_client.files_upload = mocker.stub(name="files_upload")
-    # mocker.patch.object(slack_report.slack_client., "files_upload")
 
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -209,7 +198,7 @@ def test_integration_forecast_and_report(
     )
 
     with SoamFlow(name=test_run_name, saver=None) as f:  # noqa
-        preds_model = forecaster(time_series=sample_data_df, output_length=7)
+        preds_model = forecaster(time_series=sample_data_df)
         plot_fn = forecast_plotter(preds_model[1], preds_model[0])
         slack_report(preds_model[0], plot_fn)
 
@@ -221,7 +210,8 @@ def test_integration_forecast_and_report(
     )
     assert fs.is_successful()
     plot_filename = str(fs.result[plot_fn]._result.value)
-    expected_msg = create_slack_message(expected_predictions, "mae")
+    # expected message built with actual preds to avoid rounding issues
+    expected_msg = create_slack_message(fs.result[preds_model]._result.value[0], "mae")
     slack_report.slack_client.files_upload.assert_called_once_with(
         channels="channel_id",
         file=plot_filename,

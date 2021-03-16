@@ -6,11 +6,15 @@ Utility functions for the whole project.
 """
 from copy import deepcopy
 import logging.config
+import os
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+import numpy as np
 import pandas as pd
 from pandas.tseries import offsets
+
+from soam.constants import DS_COL
 
 logger = logging.getLogger(__name__)
 
@@ -165,3 +169,80 @@ def split_backtesting_ranges(
         )
 
     return result_slices
+
+
+class SuppressStdOutStdErr(object):
+    """
+    A context manager to perform a "deep suppression" of stdout and stderr in
+    Python, i.e. will suppress all print, even if the print originates in a
+    compiled C/Fortran sub-function.
+
+    This will not suppress raised exceptions, since exceptions are printed
+    to stderr just before a script exits, and after the context manager has
+    exited (at least, I think that is why it lets exceptions through).
+
+    Ref:
+        https://github.com/facebook/prophet/issues/223
+    """
+
+    def __init__(self):
+        # Open a pair of null files
+        self.null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
+        # Save the actual stdout (1) and stderr (2) file descriptors.
+        self.save_fds = [os.dup(1), os.dup(2)]
+
+    def __enter__(self):
+        # Assign the null pointers to stdout and stderr.
+        os.dup2(self.null_fds[0], 1)
+        os.dup2(self.null_fds[1], 2)
+
+    def __exit__(self, *_):
+        # Re-assign the real stdout/stderr back to (1) and (2)
+        os.dup2(self.save_fds[0], 1)
+        os.dup2(self.save_fds[1], 2)
+        # Close the null files
+        for fd in self.null_fds + self.save_fds:
+            os.close(fd)
+
+
+def add_future_dates(
+    df: pd.DataFrame, periods: int, frequency: str = None, ds_col: str = DS_COL,
+):
+    """Add future dates to dataframe for which to predict with.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to be appended with future dates.
+    periods : int
+        number of new future rows or datapoints to append.
+    frequency : str, optional
+        pandas frequency string, by default None
+    ds_col : str, optional
+        date column name, by default DS_COL
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with original data plos new dates appended.
+
+    Raises
+    ------
+    ValueError
+        Frequency could not be inferred.
+    """
+    if frequency is None:
+        inferred_frequency = pd.infer_freq(df[ds_col])
+        if inferred_frequency is None:
+            raise ValueError(
+                "Frequency could not be inferred, please specify a frequency."
+            )
+        frequency = inferred_frequency
+    date_range_values = pd.date_range(
+        start=df[[ds_col]].iloc[-1][0], periods=periods + 1, freq=frequency
+    ).values[1:]
+    future_df = {col: [np.nan] * periods for col in df.columns if col != ds_col}
+    future_df[ds_col] = date_range_values
+    future_df = pd.DataFrame(future_df)
+    full_df = pd.concat([df, future_df], axis=0, ignore_index=True)
+    return full_df
