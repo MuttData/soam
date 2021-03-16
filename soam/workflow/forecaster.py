@@ -1,50 +1,45 @@
-# forecaster.py
 """
 Forecaster
 ----------
+Forecaster Task that fits a model to series and predicts.
 """
+from typing import TYPE_CHECKING, List, Optional, Tuple  # pylint:disable=unused-import
 
-from typing import (  # pylint:disable=unused-import
-    TYPE_CHECKING,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-)
-
-from darts import TimeSeries
-from darts.models.forecasting_model import ForecastingModel
 import pandas as pd
-from prefect.utilities.tasks import defaults_from_attrs
 
-from soam.constants import DS_COL, YHAT_COL
+from soam.constants import DS_COL, Y_COL
 from soam.core import Step
-from soam.utilities.utils import sanitize_arg_empty_dict
 
 if TYPE_CHECKING:
     from soam.savers import Saver
 
 
 class Forecaster(Step):
+    """Forecaster Task."""
+
     def __init__(  # type: ignore
         self,
-        model: Optional[ForecastingModel] = None,
+        model,
         savers: "Optional[List[Saver]]" = None,
         output_length: int = 1,
-        model_kwargs: Optional[Dict] = None,
-        **kwargs
+        ds_col: str = DS_COL,
+        response_col: str = Y_COL,
+        **kwargs,
     ):
-        """Wraps a forecasting model to run it inside a pipeline.
+        """Wrap a forecasting model to run it inside a pipeline.
 
         Parameters
-        model : darts.models.forecasting_model.ForecastingModel
+        ----------
+        model : scikit-learn.base.BaseEstimator
             The model that will be fitted and execute the predictions.
-        output_length : int
-            The length of the output to predict.
-        model_kwargs : dict
-            Keyword arguments to be passed to the model when fitting.
-        savers : list of soam.savers.Saver, optional
-            The saver to store the parameters and state changes.
+        savers : Optional[List[Saver]], optional
+            The saver to store the parameters and state changes, by default None
+        output_length : int, optional
+            The length of the output to predict, by default 1
+        ds_col : str, optional
+            The date column name of the input time series DataFrame, by default DS_COL
+        response_col : str, optional
+            The y column name of the input time series DataFrame, by default Y_COL
         """
         super().__init__(**kwargs)
         if savers is not None:
@@ -53,19 +48,17 @@ class Forecaster(Step):
 
         self.model = model
         self.output_length = output_length
-        self.model_kwargs = sanitize_arg_empty_dict(model_kwargs)
+        self.ds_col = ds_col
+        self.response_col = response_col
 
         self.time_series = pd.DataFrame()
         self.prediction = pd.DataFrame()
 
-    @defaults_from_attrs('output_length', 'model_kwargs')
     def run(  # type: ignore
-        self, time_series: pd.DataFrame, output_length=None, model_kwargs=None,
-    ) -> pd.DataFrame:
+        self, time_series: pd.DataFrame,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, object]:
         """
-        Execute fit and predict with Darts models,
-        creating a TimeSeries from a pandas DataFrame
-        and storing the prediction with in the object.
+        Execute fit and predict with a given model and time_series DataFrame.
 
         Parameters
         ----------
@@ -73,37 +66,44 @@ class Forecaster(Step):
             A pandas DataFrame containing as minimum the first column
             with DataTime values, the second column the y to predict
             and the other columns more data
-        output_length
-            The length of the output
-        model_kwargs
-            Keyword arguments to be passed to the model when fitting.
 
         Returns
         -------
-        tuple(pandas.DataFrame, Darts.ForecastingModel)
-            a tuple containing a pandas DataFrame with the predicted values
-            and the trained model.
+        tuple(pandas.DataFrame, pandas.DataFrame, model)
+            0 : Predicted Values DataFrame.
+            1 : Provided Time Series data (untouched).
+            2 : Trained model.
         """
-        # TODO: **kwargs should be a dedicated variable for model hyperparams.
-        self.time_series = time_series.copy()  # type: ignore
-        values_columns = self.time_series.columns.to_list()
-        values_columns.remove(DS_COL)
+        self.time_series = time_series.copy()
 
-        time_series = TimeSeries.from_dataframe(
-            self.time_series, time_col=DS_COL, value_cols=values_columns
-        )
+        X, y = self._format_input(time_series)
 
-        # TODO: fix Unexpected argument **kwargs in self.model.fit
-        self.model.fit(time_series, **model_kwargs)  # type: ignore
-        self.prediction = self.model.predict(output_length).pd_dataframe()  # type: ignore
-
-        self.prediction.reset_index(level=0, inplace=True)
-        self.prediction.rename(
-            columns={
-                self.prediction.columns[0]: DS_COL,
-                self.prediction.columns[1]: YHAT_COL,
-            },
-            inplace=True,
-        )
-
+        X_train = X[: -self.output_length]
+        X_pred = X[-self.output_length :]
+        self.model.fit(X_train, y)
+        self.prediction = self.model.predict(X_pred)
         return self.prediction, self.time_series, self.model
+
+    def _format_input(
+        self, time_series: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.Series]:
+        """Transform time series DataFrame into SoaM compatible format.
+
+        Parameters
+        ----------
+        time_series : pandas.DataFrame
+
+        Returns
+        -------
+        pandas.DataFrame
+            Formatted DataFrame
+        """
+        if self.ds_col not in time_series.columns:
+            raise ValueError(f"{self.ds_col} not present Time Series columns.")
+        if self.response_col not in time_series.columns:
+            raise ValueError(f"{self.response_col} not present Time Series columns.")
+        time_series = time_series.sort_values(by=self.ds_col)
+        return (
+            time_series.drop(self.response_col, axis=1),
+            time_series[self.response_col],
+        )
