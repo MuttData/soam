@@ -2,7 +2,7 @@ from dateutil.parser import parse
 import pdftotext
 import pytest
 
-from soam.reporting import IpynbToPDF
+from soam.reporting import PDFReportTask
 
 
 @pytest.fixture(name='one_cell_notebook_template')
@@ -51,7 +51,7 @@ def remove_extra_lines_from_first_page(page_text):
 
 
 def test_run_fails_if_path_is_not_file():
-    reporter = IpynbToPDF("/not_a_real_file.txt")
+    reporter = PDFReportTask("/not_a_real_file.txt")
     test_path = "test"
     with pytest.raises(ValueError, match=r".*file*"):
         reporter.run(test_path, {})
@@ -62,7 +62,7 @@ def test_run_empty_notebook(one_cell_notebook_template, tmp_path):
     base_file_name = 'empty_notebook'
     test_file = tmp_path / f"{base_file_name}.ipynb"
     test_file.write_text(one_cell_notebook_template)
-    reporter = IpynbToPDF(tmp_path)
+    reporter = PDFReportTask(tmp_path)
     outfile = reporter.run(test_file, {})
     assert base_file_name in outfile
     parse(outfile.split("/")[-1], fuzzy=True)
@@ -77,7 +77,7 @@ def test_run_one_cell_notebook(one_cell_notebook_template, tmp_path):
     base_file_name = 'one_cell_notebook'
     test_file = tmp_path / f"{base_file_name}.ipynb"
     test_file.write_text(one_cell_notebook_template)
-    reporter = IpynbToPDF(tmp_path)
+    reporter = PDFReportTask(tmp_path)
     outfile = reporter.run(test_file, {})
     assert base_file_name in outfile
     parse(outfile.split("/")[-1], fuzzy=True)
