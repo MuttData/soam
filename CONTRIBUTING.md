@@ -63,7 +63,7 @@ pre-commit install -t push
 ```
 
 ## Style guide
-soam follows [PEP8](https://www.python.org/dev/peps/pep-0008/).
+`soam` follows [PEP8](https://www.python.org/dev/peps/pep-0008/).
 
 If you installed the [pre-commit hooks](#pre-commit) you shouldn't worry too much about style, since they will fix it for you or warn you about styling errors. We use the following hooks:
 
