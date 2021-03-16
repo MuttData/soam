@@ -4,23 +4,19 @@
 
 TODO: review this file, it seems unused in the rest of the project.
 """
-from abc import ABC
 from contextlib import contextmanager
 from datetime import timedelta
 import logging
 from pathlib import Path
 
-from muttlib.utils import hash_str, make_dirs, str_to_datetime
+from muttlib.utils import make_dirs, str_to_datetime
+import numpy as np
 import pandas as pd
 from pandas.tseries import offsets
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 
-from soam.constants import (
-    DAILY_TIME_GRANULARITY,
-    HOURLY_TIME_GRANULARITY,
-    TIME_GRANULARITIES,
-)
+from soam.constants import DS_COL, HOURLY_TIME_GRANULARITY, YHAT_COL
 from soam.utilities.utils import range_datetime
 
 logger = logging.getLogger(__name__)
