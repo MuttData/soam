@@ -188,6 +188,9 @@ To run the image based tests:
 pytest --mpl
 ```
 
+## Contributing
+We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](CONTRIBUTING.md).
+
 ## Rules of Thumb
 
 This section contains some recommendations when working with SoaM to avoid common mistakes:
