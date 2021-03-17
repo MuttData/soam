@@ -38,6 +38,7 @@ class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
 
 
 class DummyDataFrameTransformer(BaseDataFrameTransformer):
+    """Provides a Dummy Data Frame."""
     def __init__(self):
         pass
 
@@ -51,6 +52,7 @@ class DummyDataFrameTransformer(BaseDataFrameTransformer):
 
 
 class Transformer(Step):
+    """Generates the transformer object."""
     transformer: BaseDataFrameTransformer
 
     def __init__(
@@ -81,13 +83,16 @@ class Transformer(Step):
         self.transformer = transformer
 
     def fit(self, dataset: pd.DataFrame) -> "Transformer":
+        """Fit method"""
         self.transformer.fit(dataset)
         return self
 
     def transform(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        """Transform method"""
         return self.transformer.transform(dataset)
 
     def fit_transform(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        """Fit and transform method"""
         return self.transformer.fit(dataset).transform(dataset)
 
     @defaults_from_attrs('transformer')

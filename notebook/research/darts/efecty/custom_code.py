@@ -1,3 +1,4 @@
+"""Darts performance metrics and fortnights generation"""
 from typing import Callable
 
 from darts import TimeSeries, metrics
@@ -47,6 +48,7 @@ def sumape(
 
 
 def create_fortnights(start_date, end_date):
+    """Fortnights generation"""
     dates = pd.date_range(start=start_date, end=end_date).to_series()
 
     fortnights = (

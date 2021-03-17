@@ -1,3 +1,4 @@
+"""Test integration."""
 from copy import deepcopy
 
 import pandas as pd
@@ -39,6 +40,7 @@ def create_slack_message(
     farewell_message=DEFAULT_FAREWELL_MESSAGE,
     greeting_message=DEFAULT_GREETING_MESSAGE,
 ):
+    """Function to create the slack message."""
     greeting_message.format(metric_name=metric)
 
     summary_entries = []
@@ -54,6 +56,7 @@ def create_slack_message(
 
 
 def create_settings_file(path, content):
+    """Function to acquire the settings file path."""
     # Code to acquire resource, e.g.:
     setting_path = path / "settings.ini"
     with open(setting_path, "w+") as f:

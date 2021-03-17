@@ -22,6 +22,7 @@ DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
 
 
 class SlackReport:
+    """Generates the report to share via Slack."""
     def __init__(
         self, channel_id: str, metric_name: str, setting_path: Optional[str],
     ):
@@ -61,6 +62,7 @@ class SlackReport:
 
 
 class SlackReportTask(Step, SlackReport):
+    """Builds up the task of the report designed for Slack."""
     def __init__(
         self,
         channel_id: str,

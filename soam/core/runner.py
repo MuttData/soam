@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 
 class SoamFlow(Flow):
+    """Soam Flow to execute the pipeline steps and keep track of the whole run data"""
     def __init__(self, saver: "Optional[Saver]" = None, **kwargs):
         super().__init__(**kwargs)
         self.saver = saver
@@ -27,6 +28,7 @@ class SoamFlow(Flow):
             self.state_handlers.append(self.saver.save_flow_run)
 
     def add_task(self, task: Task) -> Task:
+        """Keeping track of the run data"""
         if self.saver is not None:
             if self.saver.save_task_run not in task.state_handlers:
                 task.state_handlers.append(self.saver.save_task_run)

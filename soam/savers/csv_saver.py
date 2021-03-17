@@ -15,6 +15,7 @@ from soam.utilities.utils import get_file_path
 
 
 class CSVSaver(Saver):
+    """CSV Saver object to store the predictions and the runs."""
     def __init__(self, path: Union[str, Path]):
         """
         Create a saver object to store the predcitions and the runs.

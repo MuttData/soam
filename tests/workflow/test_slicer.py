@@ -1,3 +1,4 @@
+"""Slicer tester."""
 from unittest import TestCase, main
 
 import pandas as pd
@@ -6,6 +7,7 @@ from soam.workflow import Slicer
 
 
 class TestSlicer(TestCase):
+    """Creates the slicer tester object."""
     columns = ["date", "letter", "move", "opportunities", "impressions", "revenue"]
     values = [
         ["2019-09-01", "A", "down", 1000, 100, 20],
@@ -31,6 +33,7 @@ class TestSlicer(TestCase):
             )
 
     def test_slice_one_column(self):
+        """Tests the slice on one column."""
         columns = ["date", "letter", "opportunities"]
         df1 = pd.DataFrame(
             columns=columns,
@@ -52,6 +55,7 @@ class TestSlicer(TestCase):
         self._test_slices("letter", "opportunities", 2, dfs)
 
     def test_slice_two_column(self):
+        """Tests the slice on two columns."""
         columns1 = ["date", "letter", "opportunities"]
         columns2 = ["date", "move", "opportunities"]
         df1 = pd.DataFrame(
@@ -90,6 +94,7 @@ class TestSlicer(TestCase):
         self._test_slices(["letter", "move"], "opportunities", 4, dfs)
 
     def test_slice_two_dimensions(self):
+        """Tests the slice on two dimensions."""
         columns = ["date", "letter", "move", "opportunities"]
         df1 = pd.DataFrame(
             columns=columns,
@@ -106,6 +111,7 @@ class TestSlicer(TestCase):
         self._test_slices([["letter", "move"]], "opportunities", 4, dfs)
 
     def test_slice_two_metrics(self):
+        """Tests the slice on two metrics."""
         columns1 = ["date", "letter", "opportunities"]
         columns2 = ["date", "letter", "impressions"]
         df1 = pd.DataFrame(
@@ -144,6 +150,7 @@ class TestSlicer(TestCase):
         self._test_slices("letter", ["opportunities", "impressions"], 4, dfs)
 
     def test_slice_bad_dimension(self):
+        """Tests the slice on a bad dimension."""
         with self.assertRaises(ValueError):
             self._test_slices("lette", "opportunities", 0, 0)
 
