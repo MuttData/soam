@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.4] - 2021-03-17
 
-### Changed
-- README file updated.
+### Added
+- `interrogate` to check docstring coverage.
 
 ## [0.2.3] - 2021-03-16
 
