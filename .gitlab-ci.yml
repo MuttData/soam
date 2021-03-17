@@ -56,7 +56,7 @@ lint:
 docstr-cov:
   stage: test_stage
   script:
-    - interrogate -c pyproject.toml
+    - interrogate soam -c pyproject.toml
   only:
     refs:
       - merge_requests
