@@ -221,6 +221,15 @@ This section contains some recommendations when working with SoaM to avoid commo
 * Use the same train-test windows when backtesting and training to deploy and on later usage.
 
 ## Credits
+Alejandro Rusi <br>
+Diego Lizondo <br>
+Eugenio Scafati <br>
+Fabian Wolfmann <br>
+Francisco Lopez Destain <br>
+Guido Trucco <br>
+Juan Martin Pampliega <br>
+Pablo Andres Lorenzatto <br>
+Wenceslao Villegas
 
 ## License
 `soam` is licensed under the [Apache License 2.0](https://gitlab.com/mutt_data/muttlib/-/blob/master/LICENCE).
