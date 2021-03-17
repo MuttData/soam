@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - 2021-03-16
 
-### Added
-- `interrogate` in pre-commit hook to check docstring coverage.
+### Changed
+- Pinned SQLAlchemy version.
 
 ## [0.2.0] - 2021-03-15
 
