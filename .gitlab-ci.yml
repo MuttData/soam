@@ -53,6 +53,15 @@ lint:
       - merge_requests
       - master
 
+docstr-cov:
+  stage: test_stage
+  script:
+    - interrogate -c pyproject.toml
+  only:
+    refs:
+      - merge_requests
+      - master
+
 bandit:
   stage: test_stage
   script:
