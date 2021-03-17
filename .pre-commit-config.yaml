@@ -52,9 +52,3 @@ repos:
       exclude: templates/*  notebook/*
       files: \.py$
       types: [python]
--   repo: https://github.com/econchick/interrogate
-    rev: 1.3.2  # or master if you're bold
-    hooks:
-      - id: interrogate
-        args: [soam, --quiet, --exclude=soam/templates/, --fail-under=50]
-
