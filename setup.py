@@ -24,6 +24,7 @@ extra_dependencies = {
         'nox',
     ],
     'test': [
+        'interrogate',
         'nox',
         'pytest',
         'pytest-mpl',
