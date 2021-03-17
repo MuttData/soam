@@ -1,3 +1,4 @@
+"""Run migrations offline and online."""
 # pylint: skip-file
 
 from logging.config import fileConfig
