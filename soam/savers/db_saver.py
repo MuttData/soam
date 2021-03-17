@@ -1,3 +1,4 @@
+"""Database saver."""
 import logging
 
 from muttlib.dbconn import BaseClient

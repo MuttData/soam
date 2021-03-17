@@ -1,3 +1,4 @@
+"""Workflow backtester."""
 from collections.abc import Mapping
 import logging
 from typing import (  # pylint:disable=unused-import

@@ -1,3 +1,4 @@
+"""Google Sheets report generation"""
 import logging
 from pathlib import Path
 from typing import Mapping
