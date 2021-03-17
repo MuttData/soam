@@ -57,7 +57,7 @@ docstr-cov:
   stage: test_stage
   script:
     - pip install interrogate
-    - interrogate soam -c pyproject.toml
+    - interrogate soam -c pyproject.toml -vv
   only:
     refs:
       - merge_requests
