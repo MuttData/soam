@@ -16,7 +16,7 @@ from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DS_COL, Y_COL, YHAT_COL
 from soam.core import Step
-from soam.utilities.utils import split_backtesting_ranges
+from soam.utilities.utils import add_future_dates, split_backtesting_ranges
 from soam.workflow.forecaster import Forecaster
 from soam.workflow.transformer import DummyDataFrameTransformer, Transformer
 
@@ -187,7 +187,8 @@ class Backtester(Step):
             preproc = preprocessor.copy()  # type: ignore
 
             ready_train_set, fitted_preproc = preproc.run(train_set)
-            prediction, _, _ = fc.run(ready_train_set, output_length=test_window)
+            ready_train_set = add_future_dates(ready_train_set, periods=test_window)
+            prediction, _, _ = fc.run(ready_train_set)
             train_start = train_set[DS_COL].min()
             train_end = train_set[DS_COL].max()
             test_end = test_set[DS_COL].max()

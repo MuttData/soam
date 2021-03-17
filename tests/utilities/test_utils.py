@@ -4,9 +4,11 @@ from pathlib import Path
 from typing import List, Tuple
 import unittest
 
+import numpy as np
 import pandas as pd
+import pytest
 
-from soam.utilities.utils import split_backtesting_ranges
+from soam.utilities.utils import add_future_dates, split_backtesting_ranges
 
 ROOT_TEST_DIRECTORY = Path(__file__).parent / "resources" / "test_utils"
 VALIDATION_PREFIX = "validation_"
@@ -170,6 +172,66 @@ class TestSplitBacktestingRanges(unittest.TestCase):
             directory_dataframes[loaded_split_name]
             for loaded_split_name in sorted(directory_dataframes.keys())
         ]
+
+
+def test_add_future_dates_frequency_not_inferred():
+    """Test that frequency can't be inferred."""
+    test_data = pd.DataFrame.from_records(
+        np.array(
+            [
+                ('2016-06-01T00:00:00.000000000', 453990.926731),
+                ('2016-07-03T00:00:00.000000000', 461908.605069),
+                ('2016-08-04T00:00:00.000000000', 482625.559603),
+                ('2016-09-05T00:00:00.000000000', 438345.625953),
+                ('2016-10-01T00:00:00.000000000', 458133.301185),
+                ('2016-11-01T00:00:00.000000000', 467090.524589),
+                ('2016-12-03T00:00:00.000000000', 508706.424433),
+                ('2017-12-06T00:00:00.000000000', 426140.823832),
+                ('2017-02-08T00:00:00.000000000', 418005.414117),
+                ('2017-03-15T00:00:00.000000000', 470489.149374),
+            ],
+            dtype=[('ds', '<M8[ns]'), ('y', '<f8')],
+        )
+    )
+    with pytest.raises(ValueError):
+        add_future_dates(test_data, periods=5)
+        add_future_dates(test_data.iloc[:1, :], periods=5)
+
+
+def test_add_future_dates():
+    """Test that future dates are generated as expected."""
+    test_data = pd.DataFrame.from_records(
+        np.array(
+            [
+                ('2016-06-01T00:00:00.000000000', 453990.926731),
+                ('2016-07-01T00:00:00.000000000', 461908.605069),
+                ('2016-08-01T00:00:00.000000000', 482625.559603),
+                ('2016-09-01T00:00:00.000000000', 438345.625953),
+                ('2016-10-01T00:00:00.000000000', 458133.301185),
+                ('2016-11-01T00:00:00.000000000', 467090.524589),
+                ('2016-12-01T00:00:00.000000000', 508706.424433),
+                ('2017-01-01T00:00:00.000000000', 426140.823832),
+                ('2017-02-01T00:00:00.000000000', 418005.414117),
+                ('2017-03-01T00:00:00.000000000', 470489.149374),
+            ],
+            dtype=[('ds', '<M8[ns]'), ('y', '<f8')],
+        )
+    )
+    new_df = add_future_dates(test_data, periods=5)
+    future_df = pd.DataFrame.from_records(
+        np.array(
+            [
+                ('2017-04-01T00:00:00.000000000', np.nan),
+                ('2017-05-01T00:00:00.000000000', np.nan),
+                ('2017-06-01T00:00:00.000000000', np.nan),
+                ('2017-07-01T00:00:00.000000000', np.nan),
+                ('2017-08-01T00:00:00.000000000', np.nan),
+            ],
+            dtype=[('ds', '<M8[ns]'), ('y', '<f8')],
+        )
+    )
+    expected_df = pd.concat([test_data, future_df]).reset_index(drop=True)
+    pd.testing.assert_frame_equal(expected_df, new_df)
 
 
 if __name__ == '__main__':

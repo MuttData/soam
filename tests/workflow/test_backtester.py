@@ -1,8 +1,8 @@
 from copy import deepcopy
 import unittest
 
-from darts.models import ExponentialSmoothing, Theta
 import pandas as pd
+import pytest
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
@@ -14,6 +14,7 @@ from soam.constants import (
     PLOT_CONFIG,
     Y_COL,
 )
+from soam.models import SkProphet
 from soam.plotting import ForecastPlotterTask
 from soam.workflow import (
     Backtester,
@@ -39,7 +40,7 @@ def test_compute_metrics():
 
 
 class SimpleProcessor(BaseDataFrameTransformer):
-    def __init__(self, **fit_params):
+    def __init__(self, **fit_params):  # pylint:disable=super-init-not-called
         self.preproc = StandardScaler(**fit_params)
 
     def fit(self, df_X):
@@ -61,9 +62,13 @@ def assert_backtest_fold_result_common_checks(rv, ranges=None, plots=None):
 
 def assert_backtest_fold_result(rv, ranges=None, metrics=None, plots=None):
     assert_backtest_fold_result_common_checks(rv, ranges=ranges, plots=plots)
-    output_metrics = pd.Series(rv[METRICS_KEYWORD])
-    expected_metrics = pd.Series(metrics)
-    pd.testing.assert_series_equal(output_metrics, expected_metrics, rtol=1e-2)
+    for metric_name, values in metrics.items():
+        assert metric_name in rv[METRICS_KEYWORD]
+        if isinstance(values, dict):
+            for measure_name, value in values.items():
+                assert value, pytest.approx(rv[METRICS_KEYWORD][measure_name], 0.01)
+        else:
+            assert values, pytest.approx(rv[METRICS_KEYWORD][metric_name], 0.01)
 
 
 def assert_backtest_all_folds_result(rvs, expected_values):
@@ -85,11 +90,12 @@ def assert_backtest_all_folds_result_aggregated(rvs, expected_values):
         assert_backtest_fold_result_aggregated(rv, **evs)
 
 
-def test_integration_Backtester_single_fold(
+def test_integration_backtester_single_fold(
     tmp_path, sample_data_df
 ):  # pylint: disable=redefined-outer-name
+    test_window = 10
     train_data = sample_data_df
-    forecaster = Forecaster(model=Theta(), output_length=10)
+    forecaster = Forecaster(model=SkProphet(), output_length=test_window)
     preprocessor = Transformer(SimpleProcessor())
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -108,7 +114,7 @@ def test_integration_Backtester_single_fold(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
-        test_window=10,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
     )
@@ -120,22 +126,23 @@ def test_integration_Backtester_single_fold(
                 pd.Timestamp('2015-07-01 00:00:00'),
                 pd.Timestamp('2016-05-01 00:00:00'),
             ),
-            METRICS_KEYWORD: {'mae': 0.7878291094308457, 'mse': 1.3658751092701222},
+            METRICS_KEYWORD: {'mae': 0.19286372252777645, 'mse': 0.07077117049346579},
             'plots': '0_forecast_2013020100_2015080100_.png',
         },
     ]
     assert_backtest_all_folds_result(rvs, expected_values)
 
 
-def test_integration_Backtester_multi_fold(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+def test_integration_backtester_multi_fold(
+    tmp_path, sample_data_df  # pylint: disable=redefined-outer-name
+):
+    test_window = 30
     train_data = pd.concat([sample_data_df] * 3)
     train_data[DS_COL] = pd.date_range(
         train_data[DS_COL].min(), periods=len(train_data), freq='MS'
     )
-    model = ExponentialSmoothing()
-    forecaster = Forecaster(model=model, output_length=10)
+    model = SkProphet()
+    forecaster = Forecaster(model=model, output_length=test_window)
     preprocessor = Transformer(SimpleProcessor())
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -154,12 +161,11 @@ def test_integration_Backtester_multi_fold(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
-        test_window=30,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
     )
     rvs = backtester.run(train_data)
-
     expected_values = [
         {
             RANGES_KEYWORD: (
@@ -167,7 +173,7 @@ def test_integration_Backtester_multi_fold(
                 pd.Timestamp('2015-07-01 00:00:00'),
                 pd.Timestamp('2018-01-01 00:00:00'),
             ),
-            METRICS_KEYWORD: {'mae': 1.2302525646461073, 'mse': 2.8245357205721384},
+            METRICS_KEYWORD: {'mae': 1.140921182444867, 'mse': 2.4605768804352675},
             'plots': '0_forecast_2013020100_2015080100_.png',
         },
         {
@@ -176,7 +182,7 @@ def test_integration_Backtester_multi_fold(
                 pd.Timestamp('2018-01-01 00:00:00'),
                 pd.Timestamp('2020-07-01 00:00:00'),
             ),
-            METRICS_KEYWORD: {'mae': 0.8261577849244794, 'mse': 0.9293777664085056},
+            METRICS_KEYWORD: {'mae': 1.600049020613293, 'mse': 4.383723067139095},
             'plots': '0_forecast_2015080100_2018020100_.png',
         },
         {
@@ -185,7 +191,7 @@ def test_integration_Backtester_multi_fold(
                 pd.Timestamp('2020-07-01 00:00:00'),
                 pd.Timestamp('2023-01-01 00:00:00'),
             ),
-            METRICS_KEYWORD: {'mae': 1.1802703142819078, 'mse': 1.993944686736428},
+            METRICS_KEYWORD: {'mae': 3.1358162976127217, 'mse': 12.666965373730687},
             'plots': '0_forecast_2018020100_2020080100_.png',
         },
     ]
@@ -195,14 +201,15 @@ def test_integration_Backtester_multi_fold(
 # TODO: It maybe a good visual aggregation to include all metrics in one plot. This
 # TODO: is not possible with the current implementation.
 def test_integration_backtester_multi_fold_default_aggregation(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+    tmp_path, sample_data_df  # pylint: disable=redefined-outer-name
+):
+    test_window = 30
     train_data = pd.concat([sample_data_df] * 3)
     train_data[DS_COL] = pd.date_range(
         train_data[DS_COL].min(), periods=len(train_data), freq='MS'
     )
-    model = ExponentialSmoothing()
-    forecaster = Forecaster(model=model, output_length=10)
+    model = SkProphet()
+    forecaster = Forecaster(model=model, output_length=test_window)
     preprocessor = Transformer(SimpleProcessor())
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -221,13 +228,12 @@ def test_integration_backtester_multi_fold_default_aggregation(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
-        test_window=30,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
         aggregation="default",
     )
     rvs = backtester.run(train_data)
-
     expected_values = [
         {
             RANGES_KEYWORD: (
@@ -236,14 +242,14 @@ def test_integration_backtester_multi_fold_default_aggregation(
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 1.0788940440819788,
-                    'max': 1.230244804563136,
-                    'min': 0.8261670134008924,
+                    'avg': 1.9589288335569606,
+                    'max': 3.1358162976127217,
+                    'min': 1.140921182444867,
                 },
                 'mse': {
-                    'avg': 1.9159492767401751,
-                    'max': 2.8245060424504245,
-                    'min': 0.9293971010336722,
+                    'avg': 6.503755107101683,
+                    'max': 12.666965373730687,
+                    'min': 2.4605768804352675,
                 },
             },
             'plots': '0_forecast_2018020100_2020080100_.png',
@@ -253,14 +259,15 @@ def test_integration_backtester_multi_fold_default_aggregation(
 
 
 def test_integration_backtester_multi_fold_custom_aggregations(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+    tmp_path, sample_data_df  # pylint: disable=redefined-outer-name
+):
+    test_window = 30
     train_data = pd.concat([sample_data_df] * 3)
     train_data[DS_COL] = pd.date_range(
         train_data[DS_COL].min(), periods=len(train_data), freq='MS'
     )
-    model = ExponentialSmoothing()
-    forecaster = Forecaster(model=model, output_length=10)
+    model = SkProphet()
+    forecaster = Forecaster(model=model, output_length=test_window)
     preprocessor = Transformer(SimpleProcessor())
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -302,7 +309,7 @@ def test_integration_backtester_multi_fold_custom_aggregations(
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
-        test_window=30,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
         aggregation=aggregation,
@@ -317,12 +324,12 @@ def test_integration_backtester_multi_fold_custom_aggregations(
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'weighted_begining': 1.139437159,
-                    'weighted_ending': 1.119444258,
+                    'weighted_begining': 1.631725773112123,
+                    'weighted_ending': 2.4296838191792647,
                 },
                 'mse': {
-                    'weighted_begining': 2.279385923,
-                    'weighted_ending': 1.947149509,
+                    'weighted_begining': 4.886483816435117,
+                    'weighted_ending': 8.969039213753284,
                 },
             },
             'plots': '0_forecast_2015080100_2018020100_.png',
@@ -332,14 +339,15 @@ def test_integration_backtester_multi_fold_custom_aggregations(
 
 
 def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plot(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+    tmp_path, sample_data_df  # pylint: disable=redefined-outer-name
+):
+    test_window = 30
     train_data = pd.concat([sample_data_df] * 3)
     train_data[DS_COL] = pd.date_range(
         train_data[DS_COL].min(), periods=len(train_data), freq='MS'
     )
-    model = ExponentialSmoothing()
-    forecaster = Forecaster(model=model, output_length=10)
+    model = SkProphet()
+    forecaster = Forecaster(model=model, output_length=test_window)
     preprocessor = Transformer(SimpleProcessor())
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -380,7 +388,7 @@ def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plo
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
-        test_window=30,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
         aggregation=aggregation,
@@ -395,12 +403,12 @@ def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plo
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'weighted_begining': 1.139437159,
-                    'weighted_ending': 1.119444258,
+                    'weighted_begining': 1.631725773112123,
+                    'weighted_ending': 2.4296838191792647,
                 },
                 'mse': {
-                    'weighted_begining': 2.279385923,
-                    'weighted_ending': 1.947149509,
+                    'weighted_begining': 4.886483816435117,
+                    'weighted_ending': 8.969039213753284,
                 },
             },
             'plots': '0_forecast_2018020100_2020080100_.png',
@@ -410,14 +418,15 @@ def test_integration_backtester_multi_fold_custom_metric_aggregation_default_plo
 
 
 def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metric(
-    tmp_path, sample_data_df
-):  # pylint: disable=redefined-outer-name
+    tmp_path, sample_data_df  # pylint: disable=redefined-outer-name
+):
+    test_window = 30
     train_data = pd.concat([sample_data_df] * 3)
     train_data[DS_COL] = pd.date_range(
         train_data[DS_COL].min(), periods=len(train_data), freq='MS'
     )
-    model = ExponentialSmoothing()
-    forecaster = Forecaster(model=model, output_length=10)
+    model = SkProphet()
+    forecaster = Forecaster(model=model, output_length=test_window)
     preprocessor = Transformer(SimpleProcessor())
     plot_config = deepcopy(PLOT_CONFIG)
     plot_config[ANOMALY_PLOT][MONTHLY_TIME_GRANULARITY][FIG_SIZE] = (8, 3)
@@ -439,7 +448,7 @@ def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metri
         forecaster=forecaster,
         preprocessor=preprocessor,
         forecast_plotter=forecast_plotter,
-        test_window=30,
+        test_window=test_window,
         train_window=30,
         metrics=metrics,
         aggregation=aggregation,
@@ -454,14 +463,14 @@ def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metri
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 1.0788940440819788,
-                    'max': 1.230244804563136,
-                    'min': 0.8261670134008924,
+                    'avg': 1.9589288335569606,
+                    'max': 3.1358162976127217,
+                    'min': 1.140921182444867,
                 },
                 'mse': {
-                    'avg': 1.9159492767401751,
-                    'max': 2.8245060424504245,
-                    'min': 0.9293971010336722,
+                    'avg': 6.503755107101683,
+                    'max': 12.666965373730687,
+                    'min': 2.4605768804352675,
                 },
             },
             'plots': '0_forecast_2015080100_2018020100_.png',

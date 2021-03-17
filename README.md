@@ -1,6 +1,6 @@
 # SoaM
 
-[![pipeline status](https://gitlab.com/mutt_data/soam/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [![coverage report](https://gitlab.com/mutt_data/soam/badges/master/coverage.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [pypi version](https://img.shields.io/pypi/v/soam?color=blue)](https://pypi.org/project/soam/)
+[![pipeline status](https://gitlab.com/mutt_data/soam/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [![coverage report](https://gitlab.com/mutt_data/soam/badges/master/coverage.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [![pypi version](https://img.shields.io/pypi/v/soam?color=blue)](https://pypi.org/project/soam/)
 
 SoaM is library created by [Mutt](https://muttdata.ai/).
 Its goal is to create a forecasting framework, this tool is developed with conjunctions of experience on previous
@@ -63,11 +63,14 @@ for example to
 
 The project contains some extra dependencies that are not included in the default installation to make it lightweight.
 
-If you want slack or prophet extensions use:
+If you want to install extensions use:
 ```bash
 pip install -e ".[slack]"
 pip install -e ".[prophet]"
 pip install -e ".[pdf_report]"
+pip install -e ".[gsheets_report]"
+pip install -e ".[report]" # slack and *_report extras
+pip install -e ".[all]" # all previous
 ```
 
 _Note_: The `pdf_report` extra might need to run the following command before installation ([More info](https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex))
