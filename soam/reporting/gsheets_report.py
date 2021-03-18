@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class GSheetsReportTask(Step):
-    """Task to report to GSheets spreadsheet
-    """
+    """Creates a Google Sheets Report Object."""
 
     def __init__(
         self, config_json_path: str, gsheets_kwargs: Mapping = None, **kwargs

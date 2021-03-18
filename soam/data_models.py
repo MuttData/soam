@@ -60,7 +60,10 @@ Base = declarative_base()
 
 
 class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
-    """Oracle Identity"""
+    """
+    This column is a column type defined for the creation of autonumeric indices for the Oracle specific implementation.
+    """
+
     def get_dbapi_type(self, dbapi):
         return int
 
@@ -69,7 +72,8 @@ class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
 
 
 class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
-    """Identity"""
+    """Creates an identity object intended to represent an autonumeric column which calls dialect specific implementations."""
+
     impl = Integer
 
     def load_dialect_impl(self, dialect):
@@ -94,6 +98,7 @@ class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-met
 
 class SoamFlowRunSchema(Base):  # type: ignore
     """Soam Flow Run Schema Generation"""
+
     __tablename__ = SOAM_FLOW_RUN_TABLE
 
     flow_run_id = Column(UUIDType(binary=False), primary_key=True)
@@ -117,6 +122,7 @@ class StepTypeEnum(enum.Enum):
 
 class SoamTaskRunSchema(Base):  # type: ignore
     """Soam Task Run Schema Generation"""
+
     __tablename__ = SOAM_TASK_RUNS_TABLE
 
     params = Column(Text, nullable=False)
@@ -133,6 +139,7 @@ class SoamTaskRunSchema(Base):  # type: ignore
 
 class ForecastValues(AbstractIDBase):
     """Forecasted values Table Definition"""
+
     __tablename__ = FORECASTER_VALUES_TABLE
     __table_args__ = (UniqueConstraint("task_run_id", "forecast_date"),)
 

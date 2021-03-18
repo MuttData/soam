@@ -38,7 +38,9 @@ class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
 
 
 class DummyDataFrameTransformer(BaseDataFrameTransformer):
-    """Provides a Dummy Data Frame."""
+    """This transformer provides an "identity transformation.
+        Returns its input without any alteration."""
+
     def __init__(self):
         pass
 
@@ -53,6 +55,7 @@ class DummyDataFrameTransformer(BaseDataFrameTransformer):
 
 class Transformer(Step):
     """Generates the transformer object."""
+
     transformer: BaseDataFrameTransformer
 
     def __init__(

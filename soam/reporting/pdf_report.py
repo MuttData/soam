@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class PDFReport:
-    """Generate PDF from IPython Notebook."""
+    """Generate PDF Report object from IPython Notebook."""
 
     def __init__(self, base_path: str):
         """Merge on concat dataframes dependending on the keys.

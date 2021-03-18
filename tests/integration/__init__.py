@@ -1,1 +1,1 @@
-"""SoaM tests integration."""
+"""SoaM integration tests."""

@@ -48,7 +48,7 @@ def sumape(
 
 
 def create_fortnights(start_date, end_date):
-    """Fortnights generation"""
+    """Create fortnights within a given range."""
     dates = pd.date_range(start=start_date, end=end_date).to_series()
 
     fortnights = (
