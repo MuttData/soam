@@ -73,11 +73,14 @@ for example to
 
 ## Installation
 
-Base lib:
+Clone this repository:
 ```bash
-pip install soam
+git clone [soam-repo]
 ```
-
+Then run:
+```bash
+pip install . or pip install -e .
+```
 ### Install extras
 
 The project contains some extra dependencies that are not included in the default installation to make it lightweight.
