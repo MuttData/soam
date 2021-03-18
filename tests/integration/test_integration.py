@@ -1,4 +1,4 @@
-"""Test integration."""
+"""Integration test module."""
 from copy import deepcopy
 
 import pandas as pd
