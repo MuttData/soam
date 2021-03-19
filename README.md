@@ -101,6 +101,7 @@ _Note_: The `pdf_report` extra might need to run the following command before in
 
 ## Usage
 See the [documentation](documentation) to get started with `soam`.
+
 ### Examples
 
 * Forecaster : here is a [notebook](./notebook/examples/forecaster.ipynb) using and explaining the forecaster stage.
