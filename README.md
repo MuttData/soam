@@ -73,11 +73,17 @@ for example to
 
 ## Installation
 
-Clone this repository:
+Install the base lib via [pipy](https://pypi.org/project/soam/) by executing:
+
+```bash
+pip install soam
+```
+
+Or clone this repository:
 ```bash
 git clone [soam-repo]
 ```
-Then run:
+And then run:
 ```bash
 pip install . or pip install -e .
 ```
