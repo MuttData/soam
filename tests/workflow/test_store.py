@@ -14,21 +14,7 @@ TABLE_STORE = "test_store"
 
 @unittest.skipIf(not os.getenv(TEST_DB_CONNSTR), f"{TEST_DB_CONNSTR} is not set")
 class TestStore(PgTestCase):
-    def test_create(self):
-        breakpoint()
-        query_create = f"""
-            CREATE TABLE IF NOT EXISTS {TABLE_STORE}
-            (date INT,
-            country VARCHAR (50) ,
-            metric1 INT)
-            """
-        self.run_query(query_create)
-
-        # assert table exist
-        query_assert = f"SELECT to_regclass('{self.db_client.database}.{TABLE_STORE}');"
-        self.assertTrue(self.run_query(query_assert))
-
-    def store_df(self, mocker):
+    def test_store_df(self, cls):
         df = pd.DataFrame(
             {
                 "date": [1, 2, 3],
@@ -36,15 +22,23 @@ class TestStore(PgTestCase):
                 "metric1": [328, 215, 146],
             }
         )
-        spy = mocker.spy(self.db_client.insert_from_frame)
-        s = Store(self.db_client, TABLE_STORE, self.db_client.database)
-        s.run(df)
-
-        spy.assert_called_once_with(df)
+        self.store.run(df)
+        sql_select = f"""
+        SELECT * FROM {TABLE_STORE}
+        """
+        pd.testing.assert_frame_equal(cls.db_client.to_frame(sql_select), df)
 
     @classmethod
     def setUpClass(cls):
         super().setUp(cls)
+        query_create = f"""
+            CREATE TABLE IF NOT EXISTS {TABLE_STORE}
+            (date INT,
+            country VARCHAR (50),
+            metric1 INT)
+            """
+        cls.run_query(query_create)
+        cls.store = Store(cls.db_client, f"{cls.db_client.database}.{TABLE_STORE}")
 
     @classmethod
     def tearDownClass(cls):
