@@ -104,7 +104,7 @@ pages:
 # package registry, thus using the required variables to do so
 # The package will be uploaded to PYPI_URL, which can be overrided
 # not to upload to gitlab's PYPI
-deploy:
+.deploy:
   stage: deploy_stage
   script:
     - pip install twine
@@ -116,6 +116,18 @@ deploy:
   only:
     refs:
       - master
+
+deploy_gitlab:
+  stage: deploy_stage
+  script:
+    - python setup.py sdist bdist_wheel
+    - pip install dist/*
+  artifacts:
+  paths:
+    - dist/*.whl
+  only:
+    refs:
+      - merge_requests
 
 tag_release_version:
   stage: version_stage
