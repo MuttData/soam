@@ -59,7 +59,35 @@ for example to
 
 [//comment]: # (the postprocessing supports custom outputs?)
 
-# Install extras
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+- [Soam CLI](#soam-cli)
+- [Database Management](#database-management)
+- [Developers Guide](#developers-guide)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Rules of Thumb](#rules-of-thumb)
+- [Credits](#contributing)
+- [License](#license)
+
+## Installation
+
+Install the base lib via [pipy](https://pypi.org/project/soam/) by executing:
+
+```bash
+pip install soam
+```
+
+Or clone this repository:
+```bash
+git clone [soam-repo]
+```
+And then run:
+```bash
+pip install . or pip install -e .
+```
+### Install extras
 
 The project contains some extra dependencies that are not included in the default installation to make it lightweight.
 
@@ -77,7 +105,10 @@ _Note_: The `pdf_report` extra might need to run the following command before in
 
   $ `apt-get install texlive-xetex texlive-fonts-recommended`
 
-## Examples
+## Usage
+See the [documentation](documentation) to get started with `soam`.
+
+### Examples
 
 * Forecaster : here is a [notebook](./notebook/examples/forecaster.ipynb) using and explaining the forecaster stage.
 
@@ -85,7 +116,7 @@ _Note_: The `pdf_report` extra might need to run the following command before in
 
 ## SoaM CLI
 
-After installing SoaM locally (for example with `pip install soam`), there are some commands available:
+After installing SoaM locally, there are some commands available:
 
 * `soam init --output`, scaffolding for a project ready to use SoaM. `cookiecutter` will then ask for parameters via prompt.
 
@@ -199,3 +230,16 @@ This section contains some recommendations when working with SoaM to avoid commo
   Eg: Transformations, forecasters, etc.
 * Use the same train-test windows when backtesting and training to deploy and on later usage.
 
+## Credits
+Alejandro Rusi <br>
+Diego Lizondo <br>
+Eugenio Scafati <br>
+Fabian Wolfmann <br>
+Francisco Lopez Destain <br>
+Guido Trucco <br>
+Juan Martin Pampliega <br>
+Pablo Andres Lorenzatto <br>
+Wenceslao Villegas
+
+## License
+`soam` is licensed under the [Apache License 2.0](https://gitlab.com/mutt_data/muttlib/-/blob/master/LICENCE).
