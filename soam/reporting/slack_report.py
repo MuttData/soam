@@ -39,6 +39,24 @@ class SlackReport:
         greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
         farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
     ) -> Union[Future, SlackResponse]:
+        """
+        Send Slack report.
+
+        Parameters
+        ----------
+        prediction : pd.DataFrame
+            DataDrame of the predictions made.
+        plot_filename : str or pathlib.Path
+             Path of the forecast data to send.
+        greeting_message: str
+            Greeting message to send via Slack with the predictions.
+        farewell_message: str
+            Farewell message to send via Slack with the predictions.
+        Returns
+        ----------
+        Slack Report
+            Sends the specified message with the predictions data via Slack.
+        """
         if greeting_message == DEFAULT_GREETING_MESSAGE:
             greeting_message.format(metric_name=self.metric_name)
 
@@ -92,6 +110,24 @@ class SlackReportTask(Step, SlackReport):
         greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
         farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
     ):
+        """
+        Send Slack report task.
+
+        Parameters
+        ----------
+        prediction : pd.DataFrame
+            DataDrame of the predictions made.
+        plot_filename : str or pathlib.Path
+             Path of the forecast data to send.
+        greeting_message: str
+            Greeting message to send via Slack with the predictions.
+        farewell_message: str
+            Farewell message to send via Slack with the predictions.
+        Returns
+        ----------
+        Slack Report Task
+            Sends the specified message with the predictions data via Slack.
+        """
         return self.send_report(
             prediction, plot_filename, greeting_message, farewell_message
         )

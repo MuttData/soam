@@ -1,4 +1,9 @@
-"""Google Sheets report generation"""
+"""
+Google Sheets report generation
+----------
+GSheets report creator and sender. Its a postprocess that creates a GSheets report with
+the model forecasts.
+"""
 import logging
 from pathlib import Path
 from typing import Mapping
@@ -12,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class GSheetsReportTask(Step):
-    """Creates a Google Sheets Report Object."""
+    """Creates the task to generate a GSheets report."""
 
     def __init__(
         self, config_json_path: str, gsheets_kwargs: Mapping = None, **kwargs
@@ -45,6 +50,11 @@ class GSheetsReportTask(Step):
             Spreadsheet id or name as in Drive.
         kwargs:
             Extra args to pass to muttlib.gsheetsconn.GSheetsClient.insert_from_frame
+
+        Returns
+        ----------
+        GSheets Report Task
+            Google Sheets spreadsheet with the df values.
         """
 
         if df.empty:

@@ -33,6 +33,17 @@ class Step(Task, BaseEstimator):
         """
 
     def get_task_id(self) -> str:  # pylint: disable=no-self-use
+        """
+        Obtains the task id.
+
+        Parameters
+        ----------
+        TODO:
+
+        Returns
+        -------
+        flow_run_id
+            the id of the flow run."""
         return context["flow_run_id"]
 
     def __repr__(self) -> str:

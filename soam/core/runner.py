@@ -30,7 +30,18 @@ class SoamFlow(Flow):
             self.state_handlers.append(self.saver.save_flow_run)
 
     def add_task(self, task: Task) -> Task:
-        """Task to keep track of the run data"""
+        """
+        Adds the task and handlers to save the state.
+
+        Parameters
+        ----------
+        task
+            Represents a task where the flow is being executed.
+        Returns
+        -------
+        super object
+            Saves the task and the state handler.
+        """
         if self.saver is not None:
             if self.saver.save_task_run not in task.state_handlers:
                 task.state_handlers.append(self.saver.save_task_run)

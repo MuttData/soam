@@ -41,7 +41,19 @@ class DBSaver(Saver):
 
     def save_forecast(self, task: Task, old_state: State, new_state: State) -> State:
         """
-        Store the forecaster data in the create connection to a database.
+        Store the forecaster data in the constructed database.
+        Parameters
+        ----------
+        task: Task
+            Specify the forecast task you want to save information of.
+        old_state: State
+            Task old state.
+        new_state : State
+            Task new state.
+        Returns
+        ----------
+        State
+            The new updated state of the forecast task.
         """
         if new_state.is_successful():
             save_prediction = new_state.result[0].copy()
@@ -54,7 +66,19 @@ class DBSaver(Saver):
 
     def save_task_run(self, task: Task, old_state: State, new_state: State) -> State:
         """
-        Store the data of the task run in the create connection to a database.
+        Store the task run information in the database.
+        Parameters
+        ----------
+        task: Task
+            Specify the task you want to save information of.
+        old_state: State
+            Task old state.
+        new_state : State
+            Task new state.
+        Returns
+        ----------
+        State
+            The new updated state of the task.
         """
         if new_state.is_running():
             flow_run_id = context["flow_run_id"]
@@ -78,6 +102,18 @@ class DBSaver(Saver):
     ) -> State:
         """
         Save the SoamFlow run data in the create connection to a database.
+        Parameters
+        ----------
+        saomflow: SoamFlow
+            Specify the soamflow you want to save information of.
+        old_state: State
+            SoamFlow old state.
+        new_state : State
+            SoamFlow new state.
+        Returns
+        ----------
+        State
+            The new updated state of the SoamFlow.
         """
         if new_state.is_running():
             flow_run_id = context["flow_run_id"]

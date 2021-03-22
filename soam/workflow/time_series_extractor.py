@@ -27,6 +27,7 @@ from soam.core import Step
 
 if TYPE_CHECKING:
     import datetime as dt
+
     import muttlib
 
 # Simple column selection templates.
@@ -523,4 +524,15 @@ class TimeSeriesExtractor(Step):
         return conds, kwargs
 
     def run(self, build_query_kwargs: Dict[str, Any]) -> pd.DataFrame:  # type: ignore
+        """Returns aggregated data from a query into a pandas DataFrame.
+
+        Parameters
+        ----------
+        build_query_kwargs: dict
+
+        Returns
+        -------
+        pd.DataFrame
+            Agregated data from the time series extractor object.
+        """
         return self.extract(build_query_kwargs)

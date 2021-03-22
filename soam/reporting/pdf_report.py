@@ -1,4 +1,9 @@
-"""PDF Generator."""
+"""
+PDF Report Generator.
+----------
+PDF report creator. Its a postprocess that generates a PDF report with
+the model forecasts.
+"""
 from datetime import datetime
 import logging
 from pathlib import Path
@@ -40,7 +45,7 @@ class PDFReport:
 
         Returns
         -------
-        str
+        path
             Generated PDF Path
         """
         report_file = Path(nb_path)
@@ -92,9 +97,26 @@ class PDFReport:
 
 
 class PDFReportTask(Step, PDFReport):
+    """Creates the task to generate a PDF report."""
+
     def __init__(self, base_path: str):
         Step.__init__(self)
         PDFReport.__init__(self, base_path)
 
     def run(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore[override]
+        """
+        Task to export the notebook into a pdf.
+
+        Parameters
+        ----------
+        nb_path : str
+            Path of the Notebook or Script to Execute .ipynb / .py
+        parameters : Dict
+            Parameters to run the notebook with (Papermill).
+
+        Returns
+        -------
+        path
+            Generated PDF Path
+        """
         return self.export_notebook_to_pdf(nb_path, nb_params)

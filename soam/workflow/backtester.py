@@ -280,4 +280,17 @@ def aggregate_rv(
 
 
 def compute_metrics(y_true, y_pred, metrics):
+    """Computation of a given metric
+    Parameters
+    ----------
+    y_true:
+        True values for y
+    y_pred:
+        Predicted values for y.
+    metrics: metric
+        Chosen performance metric to measure the model capabilities.
+    Returns
+    ---------
+    dict
+        Performance metric and its value"""
     return {metric_name: func(y_true, y_pred) for metric_name, func in metrics.items()}

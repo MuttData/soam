@@ -25,7 +25,24 @@ RUN_ID_COL = "run_id"
 
 
 def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
-    """Get parquet cache storage directory."""
+    """
+    Get parquet cache storage directory."
+    Parameters
+    ----------
+    TODO:
+    base_dir: path
+        base directory path
+    kpi
+    prefix
+    date: date
+    end_date: date
+    sample_size: int
+        Size of the sample.
+    Returns
+    ----------
+    path
+        The new store_dir directory created.
+    """
     store_dir = base_dir / kpi / prefix
     store_dir /= f'{date:%Y%m%d}{f"-{end_date:%Y%m%d}" if end_date is not None else ""}'
     if sample_size is not None:
@@ -45,7 +62,24 @@ def get_store_file(
     extra_dir=None,
     end_date_hour=False,
 ):
-    """Create name to store tabular data query outputs."""
+    """Create name to store tabular data query outputs.
+    Parameters
+    ----------
+    TODO:
+    base_dir: path
+    kpi
+    date: date
+    sample_size=None
+    end_date=None
+    prefix=None
+    suffix=None
+    ft="pkl"
+    extra_dir=None
+    end_date_hour=False
+    Returns
+    ----------
+    path
+    """
     save_dir = base_dir / kpi
     if extra_dir is not None:
         save_dir /= extra_dir
@@ -78,7 +112,30 @@ def get_figure_full_path(
     as_posix=True,
     end_date_hour=False,
 ):
-    """Create figure file-path for given model inputs."""
+    """Create figure file-path for given model inputs.
+    Parameters
+    ----------
+    fig_dir: path
+        figure directory.
+    target_col
+        target column.
+    fig_name: str
+        name of the figure
+    start_date: date
+        start date of analysis.
+    end_date: date
+        end date of analysis
+    time_granularity
+        time granularity, how much a period represents.
+    granularity
+    suffix=None
+    as_posix=True
+    end_date_hour=False
+    Returns
+    ----------
+    path
+        Path of the created figure.
+    """
     save_dir = make_dirs(fig_dir / granularity / time_granularity / fig_name)
     root_name = f"{start_date:%Y%m%d}_{end_date:%Y%m%d}"
     if end_date_hour:
@@ -95,7 +152,20 @@ def get_figure_full_path(
 def create_forecaster_dates(
     end_date, forecaster_train_window, forecaster_future_window
 ):
-    """Process and correct all respective dates for forecaster."""
+    """Process and correct all respective dates for forecaster.
+    Parameters
+    ----------
+    end_date: date
+        end date of analysis
+    forecaster_train_window
+        window of the train set to train the forecaster.
+    forecaster_future_window
+        future time window to predict the target variable value for.
+    Returns
+    ----------
+    date
+        forecaster dates.
+    """
     # Check not both future and end date as nulls, assert order
     train_w = forecaster_train_window
     future_w = forecaster_future_window
@@ -108,6 +178,20 @@ def create_forecaster_dates(
 
 
 def create_anomaly_window_dates(end_date, anomaly_window, time_granularity):
+    """Creation of the anomaly window dates.
+    Parameters
+    ----------
+    end_date: date
+        end date of analysis
+    anomaly_window
+        window time to analyze anomalies.
+    time_granularity
+        time granularity, how much a period represents.
+    Returns
+    ----------
+    list
+        anomaly window dates.
+    """
     hourly_offset = True if time_granularity == HOURLY_TIME_GRANULARITY else False
     end_date = str_to_datetime(end_date) if isinstance(end_date, str) else end_date
     anomaly_window_start_date = end_date - timedelta(days=(anomaly_window - 1))
@@ -124,7 +208,21 @@ def create_anomaly_window_dates(end_date, anomaly_window, time_granularity):
 def insert_df_multiple_clients(
     db_clients, insertion_ids, table_name, df, coseries_ids=None, **kwargs
 ):
-    """Insert a dataframe to a list of database connections."""
+    """Insert a dataframe to a list of database connections.
+    Parameters
+    ----------
+    db_clients
+        clients database
+    insertion_ids
+        ids to insert data in.
+    table_name: str
+        name of the table
+    df: pd.DataFrame
+        pandas dataframe to insert in database.
+    coseries_ids=None
+    **kwargs
+        ."""
+
     for db_cli in db_clients:
         dialect = db_cli.dialect
         if insertion_ids:

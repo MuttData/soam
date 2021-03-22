@@ -28,7 +28,8 @@ def range_datetime(
 ):
     # TODO: review datetime_start, datetime_end, are datetimes?
     # TODO: timeskip is Tick?
-    """Build datetime generator over successive time steps."""
+    """Build datetime generator over successive time steps.
+    TODO:"""
     if timeskip is None:
         timeskip = offsets.Day(1) if not hourly_offset else offsets.Hour(1)
     if not isinstance(datetime_start, pd.Timestamp):
@@ -75,18 +76,31 @@ def sanitize_arg(v, default=None):
 
 
 def sanitize_arg_empty_dict(v):
-    """Convenience function for `sanitize_arg(v, {})`"""
+    """Convenience function for `sanitize_arg(v, {})`
+    TODO:"""
     return sanitize_arg(v, {})
 
 
 def get_file_path(path: Path, fn: str) -> Path:
-    """Find an available path for a file, using an index prefix."""
+    """Find an available path for a file, using an index prefix.
+    Parameters
+    ----------
+    path: Path
+        file path
+    fn: str
+        filename
+    Returns
+    ----------
+    path
+        file path
+    """
     paths = path.glob(f"*_{fn}")
     max_index = max((int(p.name.split("_")[0]) for p in paths), default=-1) + 1
     return path / f"{max_index}_{fn}"
 
 
 def filter_by_class_or_subclass(l, c):
+    """TODO:"""
     return [e for e in l if isinstance(e, c) or issubclass(e.__class__, c)]
 
 

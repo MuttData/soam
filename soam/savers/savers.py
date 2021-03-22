@@ -53,10 +53,12 @@ class Saver(ABC):  # pylint:disable=abstract-method
 
         Parameters
         ----------
-
+        task: Task
+            Specified task to get the type of.
         Return
         ----------
-
+        str
+            Step type of the task.
         """
         if isinstance(task, Forecaster):
             step_type = StepTypeEnum.forecast

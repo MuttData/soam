@@ -237,6 +237,11 @@ class MailReport:
 
 
 class MailReportTask(Step, MailReport):
+    """
+    MailReportTask
+    ----------
+    Builds the task that sends reports via mail."""
+
     def __init__(self, mail_recipients_list: List[str], metric_name: str, **kwargs):
         Step.__init__(self, **kwargs)  # type: ignore
         MailReport.__init__(self, mail_recipients_list, metric_name)
@@ -248,4 +253,22 @@ class MailReportTask(Step, MailReport):
         subject: str = DEFAULT_SUBJECT,
         signature: str = DEFAULT_SIGNATURE,
     ):
+        """
+        Run the Mail Report Task.
+
+        Parameters
+        ----------
+        current_date: str,
+            Current datetime as string.
+        plot_filename: Union[Path, str],
+            The path and filename of the plot.
+        subject: str = DEFAULT_SUBJECT,
+            The subject for the email.
+        signature: str = DEFAULT_SIGNATURE,
+            Signature for the email.
+        Returns
+        -------
+        Mail Report Task
+            Sends the report via email.
+        """
         return self.send(current_date, plot_filename, subject, signature)
