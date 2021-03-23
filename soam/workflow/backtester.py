@@ -89,6 +89,43 @@ class Backtester(Step):
         aggregation: Union[str, Dict] = None,
         **kwargs,
     ):
+        """
+        Backtester object initialization.
+
+        Parameters
+        ----------
+            forecaster: soam.Forecaster
+                Forecaster that will be fitted and execute the predictions.
+            preprocessor: soam.Transformer
+                Transformer that will be used to preprocess the data, optional and defaults to None.
+            forecast_plotter: soam.Plotting.ForecastPlotterTask
+                Forecast plotter, optional and defaults to None.
+            test_window: pd.Timedelta
+                Time range to be extracted from the main timeseries on which the model will be evaluated on each backtesting run.
+                If `None` then `forecaster.output_length` is be used.
+            train_window: pd.Timedelta
+                Time range on which the model will trained on each backtesting run.
+                If a pd.Timedelta value is passed then the sliding method will be used to select the training data.
+                If `None` then the full time series will be used. This is the expanding window method.
+            step_size: int
+                Distance between each successive step between the beginning of each forecasting
+                range. If None defaults to test_window.
+            metrics: dict(str, callable)
+                `dict` containing name of a metric and a callable to compute it.
+                The callable must conform to the interface used by sklearn for regression metrics:
+                https://scikit-learn.org/stable/modules/classes.html#regression-metrics
+            savers: list of soam.savers.Saver, optional
+                The saver to store the parameters and state changes.
+            aggregation: bool or dict
+                The expected aggregations for the results.
+                If set to true will use the default aggregation, this keeps the last plot,
+                and calculates the average, minimum and maximum for the different metrics.
+                If it's a dict the PLOT_KEYWORD is expected to be assigned to the index
+                of the selected plot. METRICS_KEYWORD is expected to be another dictionary
+                containing the name of the aggregation associated with the function to
+                aggregate de list of values per metric.
+                If aggregation is set to False or None, no aggregation would be performed.
+        """
         super().__init__(**kwargs)
         if savers is not None:
             for saver in savers:  # pylint: disable=unused-variable

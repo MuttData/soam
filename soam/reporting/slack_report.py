@@ -27,6 +27,18 @@ class SlackReport:
     def __init__(
         self, channel_id: str, metric_name: str, setting_path: Optional[str],
     ):
+        """
+        Initialization of the Slack Report object.
+
+        Parameters
+        ----------
+            channel_id: str
+                Slack channel id where the report will be sent.
+            metric_name: str
+                Performance metric being measured.
+            setting_path: str
+                Setting path.
+        """
         credentials = get_slack_cred(setting_path)
         self.slack_client = slack.WebClient(credentials["token"])
         self.channel_id = channel_id
@@ -93,8 +105,11 @@ class SlackReportTask(Step, SlackReport):
         """Parameters
         ----------
         channel_id: str
+            Slack channel id where the report will be sent.
         metric_name: str
-        setting_path: Optional[str]
+            Performance metric being measured.
+        setting_path: str
+            Setting path.
         kwargs:
             Extra args to pass.
         """

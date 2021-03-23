@@ -24,12 +24,13 @@ class PDFReport:
     """Generate PDF Report object from IPython Notebook."""
 
     def __init__(self, base_path: str):
-        """Merge on concat dataframes dependending on the keys.
+        """
+        Initialization of the PDF Report object.
 
         Parameters
         ----------
-        keys:
-            str or list of str labels of columns to merge on
+        base_path: str
+            string of the base path of the pdf report.
         """
         self.base_path = Path(base_path)
 

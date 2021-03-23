@@ -243,6 +243,16 @@ class MailReportTask(Step, MailReport):
     Builds the task that sends reports via mail."""
 
     def __init__(self, mail_recipients_list: List[str], metric_name: str, **kwargs):
+        """
+        Initialization of the Mail Report Task.
+
+        Parameters
+        ----------
+            mail_recipients_list: List[str]
+                List of the recipients of the email to be sent.
+            metric_name: str
+                Name of the performance metric being measured.
+        """
         Step.__init__(self, **kwargs)  # type: ignore
         MailReport.__init__(self, mail_recipients_list, metric_name)
 

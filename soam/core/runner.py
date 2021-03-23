@@ -22,6 +22,15 @@ class SoamFlow(Flow):
     SoamFlow is an extension of prefect.Flow to add tracking functionality."""
 
     def __init__(self, saver: "Optional[Saver]" = None, **kwargs):
+        """
+        Soam Flow init to execute pipeline steps and keep track of the run data.
+        Parameters
+        ----------
+        saver: soam.savers.Saver
+            The saver to store the pipeline steps and keep track of the whole run data.
+        kwargs: dict
+            extra args.
+        """
         super().__init__(**kwargs)
         self.saver = saver
         self.start_datetime: datetime

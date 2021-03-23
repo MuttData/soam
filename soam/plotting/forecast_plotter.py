@@ -44,6 +44,21 @@ class ForecastPlotterTask(Step):
         savefig_opts: Optional[Dict] = None,
         **kwargs: Any,
     ):
+        """Forecast plotter initialization
+
+        Parameters
+        ----------
+            path: (Union[Path, str]):
+                file path.
+            metric_name str:
+                performance metric being measured.
+            time_granularity: str
+                How much a time period accounts for. Defaults is daily time granularity.
+            plot_config: dict
+                plot configurations, default is None.
+            savefig_opts: dict
+                saving options, default is None.
+        """
         Step.__init__(self, **kwargs)  # type: ignore
         self.path = path
         self.metric_name = metric_name

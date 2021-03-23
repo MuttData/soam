@@ -200,9 +200,8 @@ class SuppressStdOutStdErr(object):
     """
 
     def __init__(self):
-        # Open a pair of null files
+        """Open a pair of null files and save the actoul stdout (1) and stderr (2) file descriptors."""
         self.null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
-        # Save the actual stdout (1) and stderr (2) file descriptors.
         self.save_fds = [os.dup(1), os.dup(2)]
 
     def __enter__(self):
