@@ -97,7 +97,7 @@ pages:
       - public
   only:
     refs:
-      - master
+      - merge_requests
 
 # Deploy from master to package registry
 # If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
