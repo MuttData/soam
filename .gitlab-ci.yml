@@ -122,9 +122,6 @@ deploy_gitlab:
   script:
     - python setup.py sdist bdist_wheel
     - pip install dist/*
-  artifacts:
-  paths:
-    - dist/*.whl
   only:
     refs:
       - merge_requests
