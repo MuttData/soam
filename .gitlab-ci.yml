@@ -120,8 +120,11 @@ pages:
 deploy_gitlab:
   stage: deploy_stage
   script:
-    - python setup.py sdist bdist_wheel
+    - python setup.py bdist_wheel
     - pip install dist/*
+  artifacts:
+    paths:
+      - dist/*.whl
   only:
     refs:
       - merge_requests
