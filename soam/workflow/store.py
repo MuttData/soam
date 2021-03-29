@@ -42,6 +42,8 @@ class Store(Step):
         df
             A pandas DataFrame to store.
         """
+        if not self.extra_insert_args:
+            self.extra_insert_args = {}
 
         return self.db_cli.insert_from_frame(
             df=df, table=self.table, **self.extra_insert_args
