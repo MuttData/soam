@@ -1,6 +1,7 @@
 """
 Google Sheets report generation
-----------
+Google Sheets report generation
+-------------------------------
 GSheets report creator and sender. Its a postprocess that creates a GSheets report with
 the model forecasts.
 """
