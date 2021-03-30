@@ -1,6 +1,6 @@
 """
-PDF Report Generator.
-----------
+PDF Report Generator
+--------------------
 PDF report creator. Its a postprocess that generates a PDF report with
 the model forecasts.
 """
@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 class PDFReport:
-    """Generate PDF Report object from IPython Notebook."""
+    """
+    Generate PDF Report object from IPython Notebook.
+    """
 
     def __init__(self, base_path: str):
         """
@@ -35,7 +37,8 @@ class PDFReport:
         self.base_path = Path(base_path)
 
     def export_notebook_to_pdf(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore
-        """Run notebook, convert, save and return PDF path.
+        """
+        Run notebook, convert, save and return PDF path.
 
         Parameters
         ----------
@@ -90,7 +93,9 @@ class PDFReport:
         return str(pdf_filename)
 
     def _parse_params(self, nb_params):
-        """Convert common object types to appropiate parameter types."""
+        """
+        Convert common object types to appropiate parameter types.
+        """
         for key, value in nb_params.items():
             if isinstance(value, pd.DataFrame):
                 nb_params[key] = value.to_csv(index=False)
@@ -98,7 +103,9 @@ class PDFReport:
 
 
 class PDFReportTask(Step, PDFReport):
-    """Creates the task to generate a PDF report."""
+    """
+    Creates the task to generate a PDF report.
+    """
 
     def __init__(self, base_path: str):
         Step.__init__(self)

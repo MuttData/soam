@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class ForecastPlotterTask(Step):
-    """Plot forecasts.
+    """
+    Plot forecasts.
 
     Parameters
     ----------
@@ -44,7 +45,8 @@ class ForecastPlotterTask(Step):
         savefig_opts: Optional[Dict] = None,
         **kwargs: Any,
     ):
-        """Forecast plotter initialization
+        """
+        Forecast plotter initialization
 
         Parameters
         ----------

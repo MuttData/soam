@@ -28,8 +28,10 @@ def range_datetime(
 ):
     # TODO: review datetime_start, datetime_end, are datetimes?
     # TODO: timeskip is Tick?
-    """Build datetime generator over successive time steps.
-    TODO:"""
+    """
+    Build datetime generator over successive time steps.
+    TODO:
+    """
     if timeskip is None:
         timeskip = offsets.Day(1) if not hourly_offset else offsets.Hour(1)
     if not isinstance(datetime_start, pd.Timestamp):
@@ -43,7 +45,8 @@ def range_datetime(
 
 
 def sanitize_arg(v, default=None):
-    """Sanitize mutable arguments.
+    """
+    Sanitize mutable arguments.
 
     Get a sanitized version of the given argument value to avoid mutability issues.
 
@@ -60,11 +63,13 @@ def sanitize_arg(v, default=None):
         x = sanitize_arg(x, {})
     ```
 
-    Args:
+    Parameters
+    ----------
         v: Value to check.
         default: Value to set if
 
-    Returns:
+    Returns
+    -------
         Santized value.
     """
     if default is None:
@@ -76,19 +81,24 @@ def sanitize_arg(v, default=None):
 
 
 def sanitize_arg_empty_dict(v):
-    """Convenience function for `sanitize_arg(v, {})`
-    TODO:"""
+    """
+    Convenience function for `sanitize_arg(v, {})`
+    TODO:
+    """
     return sanitize_arg(v, {})
 
 
 def get_file_path(path: Path, fn: str) -> Path:
-    """Find an available path for a file, using an index prefix.
+    """
+    Find an available path for a file, using an index prefix.
+
     Parameters
     ----------
     path: Path
         file path
     fn: str
         filename
+
     Returns
     ----------
     path
@@ -110,7 +120,8 @@ def split_backtesting_ranges(
     train_window: Optional[int] = 1,
     step_size: int = None,
 ) -> List[Tuple[pd.DataFrame, pd.DataFrame]]:
-    """Generates time series partitions for backtesting.
+    """
+    Generates time series partitions for backtesting.
 
     Parameters
     ----------
@@ -135,7 +146,7 @@ def split_backtesting_ranges(
          the model.
 
     Notes
-    -------
+    -----
     The end of the split is going to be train_window plus a multiple of step_size. So
      some of the last elements of the time series can be not used in the resulting
      splits.
@@ -221,7 +232,8 @@ class SuppressStdOutStdErr(object):
 def add_future_dates(
     df: pd.DataFrame, periods: int, frequency: str = None, ds_col: str = DS_COL,
 ):
-    """Add future dates to dataframe for which to predict with.
+    """
+    Add future dates to dataframe for which to predict with.
 
     Parameters
     ----------

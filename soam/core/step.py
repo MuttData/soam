@@ -13,7 +13,8 @@ from sklearn.base import BaseEstimator
 
 
 class Step(Task, BaseEstimator):
-    """ The base class for all steps.
+    """
+    The base class for all steps.
     All implementations of step have to implement the `run()` method defined below.
     """
 
@@ -26,6 +27,7 @@ class Step(Task, BaseEstimator):
         ----------
         time_series
             A pandas DataFrame containing the data for the step
+
         Returns
         -------
         pandas.DataFrame

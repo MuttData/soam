@@ -21,12 +21,16 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
-    """Provide an interface to transform pandas DataFrames."""
+    """
+    Provide an interface to transform pandas DataFrames.
+    """
 
     def fit(
         self, X: pd.DataFrame, **fit_params  # pylint:disable=unused-argument
     ) -> "BaseDataFrameTransformer":
-        """Fit method
+        """
+        Fit method
+
         Parameters
         ----------
         X: pandas.DataFrame
@@ -36,31 +40,36 @@ class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Transform method.
+        """
+        Transform method.
+
         Parameters
         ----------
             X: pd.DataFrame
                 DataFrame to be transformed.
 
         Raises
-        ----------
+        ------
             NotImplementedError
                 Raises error if its not a subclass.
 
         Returns
-        ----------
+        -------
             pd.DataFrame
         """
         raise NotImplementedError("Subclasses should implement this.")
 
     def fit_transform(self, X: pd.DataFrame, **fit_params) -> pd.DataFrame:
-        """Fit Transform method.
+        """
+        Fit Transform method.
+
         Parameters
         ----------
             X: pd.DataFrame
                 DataFrame to be fitted and transformed.
+
         Returns
-        ----------
+        -------
             pd.DataFrame
                 DataFrame fitted and transformed.
         """
@@ -68,14 +77,18 @@ class BaseDataFrameTransformer(BaseEstimator, TransformerMixin):
 
 
 class DummyDataFrameTransformer(BaseDataFrameTransformer):
-    """This transformer provides an "identity transformation.
-        Returns its input without any alteration."""
+    """
+    This transformer provides an "identity transformation.
+    Returns its input without any alteration.
+    """
 
     def __init__(self):
         pass
 
     def fit(self, df_X):  # pylint:disable=unused-argument
-        """Fit method
+        """
+        Fit method
+
         Parameters
         ----------
             df_X: pandas.DataFrame
@@ -84,7 +97,8 @@ class DummyDataFrameTransformer(BaseDataFrameTransformer):
         return self
 
     def transform(self, df_X, inplace=True):
-        """Transform method
+        """
+        Transform method
 
         Parameters
         ----------
@@ -93,8 +107,8 @@ class DummyDataFrameTransformer(BaseDataFrameTransformer):
             inplace: bool
                 Whether the changes should persist in the DataFrame or not. Default is True.
 
-        Returns:
-        ----------
+        Returns
+        -------
             pandas.DataFrame
                 DataFrame transformed.
         """
@@ -104,7 +118,9 @@ class DummyDataFrameTransformer(BaseDataFrameTransformer):
 
 
 class Transformer(Step):
-    """Generates the transformer object."""
+    """
+    Generates the transformer object.
+    """
 
     transformer: BaseDataFrameTransformer
 
@@ -114,7 +130,8 @@ class Transformer(Step):
         savers: "Optional[List[Saver]]" = None,
         **kwargs
     ):
-        """Handle transformations
+        """
+        Handle transformations
 
         Parameters
         ----------
@@ -136,7 +153,9 @@ class Transformer(Step):
         self.transformer = transformer
 
     def fit(self, dataset: pd.DataFrame) -> "Transformer":
-        """Fit method
+        """
+        Fit method
+
         Parameters
         ----------
             dataset: pandas.DataFrame
@@ -146,14 +165,16 @@ class Transformer(Step):
         return self
 
     def transform(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        """Transform method
+        """
+        Transform method
 
         Parameters
         ----------
             dataset: pandas.DataFrame
                 DataFrame to be transformed.
 
-        Returns:
+        Returns
+        -------
             pd.DataFrame
                 DataFrame transformed.
         """
@@ -161,12 +182,14 @@ class Transformer(Step):
 
     def fit_transform(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """Fit Transform method.
+
         Parameters
         ----------
             dataset: pd.DataFrame
                 DataFrame to be fitted and transformed.
+
         Returns
-        ----------
+        -------
             pd.DataFrame
                 DataFrame fitted and transformed.
         """

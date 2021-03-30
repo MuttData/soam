@@ -1,7 +1,7 @@
 # data_models.py
 """
 Data models
-----------
+-----------
 Contains the data models for SQLAlchemy used in the DBSaver.
 
 See Also
@@ -72,7 +72,9 @@ class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
 
 
 class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
-    """Creates an identity object intended to represent an autonumeric column which calls dialect specific implementations."""
+    """
+    Creates an identity object intended to represent an autonumeric column which calls dialect specific implementations.
+    """
 
     impl = Integer
 
@@ -159,7 +161,8 @@ class ForecastValues(AbstractIDBase):
 
 
 class AbstractTimeSeriesTable(AbstractIDBase):
-    """Base table to store time series data.
+    """
+    Base table to store time series data.
 
     This class should be used as base for the table from which timeseries will be
     extracted.

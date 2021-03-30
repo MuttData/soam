@@ -26,7 +26,8 @@ class Forecaster(Step):
         response_col: str = Y_COL,
         **kwargs,
     ):
-        """Wrap a forecasting model to run it inside a pipeline.
+        """
+        Wrap a forecasting model to run it inside a pipeline.
 
         Parameters
         ----------
@@ -87,7 +88,8 @@ class Forecaster(Step):
     def _format_input(
         self, time_series: pd.DataFrame
     ) -> Tuple[pd.DataFrame, pd.Series]:
-        """Transform time series DataFrame into SoaM compatible format.
+        """
+        Transform time series DataFrame into SoaM compatible format.
 
         Parameters
         ----------

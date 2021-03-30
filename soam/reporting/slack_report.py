@@ -1,7 +1,7 @@
 # slack_report.py
 """
 Slack Report
-----------
+------------
 Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
@@ -22,7 +22,9 @@ DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
 
 
 class SlackReport:
-    """Generates the report to share via Slack."""
+    """
+    Generates the report to share via Slack.
+    """
 
     def __init__(
         self, channel_id: str, metric_name: str, setting_path: Optional[str],
@@ -64,8 +66,9 @@ class SlackReport:
             Greeting message to send via Slack with the predictions.
         farewell_message: str
             Farewell message to send via Slack with the predictions.
+
         Returns
-        ----------
+        -------
         Slack Report
             Sends the specified message with the predictions data via Slack.
         """
@@ -93,7 +96,9 @@ class SlackReport:
 
 
 class SlackReportTask(Step, SlackReport):
-    """Builds up the task of the report designed for Slack."""
+    """
+    Builds up the task of the report designed for Slack.
+    """
 
     def __init__(
         self,
@@ -102,7 +107,8 @@ class SlackReportTask(Step, SlackReport):
         setting_path: Optional[str],
         **kwargs: Any,
     ):
-        """Parameters
+        """
+        Parameters
         ----------
         channel_id: str
             Slack channel id where the report will be sent.
@@ -138,8 +144,9 @@ class SlackReportTask(Step, SlackReport):
             Greeting message to send via Slack with the predictions.
         farewell_message: str
             Farewell message to send via Slack with the predictions.
+
         Returns
-        ----------
+        -------
         Slack Report Task
             Sends the specified message with the predictions data via Slack.
         """

@@ -1,4 +1,5 @@
-"""Module to extract and aggregate time series.
+"""
+Module to extract and aggregate time series.
 
 # General TODOs:
 - Make quantiles great again:
@@ -11,7 +12,8 @@ Notes:
     joining higher in the hierarchy.
 - It would be interesting to implement unique counts.
 
-[1] Ralph Kimball, Margy Ross - The Data Warehouse Toolkit (2013)."""
+[1] Ralph Kimball, Margy Ross - The Data Warehouse Toolkit (2013).
+"""
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from jinja2 import Template
@@ -63,7 +65,8 @@ class TimeSeriesExtractor(Step):
         table_name: str,
         **kwargs: Dict[str, Any],
     ):
-        """Class to handle the dataset retrieval from the PostgreSql database.
+        """
+        Class to handle the dataset retrieval from the PostgreSql database.
 
         Parameters
         ----------
@@ -78,7 +81,8 @@ class TimeSeriesExtractor(Step):
         self.table_name = table_name
 
     def extract(self, build_query_kwargs: Dict[str, Any],) -> pd.DataFrame:
-        """Extracts aggregated data and return it as a pandas DataFrame.
+        """
+        Extracts aggregated data and return it as a pandas DataFrame.
 
         Parameters
         ----------
@@ -115,7 +119,8 @@ class TimeSeriesExtractor(Step):
         aggregated_column_mappings: Dict = None,
         inner_join: Optional[List[Tuple[str, str, str]]] = None,
     ) -> Tuple[str, Dict[str, Any]]:
-        """Build the query to extract and aggregated dataset.
+        """
+        Build the query to extract and aggregated dataset.
 
         Parameters
         ----------
@@ -296,7 +301,8 @@ class TimeSeriesExtractor(Step):
         end_date=None,
         order_by=None,
     ):
-        """Returns the values for the dimensions provided in the dataset.
+        """
+        Returns the values for the dimensions provided in the dataset.
 
         Parameters
         ----------
@@ -380,7 +386,8 @@ class TimeSeriesExtractor(Step):
     def _filter_date_range(
         self, start_date=None, end_date=None, timestamp_col=TIMESTAMP_COL,
     ):
-        """Returns a list of conditions for a where clause and a dictionary
+        """
+        Returns a list of conditions for a where clause and a dictionary
         with keyword arguments to fill the conditions parameters.
 
         Parameters
@@ -412,7 +419,8 @@ class TimeSeriesExtractor(Step):
         return conds, kwargs
 
     def _negate_dimensions(self, dimensions):
-        """Returns dimensions without the prefix symbols and a boolean list
+        """
+        Returns dimensions without the prefix symbols and a boolean list
         indication if they have to be negated.
 
         Parameters
@@ -430,7 +438,8 @@ class TimeSeriesExtractor(Step):
         return self._detect_dimensions_prefix_symbol(dimensions, NEGATE_SYMBOL)
 
     def _dont_aggregate_dimensions(self, dimensions):
-        """Returns dimensions without the prefix symbols and a boolean list
+        """
+        Returns dimensions without the prefix symbols and a boolean list
         indication if they don't have to be aggregated.
 
         Parameters
@@ -450,7 +459,8 @@ class TimeSeriesExtractor(Step):
     def _detect_dimensions_prefix_symbol(
         self, dimensions, prefix_symbol,
     ):
-        """Returns dimensions with the prefix symbols removed and a boolean
+        """
+        Returns dimensions with the prefix symbols removed and a boolean
         list indication if they are prefixed with it.
 
         Parameters
@@ -485,7 +495,8 @@ class TimeSeriesExtractor(Step):
     def _filter_dimensions_values(
         self, dimensions, dimensions_values, negate_dimensions_values,
     ):
-        """Returns a list of conditions for a where clause and a dictionary
+        """
+        Returns a list of conditions for a where clause and a dictionary
         with keyword arguments to fill the conditions parameters.
 
         Parameters
@@ -524,7 +535,8 @@ class TimeSeriesExtractor(Step):
         return conds, kwargs
 
     def run(self, build_query_kwargs: Dict[str, Any]) -> pd.DataFrame:  # type: ignore
-        """Returns aggregated data from a query into a pandas DataFrame.
+        """
+        Returns aggregated data from a query into a pandas DataFrame.
 
         Parameters
         ----------

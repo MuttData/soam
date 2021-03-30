@@ -38,7 +38,8 @@ DEFAULT_METRIC_AGGREGATION = {
 
 
 class Backtester(Step):
-    """Class to perform backtesting.
+    """
+    Class to perform backtesting.
 
     Note: To run a single fold backtest, for example to validate the model
     performance in the last run, pass a timeseries with the exact lenght of
@@ -166,7 +167,8 @@ class Backtester(Step):
         metrics: Dict[str, Callable] = None,
         aggregation: Union[bool, Dict] = None,
     ) -> List[Dict[str, Any]]:
-        """Train the model with past data and compute metrics.
+        """
+        Train the model with past data and compute metrics.
 
         Parameters
         ----------
@@ -257,7 +259,8 @@ class Backtester(Step):
 def aggregate_rv(
     aggregation: Union[bool, Dict], result_values: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """Aggregates a list of results from the Backtester.
+    """
+    Aggregates a list of results from the Backtester.
 
     Parameters
     ----------
@@ -317,7 +320,9 @@ def aggregate_rv(
 
 
 def compute_metrics(y_true, y_pred, metrics):
-    """Computation of a given metric
+    """
+    Computation of a given metric
+
     Parameters
     ----------
     y_true:
@@ -326,8 +331,9 @@ def compute_metrics(y_true, y_pred, metrics):
         Predicted values for y.
     metrics: metric
         Chosen performance metric to measure the model capabilities.
+
     Returns
-    ---------
+    -------
     dict
         Performance metric and its value"""
     return {metric_name: func(y_true, y_pred) for metric_name, func in metrics.items()}

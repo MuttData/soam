@@ -1,7 +1,7 @@
 # mail_report.py
 """
 Mail Report
-----------
+-----------
 Mail creator and sender. Its a postprocess that sends a report with
 the model forecasts.
 """
@@ -94,7 +94,8 @@ class MailReport:
         mime_image_list: List[MIMEImage],
         attachments: List[str],
     ):
-        """Send a report email.
+        """
+        Send a report email.
         TODO: review method, may be static
 
         Parameters
@@ -161,7 +162,8 @@ class MailReport:
     def _build_subject_n_msg_body(
         self, subject: str, signature: str, metric_name: str, end_date, mime_img: str
     ) -> Tuple[str, str]:
-        """Creates the subject and message body
+        """
+        Creates the subject and message body
         TODO: review method, may be static
 
         Parameters
@@ -199,7 +201,8 @@ class MailReport:
         return subject, msg_body
 
     def _get_mime_images(self, plot_filename: Path) -> Tuple[MIMEImage, str]:
-        """Extract images from local dir paths.
+        """
+        Extract images from local dir paths.
         TODO: review method, may be static
 
         Parameters
@@ -239,7 +242,7 @@ class MailReport:
 class MailReportTask(Step, MailReport):
     """
     MailReportTask
-    ----------
+    --------------
     Builds the task that sends reports via mail."""
 
     def __init__(self, mail_recipients_list: List[str], metric_name: str, **kwargs):
@@ -248,10 +251,10 @@ class MailReportTask(Step, MailReport):
 
         Parameters
         ----------
-            mail_recipients_list: List[str]
-                List of the recipients of the email to be sent.
-            metric_name: str
-                Name of the performance metric being measured.
+        mail_recipients_list: List[str]
+            List of the recipients of the email to be sent.
+        metric_name: str
+            Name of the performance metric being measured.
         """
         Step.__init__(self, **kwargs)  # type: ignore
         MailReport.__init__(self, mail_recipients_list, metric_name)

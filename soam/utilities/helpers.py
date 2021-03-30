@@ -1,6 +1,7 @@
 # helpers.py
 # pylint: skip-file
-"""Utility functions for the project.
+"""
+Utility functions for the project.
 
 TODO: review this file, it seems unused in the rest of the project.
 """
@@ -26,7 +27,8 @@ RUN_ID_COL = "run_id"
 
 def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
     """
-    Get parquet cache storage directory."
+    Get parquet cache storage directory.
+
     Parameters
     ----------
     TODO:
@@ -38,8 +40,9 @@ def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
     end_date: date
     sample_size: int
         Size of the sample.
+
     Returns
-    ----------
+    -------
     path
         The new store_dir directory created.
     """
@@ -62,7 +65,9 @@ def get_store_file(
     extra_dir=None,
     end_date_hour=False,
 ):
-    """Create name to store tabular data query outputs.
+    """
+    Create name to store tabular data query outputs.
+
     Parameters
     ----------
     TODO:
@@ -76,8 +81,9 @@ def get_store_file(
     ft="pkl"
     extra_dir=None
     end_date_hour=False
+
     Returns
-    ----------
+    -------
     path
     """
     save_dir = base_dir / kpi
@@ -112,7 +118,9 @@ def get_figure_full_path(
     as_posix=True,
     end_date_hour=False,
 ):
-    """Create figure file-path for given model inputs.
+    """
+    Create figure file-path for given model inputs.
+
     Parameters
     ----------
     fig_dir: path
@@ -131,8 +139,9 @@ def get_figure_full_path(
     suffix=None
     as_posix=True
     end_date_hour=False
+
     Returns
-    ----------
+    -------
     path
         Path of the created figure.
     """
@@ -152,7 +161,9 @@ def get_figure_full_path(
 def create_forecaster_dates(
     end_date, forecaster_train_window, forecaster_future_window
 ):
-    """Process and correct all respective dates for forecaster.
+    """
+    Process and correct all respective dates for forecaster.
+
     Parameters
     ----------
     end_date: date
@@ -161,8 +172,9 @@ def create_forecaster_dates(
         window of the train set to train the forecaster.
     forecaster_future_window
         future time window to predict the target variable value for.
+
     Returns
-    ----------
+    -------
     date
         forecaster dates.
     """
@@ -178,7 +190,9 @@ def create_forecaster_dates(
 
 
 def create_anomaly_window_dates(end_date, anomaly_window, time_granularity):
-    """Creation of the anomaly window dates.
+    """
+    Creation of the anomaly window dates.
+
     Parameters
     ----------
     end_date: date
@@ -187,8 +201,9 @@ def create_anomaly_window_dates(end_date, anomaly_window, time_granularity):
         window time to analyze anomalies.
     time_granularity
         time granularity, how much a period represents.
+
     Returns
-    ----------
+    -------
     list
         anomaly window dates.
     """
@@ -208,7 +223,9 @@ def create_anomaly_window_dates(end_date, anomaly_window, time_granularity):
 def insert_df_multiple_clients(
     db_clients, insertion_ids, table_name, df, coseries_ids=None, **kwargs
 ):
-    """Insert a dataframe to a list of database connections.
+    """
+    Insert a dataframe to a list of database connections.
+
     Parameters
     ----------
     db_clients
@@ -220,8 +237,7 @@ def insert_df_multiple_clients(
     df: pd.DataFrame
         pandas dataframe to insert in database.
     coseries_ids=None
-    **kwargs
-        ."""
+    """
 
     for db_cli in db_clients:
         dialect = db_cli.dialect

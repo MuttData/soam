@@ -1,6 +1,6 @@
 """
 Google Sheets report generation
-----------
+-------------------------------
 GSheets report creator and sender. Its a postprocess that creates a GSheets report with
 the model forecasts.
 """
@@ -17,12 +17,15 @@ logger = logging.getLogger(__name__)
 
 
 class GSheetsReportTask(Step):
-    """Creates the task to generate a GSheets report."""
+    """
+    Creates the task to generate a GSheets report.
+    """
 
     def __init__(
         self, config_json_path: str, gsheets_kwargs: Mapping = None, **kwargs
     ):  # pylint: disable=dangerous-default-value
-        """Parameters
+        """
+        Parameters
         ----------
         config_json_path: str
             Path to GSheets config json
@@ -40,7 +43,8 @@ class GSheetsReportTask(Step):
         self.client = GSheetsClient(config_path, **gsheets_kwargs)
 
     def run(self, df: pd.DataFrame, spreadsheet: str, **insert_kwargs):  # type: ignore[override]
-        """Save df to a GSheets spreadsheet
+        """
+        Save df to a GSheets spreadsheet
 
         Parameters
         ----------
@@ -52,7 +56,7 @@ class GSheetsReportTask(Step):
             Extra args to pass to muttlib.gsheetsconn.GSheetsClient.insert_from_frame
 
         Returns
-        ----------
+        -------
         GSheets Report Task
             Google Sheets spreadsheet with the df values.
         """

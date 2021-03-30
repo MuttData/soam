@@ -18,12 +18,15 @@ if TYPE_CHECKING:
 
 
 class SoamFlow(Flow):
-    """Soam Flow to execute the pipeline steps and keep track of the whole run data.
-    SoamFlow is an extension of prefect.Flow to add tracking functionality."""
+    """
+    Soam Flow to execute the pipeline steps and keep track of the whole run data.
+    SoamFlow is an extension of prefect.Flow to add tracking functionality.
+    """
 
     def __init__(self, saver: "Optional[Saver]" = None, **kwargs):
         """
         Soam Flow init to execute pipeline steps and keep track of the run data.
+
         Parameters
         ----------
         saver: soam.savers.Saver
@@ -46,6 +49,7 @@ class SoamFlow(Flow):
         ----------
         task
             Represents a task where the flow is being executed.
+
         Returns
         -------
         super object

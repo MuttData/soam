@@ -15,7 +15,9 @@ from soam.utilities.utils import get_file_path
 
 
 class CSVSaver(Saver):
-    """CSV Saver object to store the predictions and the runs."""
+    """
+    CSV Saver object to store the predictions and the runs.
+    """
 
     def __init__(self, path: Union[str, Path]):
         """
@@ -35,12 +37,14 @@ class CSVSaver(Saver):
     def flow_path(self) -> Path:
         """
         Generation of the flow run folder directory.
+
         Parameters
         ----------
         Path
             str where the file will be created.
+
         Returns
-        ----------
+        -------
         path
             Path of the directory of the flow run folder.
         """
@@ -58,12 +62,14 @@ class CSVSaver(Saver):
     def flow_file_path(self) -> Path:
         """
         Flow file name upon the path.
+
         Parameters
         ----------
         Path
             str where the file will be created.
+
         Returns
-        ----------
+        -------
         path
             Path of the flow file.
         """
@@ -73,12 +79,14 @@ class CSVSaver(Saver):
     def flow_run_lock(self) -> Path:
         """
         Flow run lock upon the path.
+
         Parameters
         ----------
         Path
             str where the file will be created.
+
         Returns
-        ----------
+        -------
         path
             Path of the lock name.
         """
@@ -88,6 +96,7 @@ class CSVSaver(Saver):
         """
         Store the forecaster data in the constructed path
         with the `{task_slug}_forecasts.csv`.
+
         Parameters
         ----------
         task: Task
@@ -96,8 +105,9 @@ class CSVSaver(Saver):
             Task old state.
         new_state : State
             Task new state.
+
         Returns
-        ----------
+        -------
         State
             The new updated state of the forecast task.
         """
@@ -116,6 +126,7 @@ class CSVSaver(Saver):
     def save_task_run(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the task run information in the csv file created by `save_flow_run`
+
         Parameters
         ----------
         task: Task
@@ -124,8 +135,9 @@ class CSVSaver(Saver):
             Task old state.
         new_state : State
             Task new state.
+
         Returns
-        ----------
+        -------
         State
             The new updated state of the task.
         """
@@ -157,6 +169,7 @@ class CSVSaver(Saver):
     ) -> State:
         """
         Store the SoamFlow run information, create a folder for the run with a csv file.
+
         Parameters
         ----------
         saomflow: SoamFlow
@@ -165,8 +178,9 @@ class CSVSaver(Saver):
             SoamFlow old state.
         new_state : State
             SoamFlow new state.
+
         Returns
-        ----------
+        -------
         State
             The new updated state of the SoamFlow.
         """

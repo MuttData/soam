@@ -42,6 +42,7 @@ class DBSaver(Saver):
     def save_forecast(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the forecaster data in the constructed database.
+
         Parameters
         ----------
         task: Task
@@ -50,8 +51,9 @@ class DBSaver(Saver):
             Task old state.
         new_state : State
             Task new state.
+
         Returns
-        ----------
+        -------
         State
             The new updated state of the forecast task.
         """
@@ -67,6 +69,7 @@ class DBSaver(Saver):
     def save_task_run(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the task run information in the database.
+
         Parameters
         ----------
         task: Task
@@ -75,8 +78,9 @@ class DBSaver(Saver):
             Task old state.
         new_state : State
             Task new state.
+
         Returns
-        ----------
+        -------
         State
             The new updated state of the task.
         """
@@ -102,6 +106,7 @@ class DBSaver(Saver):
     ) -> State:
         """
         Save the SoamFlow run data in the create connection to a database.
+
         Parameters
         ----------
         saomflow: SoamFlow
@@ -110,8 +115,9 @@ class DBSaver(Saver):
             SoamFlow old state.
         new_state : State
             SoamFlow new state.
+
         Returns
-        ----------
+        -------
         State
             The new updated state of the SoamFlow.
         """
