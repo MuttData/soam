@@ -32,12 +32,12 @@ class SlackReport:
 
         Parameters
         ----------
-            channel_id: str
-                Slack channel id where the report will be sent.
-            metric_name: str
-                Performance metric being measured.
-            setting_path: str
-                Setting path.
+        channel_id: str
+            Slack channel id where the report will be sent.
+        metric_name: str
+            Performance metric being measured.
+        setting_path: str
+            Setting path.
         """
         credentials = get_slack_cred(setting_path)
         self.slack_client = slack.WebClient(credentials["token"])
