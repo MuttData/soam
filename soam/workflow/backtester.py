@@ -177,9 +177,9 @@ class Backtester(Step):
         forecaster : soam.Forecaster
             Forecaster that will be fitted and execute the predictions.
         preprocessor: Transformer
-            #TODO: missing description
+            Provide an interface to transform pandas DataFrames.
         forecast_plotter: ForecastPlotterTask
-            #TODO: missing description
+            Plot forecasts.
         test_window: pd.Timedelta
             Time range to be extracted from the main timeseries on which the model will
             be evaluated on each backtesting run.

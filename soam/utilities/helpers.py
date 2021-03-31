@@ -38,9 +38,11 @@ def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
     prefix: str
         prefix string
     date: datetime
+        datetime
     end_date: datetime
+        end datetime
     sample_size: int
-        Size of the sample.
+        size of the sample
 
     Returns
     -------
@@ -71,21 +73,32 @@ def get_store_file(
 
     Parameters
     ----------
-    TODO:
-    base_dir: path
-    kpi
-    date: date
-    sample_size=None
-    end_date=None
-    prefix=None
-    suffix=None
-    ft="pkl"
-    extra_dir=None
-    end_date_hour=False
+
+    base_dir: Union[str, Path]
+        base directory path.
+    kpi: str
+        key performance indicator being used.
+    date: datetime
+        datetime.
+    sample_size: int
+        size of the sample
+    end_date: datetime
+        end datetime.
+    prefix: str
+        prefix string.
+    suffix: str
+        suffix string.
+    ft: str
+        file extension, by default is "pkl" for pickle files.
+    extra_dir: str
+        extra directory.
+    end_date_hour: boolean
+        boolean value to determine if the end date hour should be included. False by default.
 
     Returns
     -------
     path
+        path of the store file.
     """
     save_dir = base_dir / kpi
     if extra_dir is not None:
@@ -134,12 +147,16 @@ def get_figure_full_path(
         start date of analysis.
     end_date: date
         end date of analysis
-    time_granularity
+    time_granularity: str
         time granularity, how much a period represents.
-    granularity
-    suffix=None
-    as_posix=True
-    end_date_hour=False
+    granularity: str
+        granularity.
+    suffix: str
+        suffix string.
+    as_posix: boolean
+        True by default.
+    end_date_hour: boolean
+        boolean value to determine if the end date hour should be included. False by default.
 
     Returns
     -------
@@ -255,7 +272,14 @@ def insert_df_multiple_clients(
 # TODO remove this function when added to muttlib
 @contextmanager
 def session_scope(engine: Engine, **session_kw):
-    """Provide a transactional scope around a series of operations."""
+    """
+    Provide a transactional scope around a series of operations.
+
+    Parameters
+    ----------
+    engine: Engine
+        engine connection to the session.
+    """
 
     Session = sessionmaker(bind=engine)
     session = Session(**session_kw)

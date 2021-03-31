@@ -30,7 +30,19 @@ def range_datetime(
     # TODO: timeskip is Tick?
     """
     Build datetime generator over successive time steps.
-    TODO:
+
+    Parameters
+    ----------
+    datetime_start: datetime
+        Start datetime.
+    datetime_end: datetime
+        End datetime.
+    hourly_offset: boolean
+        Wheteher to offset hourly. False by default.
+    timeskip: Tick
+        An instance of fast-forwarding a substantial amount of time.
+    as_datetime: boolean
+        Whether the object type should be datetime. False by default.
     """
     if timeskip is None:
         timeskip = offsets.Day(1) if not hourly_offset else offsets.Hour(1)
@@ -80,6 +92,7 @@ def sanitize_arg(v, default=None):
         return v
 
 
+def sanitize_arg_empty_dict(v):
     """Convenience function for `sanitize_arg(v, {})`."""
     return sanitize_arg(v, {})
 
@@ -105,9 +118,22 @@ def get_file_path(path: Path, fn: str) -> Path:
     return path / f"{max_index}_{fn}"
 
 
-    """Filter-out objects from list that are not class or subclass of c.
+def filter_by_class_or_subclass(l, c):
+    """
+    Filter-out objects from list that are not class or subclass of c.
 
-    TODO: Add proper parameter documnetation.
+    Parameters
+    ----------
+    l: List
+        List of objects.
+    c: Class
+        Reference class.
+
+    Returns
+    -------
+    Comprehensive list
+        Looks into the given list to check if the objects inside of it are or arent objects of the reference given class or subclass of c.
+        It filters the ones that arent objects of the class or subclass of c.
     """
     return [e for e in l if isinstance(e, c) or issubclass(e.__class__, c)]
 
