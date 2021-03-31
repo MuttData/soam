@@ -31,7 +31,6 @@ def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
 
     Parameters
     ----------
-    TODO:
     base_dir: path
         base directory path
     kpi
