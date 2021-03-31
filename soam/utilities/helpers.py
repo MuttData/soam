@@ -31,13 +31,14 @@ def get_store_dir(base_dir, kpi, prefix, date, end_date=None, sample_size=None):
 
     Parameters
     ----------
-    TODO:
-    base_dir: path
+    base_dir: Union[str, Path]
         base directory path
-    kpi
-    prefix
-    date: date
-    end_date: date
+    kpi: str
+        key performance indicator being used
+    prefix: str
+        prefix string
+    date: datetime
+    end_date: datetime
     sample_size: int
         Size of the sample.
 
