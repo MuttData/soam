@@ -5,10 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.6] - 2021-03-22
+## [0.2.7] - 2021-04-05
 
 ### Added
 - Store step
+
+## [0.2.6] - 2021-03-22
+
+### Added
+- Added `soam/db_migrations` and `test` to the exclude list of `interrogate`.
+
+## [0.2.5] - 2021-03-22
+
+### Changed
+- Updated the README.md file.
+
+## [0.2.4] - 2021-03-17
+
+### Added
+- `interrogate` to check docstring coverage.
+
+## [0.2.3] - 2021-03-16
+
+### Added
+- Issue templates created.
+
+## [0.2.2] - 2021-03-16
+
+### Added
+- `CONTRIBUTING.md` added
+
+## [0.2.1] - 2021-03-16
+
+### Changed
+- Pinned SQLAlchemy version.
+
+## [0.2.0] - 2021-03-15
+
+### Added
+- Prophet model wrapper from `pomopt` project.
+- `add_future_dates` utils to add prediction dates onto time_series DataFrames.
+- New tests for `Forecaster` module.
+
+### Changed
+- Forecaster inteface, simplified Forecaster task arguments.
+
+### Removed
+- Darts integration.
+
+## [0.1.7] - 2021-03-15
+
+### Added
+- `.coveragerc` to set a min coverage percentage.
 
 ## [0.1.6] - 2021-03-12
 
@@ -24,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2021-03-10
 
 ### Added
-- 'all' and 'report' extras
+- `all` and `report` extras
 
 ## [0.1.3] - 2021-03-10
 

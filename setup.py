@@ -24,6 +24,7 @@ extra_dependencies = {
         'nox',
     ],
     'test': [
+        'interrogate',
         'nox',
         'pytest',
         'pytest-mpl',
@@ -79,7 +80,7 @@ setuptools.setup(
         "jinja2",
         "pandas>=1.0.0",
         "Cython<0.29.18,>=0.29",
-        "sqlalchemy",
+        "sqlalchemy<1.4.0,>=1.3.0",
         "sqlalchemy_utils",
         "u8darts",
         "alembic",
