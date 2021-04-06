@@ -39,7 +39,7 @@ extra_dependencies = {
         'statsmodels<0.12,>=0.11',
     ],
     'slack': ["slackclient",],
-    'prophet': ["fbprophet",],
+    'prophet': ["pystan==2.19.1.1", "fbprophet==0.6",],
     'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
     'gsheets_report': ["muttlib[gsheets]>=1.0,<2"],
 }
@@ -90,6 +90,7 @@ setuptools.setup(
         "click",
         "cookiecutter",
         "muttlib>=1.0,<2",
+        'numpy==1.19.5',
     ],
     extras_require=extra_dependencies,
     python_requires="~=3.6",
