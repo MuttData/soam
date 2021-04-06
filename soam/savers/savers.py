@@ -1,7 +1,7 @@
 # savers.py
 """
 Saver
-----------
+-----
 Saver is an abstract class used to store parameters and data through the
 pipeline.
 """
@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class Saver(ABC):  # pylint:disable=abstract-method
-    """The base class for all savers objects.
+    """
+    The base class for all savers objects.
 
     All implementations of Saver have to implement the state_handler of Prefect.
     Please check the [link](https://docs.prefect.io/core/concepts/states.html#state-handlers-callbacks)
@@ -53,10 +54,13 @@ class Saver(ABC):  # pylint:disable=abstract-method
 
         Parameters
         ----------
+        task: Task
+            Specified task to get the type of.
 
         Return
-        ----------
-
+        ------
+        str
+            Step type of the task.
         """
         if isinstance(task, Forecaster):
             step_type = StepTypeEnum.forecast
