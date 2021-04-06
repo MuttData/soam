@@ -1,3 +1,4 @@
+"""SoaM workflow."""
 from soam.workflow.backtester import Backtester, compute_metrics
 from soam.workflow.forecaster import Forecaster
 from soam.workflow.merge_concat import MergeConcat

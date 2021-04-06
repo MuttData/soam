@@ -1,3 +1,4 @@
+"""Forecaster tester."""
 import numpy as np
 import pandas as pd
 
@@ -8,6 +9,7 @@ from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 
 def test_forecaster(sample_data_df):  # pylint: disable=redefined-outer-name
+    """Function to test the forecaster on sample data."""
     output_length = 10
     train_data = sample_data_df
     data = add_future_dates(train_data, output_length)

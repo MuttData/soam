@@ -1,3 +1,4 @@
+"""Forecast plotter tests."""
 from copy import deepcopy
 import locale
 

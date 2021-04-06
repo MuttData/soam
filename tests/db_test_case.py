@@ -1,3 +1,4 @@
+"""Testing the database case."""
 import logging
 import os
 from unittest import TestCase
@@ -12,6 +13,7 @@ TEST_DB_NAME = "pytests"
 
 
 class PgTestCase(TestCase):
+    """Creates the Test Case object."""
 
     db_connstr = os.getenv(TEST_DB_CONNSTR)
     if db_connstr:
