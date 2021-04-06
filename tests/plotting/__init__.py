@@ -1,0 +1,1 @@
+"""SoaM tests for plotting."""

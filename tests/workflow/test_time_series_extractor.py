@@ -15,7 +15,7 @@ from tests.db_test_case import TEST_DB_CONNSTR, PgTestCase
 
 
 class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
-
+    """Creates the Concrete Time Series Table Object."""
     __tablename__ = "test_data"
 
     # We should really be using the timestamp inherited from AbstractTimeSeriesTable.
@@ -42,6 +42,7 @@ class ConcreteTimeSeriesTable(AbstractTimeSeriesTable):
 
 
 class ConcreteAdNetworkJoinTimeSeriesTable(AbstractIDBase):
+    """Creates the Concrete Ad Network Object."""
     __tablename__ = "test_ad_network_join_data"
 
     ad_network = Column(String(64))
@@ -49,6 +50,7 @@ class ConcreteAdNetworkJoinTimeSeriesTable(AbstractIDBase):
 
 
 class ConcretePlacementIdJoinTimeSeriesTable(AbstractIDBase):
+    """Creates the Concrete Placement Id Object."""
     __tablename__ = "test_placement_id_join_data"
 
     placement_id = Column(String(256))
@@ -121,6 +123,7 @@ aggregated_column_mappings = {
 
 @unittest.skipIf(not os.getenv(TEST_DB_CONNSTR), f"{TEST_DB_CONNSTR} is not set")
 class TestDatasetStore(PgTestCase):
+    """Test dataset store object."""
     def _test_load(
         self,
         columns,

@@ -1,3 +1,4 @@
+"""CSV saver."""
 from pathlib import Path
 from typing import Union
 
@@ -14,6 +15,10 @@ from soam.utilities.utils import get_file_path
 
 
 class CSVSaver(Saver):
+    """
+    CSV Saver object to store the predictions and the runs.
+    """
+
     def __init__(self, path: Union[str, Path]):
         """
         Create a saver object to store the predcitions and the runs.
@@ -30,6 +35,19 @@ class CSVSaver(Saver):
 
     @property
     def flow_path(self) -> Path:
+        """
+        Generation of the flow run folder directory.
+
+        Parameters
+        ----------
+        Path
+            str where the file will be created.
+
+        Returns
+        -------
+        path
+            Path of the directory of the flow run folder.
+        """
         flow_run_folder = (
             context["flow_name"]
             + "_"
@@ -37,20 +55,61 @@ class CSVSaver(Saver):
             + "_"
             + context["flow_run_id"]
         )
+
         return make_dirs(self.path / flow_run_folder)
 
     @property
     def flow_file_path(self) -> Path:
+        """
+        Flow file name upon the path.
+
+        Parameters
+        ----------
+        Path
+            str where the file will be created.
+
+        Returns
+        -------
+        path
+            Path of the flow file.
+        """
         return self.flow_path / FLOW_FILE_NAME
 
     @property
     def flow_run_lock(self) -> Path:
+        """
+        Flow run lock upon the path.
+
+        Parameters
+        ----------
+        Path
+            str where the file will be created.
+
+        Returns
+        -------
+        path
+            Path of the lock name.
+        """
         return self.flow_path / LOCK_NAME
 
     def save_forecast(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the forecaster data in the constructed path
         with the `{task_slug}_forecasts.csv`.
+
+        Parameters
+        ----------
+        task: Task
+            Specify the forecast task you want to save information of.
+        old_state: State
+            Task old state.
+        new_state : State
+            Task new state.
+
+        Returns
+        -------
+        State
+            The new updated state of the forecast task.
         """
         if new_state.is_successful():
             save_prediction = new_state.result[0].copy()
@@ -67,6 +126,20 @@ class CSVSaver(Saver):
     def save_task_run(self, task: Task, old_state: State, new_state: State) -> State:
         """
         Store the task run information in the csv file created by `save_flow_run`
+
+        Parameters
+        ----------
+        task: Task
+            Specify the task you want to save information of.
+        old_state: State
+            Task old state.
+        new_state : State
+            Task new state.
+
+        Returns
+        -------
+        State
+            The new updated state of the task.
         """
         if new_state.is_successful():
             flow_run_file = self.flow_file_path
@@ -96,6 +169,20 @@ class CSVSaver(Saver):
     ) -> State:
         """
         Store the SoamFlow run information, create a folder for the run with a csv file.
+
+        Parameters
+        ----------
+        saomflow: SoamFlow
+            Specify the soamflow you want to save information of.
+        old_state: State
+            SoamFlow old state.
+        new_state : State
+            SoamFlow new state.
+
+        Returns
+        -------
+        State
+            The new updated state of the SoamFlow.
         """
         if new_state.is_running():
             csv_data = {

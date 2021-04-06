@@ -1,3 +1,4 @@
+"""Main module for python notebooks examples"""
 import datetime
 import logging
 
@@ -21,6 +22,7 @@ now = datetime.datetime.today()
 
 @task
 def read_csv_data(path: str) -> pd.DataFrame:
+    """Read data from a csv and output a dataframe"""
     df = pd.read_csv(path)
     df["ds"] = df["date"]
     df = df[df["game"] == "battletanksbeta"]
