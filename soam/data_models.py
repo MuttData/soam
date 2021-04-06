@@ -1,7 +1,7 @@
 # data_models.py
 """
 Data models
-----------
+-----------
 Contains the data models for SQLAlchemy used in the DBSaver.
 
 See Also
@@ -60,6 +60,10 @@ Base = declarative_base()
 
 
 class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
+    """
+    This column is a column type defined for the creation of autonumeric indices for the Oracle specific implementation.
+    """
+
     def get_dbapi_type(self, dbapi):
         return int
 
@@ -68,6 +72,9 @@ class OracleIdentity(types.UserDefinedType):  # pylint:disable=abstract-method
 
 
 class Identity(types.TypeDecorator):  # pylint:disable=abstract-method
+    """
+    Creates an identity object intended to represent an autonumeric column which calls dialect specific implementations.
+    """
 
     impl = Integer
 
@@ -92,6 +99,7 @@ class AbstractIDBase(Base):  # type: ignore # pylint: disable=too-few-public-met
 
 
 class SoamFlowRunSchema(Base):  # type: ignore
+    """Soam Flow Run Schema Generation"""
 
     __tablename__ = SOAM_FLOW_RUN_TABLE
 
@@ -115,6 +123,7 @@ class StepTypeEnum(enum.Enum):
 
 
 class SoamTaskRunSchema(Base):  # type: ignore
+    """Soam Task Run Schema Generation"""
 
     __tablename__ = SOAM_TASK_RUNS_TABLE
 
@@ -131,6 +140,8 @@ class SoamTaskRunSchema(Base):  # type: ignore
 
 
 class ForecastValues(AbstractIDBase):
+    """Forecasted values Table Definition"""
+
     __tablename__ = FORECASTER_VALUES_TABLE
     __table_args__ = (UniqueConstraint("task_run_id", "forecast_date"),)
 
@@ -150,7 +161,8 @@ class ForecastValues(AbstractIDBase):
 
 
 class AbstractTimeSeriesTable(AbstractIDBase):
-    """Base table to store time series data.
+    """
+    Base table to store time series data.
 
     This class should be used as base for the table from which timeseries will be
     extracted.

@@ -18,7 +18,22 @@ if TYPE_CHECKING:
 
 
 class SoamFlow(Flow):
+    """
+    Soam Flow to execute the pipeline steps and keep track of the whole run data.
+    SoamFlow is an extension of prefect.Flow to add tracking functionality.
+    """
+
     def __init__(self, saver: "Optional[Saver]" = None, **kwargs):
+        """
+        Soam Flow init to execute pipeline steps and keep track of the run data.
+
+        Parameters
+        ----------
+        saver: soam.savers.Saver
+            The saver to store the pipeline steps and keep track of the whole run data.
+        kwargs: dict
+            extra args.
+        """
         super().__init__(**kwargs)
         self.saver = saver
         self.start_datetime: datetime
@@ -27,6 +42,19 @@ class SoamFlow(Flow):
             self.state_handlers.append(self.saver.save_flow_run)
 
     def add_task(self, task: Task) -> Task:
+        """
+        Adds the task and handlers to save the state.
+
+        Parameters
+        ----------
+        task
+            Represents a task where the flow is being executed.
+
+        Returns
+        -------
+        super object
+            Saves the task and the state handler.
+        """
         if self.saver is not None:
             if self.saver.save_task_run not in task.state_handlers:
                 task.state_handlers.append(self.saver.save_task_run)

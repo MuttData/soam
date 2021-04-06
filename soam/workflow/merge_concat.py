@@ -16,7 +16,8 @@ class MergeConcat(Step):
     def __init__(
         self, keys: Union[str, List[str], None] = None, **kwargs,
     ):
-        """Merge on concat dataframes dependending on the keys
+        """
+        Merge on concat dataframes dependending on the keys
 
         Parameters
         ----------
@@ -40,10 +41,12 @@ class MergeConcat(Step):
         ----------
         in_df
             A pandas DataFrame containing the keys as columns
+
         Returns
         -------
         A pandas DataFrame
             with merged or concateneted data
+
         Examples
         --------
         >>> import pandas as pd

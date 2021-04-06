@@ -28,7 +28,22 @@ def range_datetime(
 ):
     # TODO: review datetime_start, datetime_end, are datetimes?
     # TODO: timeskip is Tick?
-    """Build datetime generator over successive time steps."""
+    """
+    Build datetime generator over successive time steps.
+
+    Parameters
+    ----------
+    datetime_start: datetime
+        Start datetime.
+    datetime_end: datetime
+        End datetime.
+    hourly_offset: boolean
+        Wheteher to offset hourly. False by default.
+    timeskip: Tick
+        An instance of fast-forwarding a substantial amount of time.
+    as_datetime: boolean
+        Whether the object type should be datetime. False by default.
+    """
     if timeskip is None:
         timeskip = offsets.Day(1) if not hourly_offset else offsets.Hour(1)
     if not isinstance(datetime_start, pd.Timestamp):
@@ -42,7 +57,8 @@ def range_datetime(
 
 
 def sanitize_arg(v, default=None):
-    """Sanitize mutable arguments.
+    """
+    Sanitize mutable arguments.
 
     Get a sanitized version of the given argument value to avoid mutability issues.
 
@@ -59,11 +75,13 @@ def sanitize_arg(v, default=None):
         x = sanitize_arg(x, {})
     ```
 
-    Args:
+    Parameters
+    ----------
         v: Value to check.
         default: Value to set if
 
-    Returns:
+    Returns
+    -------
         Santized value.
     """
     if default is None:
@@ -75,18 +93,48 @@ def sanitize_arg(v, default=None):
 
 
 def sanitize_arg_empty_dict(v):
-    """Convenience function for `sanitize_arg(v, {})`"""
+    """Convenience function for `sanitize_arg(v, {})`."""
     return sanitize_arg(v, {})
 
 
 def get_file_path(path: Path, fn: str) -> Path:
-    """Find an available path for a file, using an index prefix."""
+    """
+    Find an available path for a file, using an index prefix.
+
+    Parameters
+    ----------
+    path: Path
+        file path
+    fn: str
+        filename
+
+    Returns
+    ----------
+    path
+        file path
+    """
     paths = path.glob(f"*_{fn}")
     max_index = max((int(p.name.split("_")[0]) for p in paths), default=-1) + 1
     return path / f"{max_index}_{fn}"
 
 
 def filter_by_class_or_subclass(l, c):
+    """
+    Filter-out objects from list that are not class or subclass of c.
+
+    Parameters
+    ----------
+    l: List
+        List of objects.
+    c: Class
+        Reference class.
+
+    Returns
+    -------
+    Comprehensive list
+        Looks into the given list to check if the objects inside of it are or arent objects of the reference given class or subclass of c.
+        It filters the ones that arent objects of the class or subclass of c.
+    """
     return [e for e in l if isinstance(e, c) or issubclass(e.__class__, c)]
 
 
@@ -96,7 +144,8 @@ def split_backtesting_ranges(
     train_window: Optional[int] = 1,
     step_size: int = None,
 ) -> List[Tuple[pd.DataFrame, pd.DataFrame]]:
-    """Generates time series partitions for backtesting.
+    """
+    Generates time series partitions for backtesting.
 
     Parameters
     ----------
@@ -121,7 +170,7 @@ def split_backtesting_ranges(
          the model.
 
     Notes
-    -------
+    -----
     The end of the split is going to be train_window plus a multiple of step_size. So
      some of the last elements of the time series can be not used in the resulting
      splits.
@@ -186,9 +235,8 @@ class SuppressStdOutStdErr(object):
     """
 
     def __init__(self):
-        # Open a pair of null files
+        """Open a pair of null files and save the actual stdout (1) and stderr (2) file descriptors."""
         self.null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
-        # Save the actual stdout (1) and stderr (2) file descriptors.
         self.save_fds = [os.dup(1), os.dup(2)]
 
     def __enter__(self):
@@ -208,7 +256,8 @@ class SuppressStdOutStdErr(object):
 def add_future_dates(
     df: pd.DataFrame, periods: int, frequency: str = None, ds_col: str = DS_COL,
 ):
-    """Add future dates to dataframe for which to predict with.
+    """
+    Add future dates to dataframe for which to predict with.
 
     Parameters
     ----------
