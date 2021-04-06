@@ -101,9 +101,10 @@ def _base_10_tick_scaler(median_val: float) -> int:
 def _create_common_series(
     df: pd.DataFrame, ds_col: str, start_date=None, end_date=None
 ) -> Tuple[pd.DataFrame, np.ndarray]:  # pylint:disable=unused-argument
-    """Get series data for start/end date range.
-
-    Return filtered values and dates."""
+    """
+    Get series data for start/end date range.
+    Return filtered values and dates.
+    """
     window = df
     if start_date:
         window = window.query(f"@start_date <= {ds_col}")
@@ -122,8 +123,31 @@ def create_forecast_figure(
     time_granularity: str = DAILY_TIME_GRANULARITY,
     plot_config: Optional[Dict] = None,
 ) -> Figure:
-    """Plot trend, forecast and anomalies with history, anomaly and forecast phases."""
+    """
+    Plot trend, forecast and anomalies with history, anomaly and forecast phases.
 
+    Parameters
+    ----------
+    df: pd.DataFrame,
+        Data frame with the values.
+    metric_name: str,
+        Data type of the metric name.
+    end_date,
+        End date of the forecast.
+    forecast_window,
+        How many forecast periods is the figure ilustrating.
+    anomaly_window: int = 0,
+        Size of the anomaly window.
+    time_granularity: str = DAILY_TIME_GRANULARITY,
+        How much does a period represents.
+    plot_config: Optional[Dict] = None,
+        Plot configuration.
+
+    Returns
+    -------
+    fig
+        The forecast figure.
+    """
     plot_config_: Dict
     if plot_config is None:
         plot_config_ = PLOT_CONFIG

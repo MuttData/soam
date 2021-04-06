@@ -1,0 +1,1 @@
+"""SoaM integration tests."""

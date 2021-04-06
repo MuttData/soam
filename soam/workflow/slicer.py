@@ -1,6 +1,6 @@
 """
 Slicer
-----------
+------
 A class to create dataframes for aggregations
 """
 
@@ -31,7 +31,8 @@ class Slicer(Step):
         keeps: Union[str, List[str], None] = None,
         **kwargs,
     ):
-        """Slice the incoming data upon the given dimensions
+        """
+        Slice the incoming data upon the given dimensions
 
         Parameters
         ----------
@@ -65,6 +66,7 @@ class Slicer(Step):
         ----------
         raw_df
             A pandas DataFrame containing the raw data to slice
+
         Returns
         -------
         list[pd.DataFrame]

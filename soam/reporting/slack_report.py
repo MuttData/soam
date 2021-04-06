@@ -1,7 +1,7 @@
 # slack_report.py
 """
 Slack Report
-----------
+------------
 Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
@@ -22,9 +22,25 @@ DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
 
 
 class SlackReport:
+    """
+    Generates the report to share via Slack.
+    """
+
     def __init__(
         self, channel_id: str, metric_name: str, setting_path: Optional[str],
     ):
+        """
+        Initialization of the Slack Report object.
+
+        Parameters
+        ----------
+        channel_id: str
+            Slack channel id where the report will be sent.
+        metric_name: str
+            Performance metric being measured.
+        setting_path: str
+            Setting path.
+        """
         credentials = get_slack_cred(setting_path)
         self.slack_client = slack.WebClient(credentials["token"])
         self.channel_id = channel_id
@@ -37,6 +53,25 @@ class SlackReport:
         greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
         farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
     ) -> Union[Future, SlackResponse]:
+        """
+        Send Slack report.
+
+        Parameters
+        ----------
+        prediction : pd.DataFrame
+            DataDrame of the predictions made.
+        plot_filename : str or pathlib.Path
+             Path of the forecast data to send.
+        greeting_message: str
+            Greeting message to send via Slack with the predictions.
+        farewell_message: str
+            Farewell message to send via Slack with the predictions.
+
+        Returns
+        -------
+        Slack Report
+            Sends the specified message with the predictions data via Slack.
+        """
         if greeting_message == DEFAULT_GREETING_MESSAGE:
             greeting_message.format(metric_name=self.metric_name)
 
@@ -61,6 +96,10 @@ class SlackReport:
 
 
 class SlackReportTask(Step, SlackReport):
+    """
+    Builds up the task of the report designed for Slack.
+    """
+
     def __init__(
         self,
         channel_id: str,
@@ -68,6 +107,18 @@ class SlackReportTask(Step, SlackReport):
         setting_path: Optional[str],
         **kwargs: Any,
     ):
+        """
+        Parameters
+        ----------
+        channel_id: str
+            Slack channel id where the report will be sent.
+        metric_name: str
+            Performance metric being measured.
+        setting_path: str
+            Setting path.
+        kwargs:
+            Extra args to pass.
+        """
         Step.__init__(self, **kwargs)  # type: ignore
         SlackReport.__init__(
             self, channel_id, metric_name, setting_path,
@@ -80,6 +131,25 @@ class SlackReportTask(Step, SlackReport):
         greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
         farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
     ):
+        """
+        Send Slack report task.
+
+        Parameters
+        ----------
+        prediction : pd.DataFrame
+            DataDrame of the predictions made.
+        plot_filename : str or pathlib.Path
+             Path of the forecast data to send.
+        greeting_message: str
+            Greeting message to send via Slack with the predictions.
+        farewell_message: str
+            Farewell message to send via Slack with the predictions.
+
+        Returns
+        -------
+        Slack Report Task
+            Sends the specified message with the predictions data via Slack.
+        """
         return self.send_report(
             prediction, plot_filename, greeting_message, farewell_message
         )

@@ -13,7 +13,8 @@ from sklearn.base import BaseEstimator
 
 
 class Step(Task, BaseEstimator):
-    """ The base class for all steps.
+    """
+    The base class for all steps.
     All implementations of step have to implement the `run()` method defined below.
     """
 
@@ -26,6 +27,7 @@ class Step(Task, BaseEstimator):
         ----------
         time_series
             A pandas DataFrame containing the data for the step
+
         Returns
         -------
         pandas.DataFrame
@@ -33,6 +35,14 @@ class Step(Task, BaseEstimator):
         """
 
     def get_task_id(self) -> str:  # pylint: disable=no-self-use
+        """
+        Obtains the task id.
+
+        Returns
+        -------
+        flow_run_id
+            the id of the flow run.
+        """
         return context["flow_run_id"]
 
     def __repr__(self) -> str:
