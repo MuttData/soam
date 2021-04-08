@@ -90,7 +90,7 @@ setuptools.setup(
         "click",
         "cookiecutter",
         "muttlib>=1.0,<2",
-        'numpy==1.19.5',
+        'numpy==1.19.0',
     ],
     extras_require=extra_dependencies,
     python_requires="~=3.6",
