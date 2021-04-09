@@ -9,6 +9,7 @@ from soam.workflow import BaseDataFrameTransformer, Transformer
 
 class SimpleProcessor(BaseDataFrameTransformer):
     """Creates the Simple Processor Object."""
+
     def __init__(self, **fit_params):
         self.preproc = StandardScaler(**fit_params)
 
@@ -27,6 +28,7 @@ class SimpleProcessor(BaseDataFrameTransformer):
 
 class TransformerTestCase(TestCase):
     """Creates the Transformer Test Case Object."""
+
     def test_simple_case(self):
         """Simple case testing."""
         test_data_X = pd.DataFrame({'a': [1, 2, 3]})

@@ -43,6 +43,7 @@ def test_compute_metrics():
 
 class SimpleProcessor(BaseDataFrameTransformer):
     """Create a Simple Processor object."""
+
     def __init__(self, **fit_params):  # pylint:disable=super-init-not-called
         self.preproc = StandardScaler(**fit_params)
 
