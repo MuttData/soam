@@ -5,7 +5,7 @@ Postprocess to plot the model forecasts.
 """
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
@@ -38,7 +38,7 @@ class ForecastPlotterTask(Step):
 
     def __init__(
         self,
-        path: Union[Path, str],
+        path: Path,
         metric_name: str,
         time_granularity: str = DAILY_TIME_GRANULARITY,
         plot_config: Optional[Dict] = None,
@@ -50,7 +50,7 @@ class ForecastPlotterTask(Step):
 
         Parameters
         ----------
-            path: (Union[Path, str]):
+            path: Path:
                 file path.
             metric_name str:
                 performance metric being measured.
@@ -120,7 +120,7 @@ class ForecastPlotterTask(Step):
             plot_config=plot_config,
         )
 
-        path.mkdir(parents=True, exist_ok=True)
+        self.path.mkdir(parents=True, exist_ok=True)
         fn = "_".join(
             ["forecast", f"{start_date:%Y%m%d%H}", f"{end_date:%Y%m%d%H}", ".png"]
         )
