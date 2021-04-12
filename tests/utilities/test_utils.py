@@ -18,6 +18,7 @@ TRAIN_PREFIX = "train_"
 
 class TestSplitBacktestingRanges(unittest.TestCase):
     """Create an object to test the utils."""
+
     def setUp(self):
         with open(ROOT_TEST_DIRECTORY / "initial_dataframe.csv") as df_stream:
             self.initial_df = pd.read_csv(df_stream, index_col=0)

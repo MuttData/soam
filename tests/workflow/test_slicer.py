@@ -8,6 +8,7 @@ from soam.workflow import Slicer
 
 class TestSlicer(TestCase):
     """Creates the slicer tester object."""
+
     columns = ["date", "letter", "move", "opportunities", "impressions", "revenue"]
     values = [
         ["2019-09-01", "A", "down", 1000, 100, 20],

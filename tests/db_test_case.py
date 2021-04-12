@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 TEST_DB_CONNSTR = "TEST_DB_CONNSTR"
 TEST_DB_NAME = "pytests"
+POSTGRES_DB = "soam_db"
 
 
 class PgTestCase(TestCase):
@@ -34,6 +35,7 @@ class PgTestCase(TestCase):
         return ret
 
     def setUp(self):
+        # self.db_client.database =  os.getenv(POSTGRES_DB)
         self.db_client._engine = None  # pylint:disable=protected-access
         conn = self.db_client._connect()  # pylint:disable=protected-access
         # DROP/CREATE DATABASE fails in a normal session.
@@ -48,7 +50,7 @@ class PgTestCase(TestCase):
         conn.execution_options(isolation_level="AUTOCOMMIT").execute(query)
         conn.close()
         self.db_client._engine = None  # pylint:disable=protected-access
-        self.db_client.database = TEST_DB_NAME
+        # self.db_client.database = TEST_DB_NAME
 
     def tearDown(self):
         # FIXME: This should drop the test database but it fails. The reason seem to be
