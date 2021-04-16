@@ -39,9 +39,7 @@ extra_dependencies = {
         'statsmodels<0.12,>=0.11',
     ],
     'slack': ["slackclient",],
-    'orbit': [
-        'orbit-ml @ git+https://github.com/uber/orbit.git@1a9e38723514255293033541169ce5902aa58d6a'
-    ],
+    'orbit': ['orbit-ml'],
     'prophet': ["pystan==2.19.1.1", "fbprophet==0.6",],
     'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
     'gsheets_report': ["muttlib[gsheets]>=1.0,<2"],
