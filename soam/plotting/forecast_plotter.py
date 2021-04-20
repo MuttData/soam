@@ -7,8 +7,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-import pandas as pd
-from prefect.utilities.tasks import defaults_from_attrs
+import pandas as pd  # pylint: disable=import-error
+from prefect.utilities.tasks import defaults_from_attrs  # pylint: disable=import-error
 
 from soam.constants import DAILY_TIME_GRANULARITY, DS_COL
 from soam.core.step import Step
@@ -119,8 +119,8 @@ class ForecastPlotterTask(Step):
             time_granularity=time_granularity,
             plot_config=plot_config,
         )
-        
-        path = path
+
+        path = self.path
         self.path.mkdir(parents=True, exist_ok=True)
         fn = "_".join(
             ["forecast", f"{start_date:%Y%m%d%H}", f"{end_date:%Y%m%d%H}", ".png"]
