@@ -2,9 +2,9 @@
 from typing import List, Union
 import warnings
 
-from orbit.models.dlt import DLTFull
-import pandas as pd
-from typing_extensions import Literal
+from orbit.models.dlt import DLTFull  # pylint: disable=import-error
+import pandas as pd  # pylint: disable=import-error
+from typing_extensions import Literal  # pylint: disable=import-error
 
 from soam.constants import SEED
 from soam.models._base import SkWrapper, sk_constructor_wrapper
@@ -82,7 +82,7 @@ class SkOrbit(SkWrapper):
         """Scikit learn's predict."""
         X = self._transform_to_input_format(X)
 
-        predictions = self.model.predict(X)
+        predictions = self.model.predict(X)  # pylint: disable=assignment-from-no-return
         predictions = self._transform_to_output_format(predictions)
 
         return predictions
