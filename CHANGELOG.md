@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Bumped CI python version.
-- Exclude notebooks on pre-commit.
+- Exclude notebooks and templates on pre-commit.
 - Fixed lint issues.
 
 ## [0.3.2] - 2021-04-16
