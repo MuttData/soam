@@ -1,4 +1,4 @@
-exclude: soam/templates/* notebook/*
+exclude: (?s:soam/templates/.*)\\Z (?s:notebook/.*)\\Z
 repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     rev: v2.5.0
@@ -20,18 +20,17 @@ repos:
       entry: isort
       language: system
       types: [python]
-      exclude: templates/*  notebook/*
+      exclude: (?s:soam/templates/.*)\\Z (?s:notebook/.*)\\Z
 -   repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:
     - id: black
       name: black
       entry: black
-      language: system
+      language: python
       types: [python]
       args: [--skip-string-normalization]
-      exclude: templates/*  notebook/*
-      language_version: python3.7
+      language_version: python3.8.5
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.761
     hooks:
@@ -41,7 +40,7 @@ repos:
       language: system
       types: [python]
       files: \.py$
-      exclude: soam/templates/* notebook/*
+      exclude: (?s:soam/templates/.*)\\Z (?s:notebook/.*)\\Z
 -   repo: https://github.com/pre-commit/mirrors-pylint
     rev: v2.4.4
     hooks:
@@ -49,6 +48,6 @@ repos:
       name: pylint
       entry: pylint
       language: system
-      exclude: templates/*  notebook/*
+      exclude: (?s:soam/templates/.*)\\Z (?s:notebook/.*)\\Z
       files: \.py$
       types: [python]
