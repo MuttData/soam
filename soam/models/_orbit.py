@@ -4,7 +4,7 @@ import warnings
 
 from orbit.models.dlt import DLTFull  # pylint: disable=import-error
 import pandas as pd
-from typing_extensions import Literal  # pylint: disable=import-error
+from typing_extensions import Literal
 
 from soam.constants import SEED
 from soam.models._base import SkWrapper, sk_constructor_wrapper

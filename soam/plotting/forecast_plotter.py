@@ -7,8 +7,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-import pandas as pd  # pylint: disable=import-error
-from prefect.utilities.tasks import defaults_from_attrs  # pylint: disable=import-error
+import pandas as pd
+from prefect.utilities.tasks import defaults_from_attrs
 
 from soam.constants import DAILY_TIME_GRANULARITY, DS_COL
 from soam.core.step import Step
