@@ -2,7 +2,7 @@
 from typing import List, Union
 import warnings
 
-from orbit.models.dlt import DLTFull  # pylint: disable=import-error
+from orbit.models.dlt import DLTFull
 import pandas as pd
 from typing_extensions import Literal
 
