@@ -3,7 +3,7 @@ from typing import List, Union
 import warnings
 
 from orbit.models.dlt import DLTFull  # pylint: disable=import-error
-import pandas as pd  # pylint: disable=import-error
+import pandas as pd
 from typing_extensions import Literal  # pylint: disable=import-error
 
 from soam.constants import SEED
