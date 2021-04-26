@@ -120,11 +120,9 @@ pages:
 deploy_gitlab:
   stage: deploy_stage
   script:
+    - pip install twine
     - python setup.py bdist_wheel
-    - pip install dist/*
-  artifacts:
-    paths:
-      - dist/*.whl
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url https://gitlab.example.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
   only:
     refs:
       - merge_requests
