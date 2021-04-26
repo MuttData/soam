@@ -120,7 +120,7 @@ class ForecastPlotterTask(Step):
             plot_config=plot_config,
         )
 
-        path = self.path
+        path = path or self.path
         self.path.mkdir(parents=True, exist_ok=True)
         fn = "_".join(
             ["forecast", f"{start_date:%Y%m%d%H}", f"{end_date:%Y%m%d%H}", ".png"]
