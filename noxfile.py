@@ -1,12 +1,12 @@
+"""nox file"""
 import nox
 
 
-@nox.session(reuse_venv=True, python="3.7")
+@nox.session(reuse_venv=True, python="3.8.5")
 def tests(session):
     """Run all tests."""
     session.install(".")
-    session.install(".[test]")
-    session.install(".[report]")
+    session.install(".[all]")
 
     cmd = ["pytest", "-v", "--mpl", "-n", "auto"]
 
@@ -26,19 +26,17 @@ def tests(session):
     )
 
 
-@nox.session(reuse_venv=True, python="3.7")
+@nox.session(reuse_venv=True, python="3.8.5")
 def lint(session):
     """Run all pre-commit hooks."""
 
     session.install(".")
-    session.install(".[test]")
-    session.install(".[report]")
-    session.install(".[dev]")
+    session.install(".[all]")
     session.run("pre-commit", "install")
     session.run("pre-commit", "run", "--show-diff-on-failure", "--all-files")
 
 
-@nox.session(reuse_venv=True, python="3.7")
+@nox.session(reuse_venv=True, python="3.8.5")
 def bandit(session):
     """Run all pre-commit hooks."""
     session.install("bandit")
@@ -46,7 +44,7 @@ def bandit(session):
     session.run("bandit", "-r", "soam/", "-ll", "-c", "bandit.yaml")
 
 
-@nox.session(reuse_venv=True, python="3.7")
+@nox.session(reuse_venv=True, python="3.8.5")
 def pyreverse(session):
     """Create class diagrams."""
     session.install(".")

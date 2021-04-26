@@ -5,7 +5,7 @@ Postprocess to plot the model forecasts.
 """
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 import pandas as pd
 from prefect.utilities.tasks import defaults_from_attrs
@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class ForecastPlotterTask(Step):
-    """Plot forecasts.
+    """
+    Plot forecasts.
 
     Parameters
     ----------
@@ -37,13 +38,29 @@ class ForecastPlotterTask(Step):
 
     def __init__(
         self,
-        path: Union[Path, str],
+        path: Path,
         metric_name: str,
         time_granularity: str = DAILY_TIME_GRANULARITY,
         plot_config: Optional[Dict] = None,
         savefig_opts: Optional[Dict] = None,
         **kwargs: Any,
     ):
+        """
+        Forecast plotter initialization
+
+        Parameters
+        ----------
+            path: Path:
+                file path.
+            metric_name str:
+                performance metric being measured.
+            time_granularity: str
+                How much a time period accounts for. Defaults is daily time granularity.
+            plot_config: dict
+                plot configurations, default is None.
+            savefig_opts: dict
+                saving options, default is None.
+        """
         Step.__init__(self, **kwargs)  # type: ignore
         self.path = path
         self.metric_name = metric_name
@@ -102,8 +119,9 @@ class ForecastPlotterTask(Step):
             time_granularity=time_granularity,
             plot_config=plot_config,
         )
-
-        path.mkdir(parents=True, exist_ok=True)
+        
+        path = path
+        self.path.mkdir(parents=True, exist_ok=True)
         fn = "_".join(
             ["forecast", f"{start_date:%Y%m%d%H}", f"{end_date:%Y%m%d%H}", ".png"]
         )

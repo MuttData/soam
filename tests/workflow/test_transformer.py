@@ -1,3 +1,4 @@
+"""Transformer tester."""
 from unittest import TestCase
 
 import pandas as pd
@@ -7,14 +8,18 @@ from soam.workflow import BaseDataFrameTransformer, Transformer
 
 
 class SimpleProcessor(BaseDataFrameTransformer):
+    """Creates the Simple Processor Object."""
+
     def __init__(self, **fit_params):
         self.preproc = StandardScaler(**fit_params)
 
     def fit(self, df_X):
+        """Fit."""
         self.preproc.fit(df_X['a'].values.reshape(-1, 1))
         return self
 
     def transform(self, df_X, inplace=True):
+        """Transform."""
         if not inplace:
             df_X = df_X.copy()
         df_X['a'] = self.preproc.transform(df_X['a'].values.reshape(-1, 1))
@@ -22,7 +27,10 @@ class SimpleProcessor(BaseDataFrameTransformer):
 
 
 class TransformerTestCase(TestCase):
+    """Creates the Transformer Test Case Object."""
+
     def test_simple_case(self):
+        """Simple case testing."""
         test_data_X = pd.DataFrame({'a': [1, 2, 3]})
         test_data_X2 = pd.DataFrame({'a': [4, 6, 8]})
         expected_output = pd.DataFrame({"a": [-1.2247448714, 0.0, 1.2247448714]})

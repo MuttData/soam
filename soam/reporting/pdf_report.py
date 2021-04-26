@@ -1,4 +1,9 @@
-"""PDF Generator."""
+"""
+PDF Report Generator
+--------------------
+PDF report creator. Its a postprocess that generates a PDF report with
+the model forecasts.
+"""
 from datetime import datetime
 import logging
 from pathlib import Path
@@ -16,20 +21,24 @@ logger = logging.getLogger(__name__)
 
 
 class PDFReport:
-    """Generate PDF from IPython Notebook."""
+    """
+    Generate PDF Report object from IPython Notebook.
+    """
 
     def __init__(self, base_path: str):
-        """Merge on concat dataframes dependending on the keys.
+        """
+        Initialization of the PDF Report object.
 
         Parameters
         ----------
-        keys:
-            str or list of str labels of columns to merge on
+        base_path: str
+            string of the base path of the pdf report.
         """
         self.base_path = Path(base_path)
 
     def export_notebook_to_pdf(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore
-        """Run notebook, convert, save and return PDF path.
+        """
+        Run notebook, convert, save and return PDF path.
 
         Parameters
         ----------
@@ -40,7 +49,7 @@ class PDFReport:
 
         Returns
         -------
-        str
+        path
             Generated PDF Path
         """
         report_file = Path(nb_path)
@@ -84,7 +93,9 @@ class PDFReport:
         return str(pdf_filename)
 
     def _parse_params(self, nb_params):
-        """Convert common object types to appropiate parameter types."""
+        """
+        Convert common object types to appropiate parameter types.
+        """
         for key, value in nb_params.items():
             if isinstance(value, pd.DataFrame):
                 nb_params[key] = value.to_csv(index=False)
@@ -92,9 +103,28 @@ class PDFReport:
 
 
 class PDFReportTask(Step, PDFReport):
+    """
+    Creates the task to generate a PDF report.
+    """
+
     def __init__(self, base_path: str):
         Step.__init__(self)
         PDFReport.__init__(self, base_path)
 
     def run(self, nb_path: str, nb_params: Dict) -> str:  # type: ignore[override]
+        """
+        Task to export the notebook into a pdf.
+
+        Parameters
+        ----------
+        nb_path : str
+            Path of the Notebook or Script to Execute .ipynb / .py
+        parameters : Dict
+            Parameters to run the notebook with (Papermill).
+
+        Returns
+        -------
+        path
+            Generated PDF Path
+        """
         return self.export_notebook_to_pdf(nb_path, nb_params)

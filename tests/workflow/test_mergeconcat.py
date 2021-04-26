@@ -1,3 +1,4 @@
+"""Merge concat tester"""
 import pandas as pd
 from pandas._testing import assert_frame_equal
 
@@ -5,6 +6,7 @@ from soam.workflow import MergeConcat
 
 
 def test_merge_concat():
+    """Function to test the merge concat."""
     df1 = pd.DataFrame({"date": [1], "metric1": [512]})
     df2 = pd.DataFrame({"date": [1], "metric2": [328]})
     df3 = pd.DataFrame({"date": [2], "metric1": [238]})
