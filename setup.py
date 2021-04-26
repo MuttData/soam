@@ -68,7 +68,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     packages=setuptools.find_packages(),
-    package_data={"soam": ["resources/*.html", "templates/*", "db_migrations"]},
+    package_data={
+        "soam": ["resources/*.html", "templates/*", "db_migrations", "resources/*.tpl"]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
