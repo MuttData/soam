@@ -82,7 +82,7 @@ class SkOrbit(SkWrapper):
         """Scikit learn's predict."""
         X = self._transform_to_input_format(X)
 
-        predictions = self.model.predict(X)
+        predictions = self.model.predict(X)  # pylint: disable=assignment-from-no-return
         predictions = self._transform_to_output_format(predictions)
 
         return predictions
