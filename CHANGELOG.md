@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.2] - 2021-04-16
 
+### Fixed
+- .tpl resources path inclusion.
+
+## [0.3.2] - 2021-04-16
+
 ### Added
 - quickstart.ipynb
 - soamflowrun.ipynb
