@@ -27,7 +27,7 @@ repos:
     - id: black
       name: black
       entry: black
-      language: system
+      language: python
       types: [python]
       args: [--skip-string-normalization]
       exclude: templates/.+|notebook/.+
