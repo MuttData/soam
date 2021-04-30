@@ -6,7 +6,9 @@ import warnings
 import pandas as pd
 from sklearn.model_selection import GridSearchCV, ParameterGrid, TimeSeriesSplit
 from sklearn.pipeline import Pipeline
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.holtwinters import (  # pylint: disable=import-error
+    ExponentialSmoothing,
+)
 
 from soam.constants import (
     DATE_COL,
@@ -14,6 +16,7 @@ from soam.constants import (
     DEFAULT_TRAINING_DAYS,
     DEFAULT_TSPLIT_SPLITS,
     DEFAULT_TSPLIT_TEST_SIZE,
+    YHAT_COL,
 )
 from soam.models._base import SkWrapper, sk_constructor_wrapper
 from soam.models.metaestimator import DaysSelectorEstimator
@@ -34,7 +37,7 @@ class SkExponentialSmoothing(SkWrapper):
 
     @sk_constructor_wrapper(ExponentialSmoothing)
     def __init__(
-        self, fit_params: Dict = None, date_col: str = None,
+        self, fit_params: Dict = None, date_col: str = DATE_COL,
     ):
         """Construct wrapper with extra parameters in addition to the ExponentialSmoothing ones.
 
@@ -77,6 +80,7 @@ class SkExponentialSmoothing(SkWrapper):
         start = self._train_len
         end = start + X_len - 1
         predictions = self.model_fit.predict(start, end)
+        predictions = self._transform_to_output_format(predictions, X)
 
         return predictions.reset_index(drop=True)
 
@@ -96,11 +100,21 @@ class SkExponentialSmoothing(SkWrapper):
         if y is not None:
             # train
             if self.date_col is not None:
-                return pd.Series(y.values, index=X[self.date_col])
+                print(y)
+                return pd.Series(y.values, index=X[self.date_col].values)
             return pd.Series(y.values, index=X.index)
         else:
             # predict
             return X.pipe(len), y
+
+    def _transform_to_output_format(
+        self, predictions: pd.Series, X_pred: pd.DataFrame
+    ) -> pd.DataFrame:
+        """Transform Prophet output to SoaM format."""
+        final_predictions = pd.DataFrame()
+        final_predictions[self.date_col] = X_pred[self.date_col].values
+        final_predictions[YHAT_COL] = predictions.values
+        return final_predictions
 
 
 def holtwinters_estimator_factory(**kwargs):
