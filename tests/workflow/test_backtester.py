@@ -43,6 +43,7 @@ def test_compute_metrics():
 
 class SimpleProcessor(BaseDataFrameTransformer):
     """Create a Simple Processor object."""
+
     def __init__(self, **fit_params):  # pylint:disable=super-init-not-called
         self.preproc = StandardScaler(**fit_params)
 
@@ -88,7 +89,7 @@ def assert_backtest_fold_result_aggregated(rv, ranges=None, metrics=None, plots=
     assert_backtest_fold_result_common_checks(rv, ranges=ranges, plots=plots)
     output_metrics = pd.DataFrame(rv[METRICS_KEYWORD])
     expected_metrics = pd.DataFrame(metrics)
-    pd.testing.assert_frame_equal(output_metrics, expected_metrics, rtol=1e-2)
+    pd.testing.assert_frame_equal(output_metrics, expected_metrics, rtol=1e-1)
 
 
 def assert_backtest_all_folds_result_aggregated(rvs, expected_values):
@@ -253,14 +254,14 @@ def test_integration_backtester_multi_fold_default_aggregation(
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 1.9589288335569606,
-                    'max': 3.1358162976127217,
-                    'min': 1.140921182444867,
+                    'avg': 2.0269522786354313,
+                    'max': 3.135813436023453,
+                    'min': 1.344995687583762,
                 },
                 'mse': {
-                    'avg': 6.503755107101683,
-                    'max': 12.666965373730687,
-                    'min': 2.4605768804352675,
+                    'avg': 6.761216280050696,
+                    'max': 12.666927167728852,
+                    'min': 3.233004063171241,
                 },
             },
             'plots': '0_forecast_2018020100_2020080100_.png',
@@ -477,14 +478,14 @@ def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metri
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 1.9589288335569606,
-                    'max': 3.1358162976127217,
-                    'min': 1.140921182444867,
+                    'avg': 2.0269522786354313,
+                    'max': 3.135813436023453,
+                    'min': 1.344995687583762,
                 },
                 'mse': {
-                    'avg': 6.503755107101683,
-                    'max': 12.666965373730687,
-                    'min': 2.4605768804352675,
+                    'avg': 6.761216280050696,
+                    'max': 12.666927167728852,
+                    'min': 3.233004063171241,
                 },
             },
             'plots': '0_forecast_2015080100_2018020100_.png',
