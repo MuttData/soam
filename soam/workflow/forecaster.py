@@ -81,7 +81,9 @@ class Forecaster(Step):
 
         X_train = X[: -self.output_length]
         X_pred = X[-self.output_length :]
-        self.model.fit(X_train, y)
+        y_train = y[: -self.output_length]
+
+        self.model.fit(X_train, y_train)
         self.prediction = self.model.predict(X_pred)
         return self.prediction, self.time_series, self.model
 
