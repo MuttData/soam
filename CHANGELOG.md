@@ -5,7 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.7] - 2021-04-06
+## [0.3.4 - 2021-04-29]
+
+### Changed
+- The db for the Quickstart is now hosted on SQLite.
+
+## [0.3.3 - 2021-04-20]
+
+### Fixed
+- Bumped CI python version.
+- Exclude notebooks and templates on pre-commit.
+- Fixed lint issues.
+
+## [0.3.2] - 2021-04-16
+
+### Fixed
+- .tpl resources path inclusion.
+
+## [0.3.2] - 2021-04-16
+
+### Added
+- quickstart.ipynb
+- soamflowrun.ipynb
+
+## [0.3.1] - 2021-04-16
+
+### Changed
+- Orbit dependency
+
+## [0.3.0] - 2021-04-12
+
+### Added
+- Orbit wrapper
+
+## [0.2.9] - 2021-04-09
+
+### Added
+- Store step
+
+## [0.2.8] - 2021-04-06
 
 ### Added
 - Adding numpy style docstrings to public methods and modules.
