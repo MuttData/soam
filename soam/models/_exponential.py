@@ -91,7 +91,6 @@ class SkExponentialSmoothing(SkWrapper):
         if y is not None:
             # train
             if self.date_col is not None:
-                print(y)
                 return pd.Series(y.values, index=X[self.date_col].values)
             return pd.Series(y.values, index=X.index)
         else:
