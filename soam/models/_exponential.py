@@ -4,22 +4,12 @@ from typing import Dict, Tuple
 import warnings
 
 import pandas as pd
-from sklearn.model_selection import GridSearchCV, ParameterGrid, TimeSeriesSplit
-from sklearn.pipeline import Pipeline
 from statsmodels.tsa.holtwinters import (  # pylint: disable=import-error
     ExponentialSmoothing,
 )
 
-from soam.constants import (
-    DATE_COL,
-    DEFAULT_TRAIN_DAYS_LIST,
-    DEFAULT_TRAINING_DAYS,
-    DEFAULT_TSPLIT_SPLITS,
-    DEFAULT_TSPLIT_TEST_SIZE,
-    YHAT_COL,
-)
+from soam.constants import DATE_COL, YHAT_COL
 from soam.models._base import SkWrapper, sk_constructor_wrapper
-from soam.models.metaestimator import DaysSelectorEstimator
 from soam.utilities.utils import SuppressStdOutStdErr
 
 # supress model FutureWarnings and ConvergenceWarnings bc FDA
@@ -97,6 +87,7 @@ class SkExponentialSmoothing(SkWrapper):
         self, X: pd.DataFrame, y: pd.Series = None
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Transform input to ExponentialSmoothing compatible format."""
+        # saving as prediction start point
         if y is not None:
             # train
             if self.date_col is not None:
@@ -115,54 +106,3 @@ class SkExponentialSmoothing(SkWrapper):
         final_predictions[self.date_col] = X_pred[self.date_col].values
         final_predictions[YHAT_COL] = predictions.values
         return final_predictions
-
-
-def holtwinters_estimator_factory(**kwargs):
-    """Create SkLearn estimator/pipeline for Exponential Smoothing Model.
-
-    Notes:
-        Use sorted values, use yhat_only = True
-    """
-    training_days = kwargs.get('training_days', DEFAULT_TRAINING_DAYS)
-    train_days_list = DEFAULT_TRAIN_DAYS_LIST
-    if training_days > max(DEFAULT_TRAIN_DAYS_LIST):
-        train_days_list = DEFAULT_TRAIN_DAYS_LIST + [training_days]
-
-    exp_smoothing_grid = list(
-        ParameterGrid(
-            {
-                "trend": ["add", "mul", "additive", "multiplicative"],
-                "damped_trend": [True, False],
-                "seasonal_periods": [None, 7],
-                "seasonal": ["add", "mul", "additive", "multiplicative"],
-                "date_col": [DATE_COL],
-                "freq": ["D"],
-            }
-        )
-    )
-
-    grid = {
-        "regressor__estimator_class": [SkExponentialSmoothing],
-        "regressor__amount_of_days": train_days_list,
-        "regressor__sort_col": [DATE_COL],
-        "regressor__estimator_kwargs": exp_smoothing_grid,
-    }
-
-    test_size = DEFAULT_TSPLIT_TEST_SIZE
-    max_train_size = max(train_days_list) - test_size
-    ts_splitter = TimeSeriesSplit(
-        n_splits=DEFAULT_TSPLIT_SPLITS,
-        max_train_size=max_train_size,
-        test_size=test_size,
-    )
-
-    pipeline = Pipeline(
-        [("regressor", DaysSelectorEstimator(SkExponentialSmoothing, training_days,),)]
-    )
-
-    return GridSearchCV(
-        pipeline, grid, scoring="explained_variance", cv=ts_splitter, verbose=0
-    )
-
-
-estimator_factory = holtwinters_estimator_factory
