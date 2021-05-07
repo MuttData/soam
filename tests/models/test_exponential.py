@@ -45,6 +45,7 @@ def test_fit_transform_exponential(
         data = add_future_dates(train_data, output_length)
         X, y = data[data.columns[:-1]], data[data.columns[-1]]
         wrapper = SkExponentialSmoothing()
+        model_patch.assert_not_called()
         wrapper.fit_transform(X, y)
         model_patch.assert_called_once()
         model_patch.return_value.fit.assert_called_once()
