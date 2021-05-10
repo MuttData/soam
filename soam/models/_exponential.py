@@ -70,7 +70,6 @@ class SkExponentialSmoothing(SkWrapper):
         end = start + X_len - 1
         predictions = self.model_fit.predict(start, end)
         predictions = self._transform_to_output_format(predictions, X)
-
         return predictions
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
