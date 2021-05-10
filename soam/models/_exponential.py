@@ -66,13 +66,12 @@ class SkExponentialSmoothing(SkWrapper):
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """Scikit learn's predict."""
         X_len, _ = self._transform_to_input_format(X)
-
         start = self._train_len
         end = start + X_len - 1
         predictions = self.model_fit.predict(start, end)
         predictions = self._transform_to_output_format(predictions, X)
 
-        return predictions.reset_index(drop=True)
+        return predictions
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Scikit learn's transform."""
