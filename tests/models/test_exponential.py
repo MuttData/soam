@@ -47,6 +47,9 @@ def test_fit_transform_exponential(
         X, y = data[data.columns[:-1]], data[data.columns[-1]]
         wrapper = SkExponentialSmoothing()
         model_patch.assert_not_called()
+        predict_mock = MagicMock()
+        predict_mock.predict.return_value = 3
+        model_patch.return_value.fit = predict_mock
         wrapper.fit_transform(X, y)
         model_patch.assert_called_once()
         model_patch.return_value.fit.assert_called_once()
