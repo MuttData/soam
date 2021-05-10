@@ -2,7 +2,7 @@
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest  # pylint: disable=import-error
 
 from soam.constants import DATE_COL, YHAT_COL
