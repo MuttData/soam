@@ -1,9 +1,11 @@
+"""ExponentialSmoothing wrapper tests."""
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest  # pylint: disable=import-error
 
+from soam.constants import DATE_COL, YHAT_COL
 from soam.models import SkExponentialSmoothing
 from soam.utilities.utils import add_future_dates
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
@@ -38,8 +40,8 @@ def test_predict_without_fit_fails_exponential(
 
 
 def test_fit_transform_exponential(
-    sample_data_df,
-):  # pylint: disable=redefined-outer-name
+    sample_data_df,  # pylint: disable=redefined-outer-name
+):
     with patch("soam.models._exponential.ExponentialSmoothing") as model_patch:
         output_length = 10
         train_data = sample_data_df
@@ -47,19 +49,21 @@ def test_fit_transform_exponential(
         X, y = data[data.columns[:-1]], data[data.columns[-1]]
         wrapper = SkExponentialSmoothing()
         model_patch.assert_not_called()
-        wrapper.fit_transform(X, y)
+        # Setup mock for fit() return value
+        pred_mock = MagicMock()
+        prediction_values = pd.Series([i for i in range(output_length)])
+        pred_mock.predict.return_value = prediction_values
+        model_patch.return_value.fit.return_value = pred_mock
+        # Run fit_transform
+        predictions = wrapper.fit_transform(X, y, output_length=output_length)
         model_patch.assert_called_once()
         model_patch.return_value.fit.assert_called_once()
-        model_patch.return_value.predict.assert_called_once()
-
-
-def test_predict_exponential():
-    X = MagicMock()
-    wrapper = SkExponentialSmoothing()
-    model_mock = MagicMock()
-    wrapper.model = model_mock
-    wrapper.predict(X)
-    model_mock.predict.assert_called_once_with(X)
-    model_mock.predict.return_value.rename.assert_called_once_with(
-        columns={"prediction": "yhat"}
-    )
+        pred_mock.predict.assert_called_once()
+        # Setup expected prediction
+        expected_predictions = pd.DataFrame(
+            {
+                DATE_COL: X[DATE_COL].values[-output_length:],
+                YHAT_COL: prediction_values.values,
+            }
+        )
+        assert_frame_equal(predictions, expected_predictions)

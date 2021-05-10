@@ -78,10 +78,13 @@ class SkExponentialSmoothing(SkWrapper):
         """Scikit learn's transform."""
         return self.predict(X)
 
-    def fit_transform(self, X: pd.DataFrame, y: pd.Series):
-        """Scikit learn's fit_transform."""
-        self.fit(X, y)
-        return self.transform(X)
+    def fit_transform(self, X: pd.DataFrame, y: pd.Series, output_length: int = 1):
+        """Scikit learn's fit_transform with output_length."""
+        X_train = X[:-output_length]
+        X_pred = X[-output_length:]
+        y_train = y[:-output_length]
+        self.fit(X_train, y_train)
+        return self.transform(X_pred)
 
     def _transform_to_input_format(
         self, X: pd.DataFrame, y: pd.Series = None
