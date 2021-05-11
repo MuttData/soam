@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<<<<<<< HEAD
+=======
+## [0.3.6 - 2021-05-10]
+
+### Added
+- Exponential Smoothing Tests.
+
+### Fixed
+- y-train on Forecaster run method.
+
+>>>>>>> a0024d3... Apply 5 suggestion(s) to 2 file(s)
 ## [0.3.5 - 2021-05-06]
 
 ### Changed

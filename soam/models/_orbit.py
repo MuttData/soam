@@ -16,7 +16,7 @@ from soam.utilities.utils import SuppressStdOutStdErr
 class SkOrbit(SkWrapper):
     """Scikit-Learn Orbit model wrapper."""
 
-    _ignore_params = ["yhat_only"]
+    _ignore_params = ["full_output"]
 
     @sk_constructor_wrapper(DLTFull)
     def __init__(
