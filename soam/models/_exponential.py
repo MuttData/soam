@@ -1,10 +1,9 @@
 """statsmodels.holtwinters estimators."""
 import logging
 from typing import Dict, Tuple
-import warnings
 
 import pandas as pd
-from statsmodels.tsa.holtwinters import (  # pylint: disable=import-error
+from statsmodels.tsa.holtwinters import ( 
     ExponentialSmoothing,
 )
 
@@ -51,7 +50,7 @@ class SkExponentialSmoothing(SkWrapper):
         # arrays are required at model initialization
         self.endog = self._transform_to_input_format(X, y)
         self.model = self._init_sk_model(ExponentialSmoothing, clean=True)
-        with warnings.catch_warnings(), SuppressStdOutStdErr():
+        with SuppressStdOutStdErr():
 
             self.model_fit = (
                 self.model.fit()
@@ -101,7 +100,7 @@ class SkExponentialSmoothing(SkWrapper):
     def _transform_to_output_format(
         self, predictions: pd.Series, X_pred: pd.DataFrame
     ) -> pd.DataFrame:
-        """Transform Prophet output to SoaM format."""
+        """Transform ExponentialSmoothing output to SoaM format."""
         final_predictions = pd.DataFrame()
         final_predictions[self.date_col] = X_pred[self.date_col].values
         final_predictions[YHAT_COL] = predictions.values

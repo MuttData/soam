@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Exponential Smoothing Tests.
-- y-train on Forecaster.
+
+### Fixed
+- y-train on Forecaster run method.
 
 ## [0.3.5 - 2021-05-06]
 
