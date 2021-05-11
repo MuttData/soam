@@ -3,9 +3,7 @@ import logging
 from typing import Dict, Tuple
 
 import pandas as pd
-from statsmodels.tsa.holtwinters import ( 
-    ExponentialSmoothing,
-)
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 from soam.constants import DS_COL, YHAT_COL
 from soam.models._base import SkWrapper, sk_constructor_wrapper
