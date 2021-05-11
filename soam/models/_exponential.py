@@ -12,10 +12,6 @@ from soam.constants import DS_COL, YHAT_COL
 from soam.models._base import SkWrapper, sk_constructor_wrapper
 from soam.utilities.utils import SuppressStdOutStdErr
 
-# supress model FutureWarnings and ConvergenceWarnings bc FDA
-warnings.simplefilter("ignore", category=FutureWarning)
-
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
