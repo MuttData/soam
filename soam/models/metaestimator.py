@@ -146,14 +146,3 @@ class DaysSelectorEstimator(BaseEstimator):
         self.estimator_kwargs = params['estimator_kwargs']
         self._estimator = self.estimator_class.new(**self.estimator_kwargs)
         return self
-
-
-##  def __repr__(self):
-#      """Text representation of the object to look it nicely in the
-#      interpreter.
-#      """
-#      args = ','.join('%s=%s' % (k, v) for k, v in self.get_params().items())
-#      return '%s(%s)' % (self.__class__.__name__, args)
-#
-#  __str__ = __repr__
-#
