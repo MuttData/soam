@@ -8,7 +8,7 @@ from statsmodels.tsa.holtwinters import (  # pylint: disable=import-error
     ExponentialSmoothing,
 )
 
-from soam.constants import DATE_COL, YHAT_COL
+from soam.constants import DS_COL, YHAT_COL
 from soam.models._base import SkWrapper, sk_constructor_wrapper
 from soam.utilities.utils import SuppressStdOutStdErr
 
@@ -27,7 +27,7 @@ class SkExponentialSmoothing(SkWrapper):
 
     @sk_constructor_wrapper(ExponentialSmoothing)
     def __init__(
-        self, fit_params: Dict = None, date_col: str = DATE_COL,
+        self, fit_params: Dict = None, date_col: str = DS_COL,
     ):
         """Construct wrapper with extra parameters in addition to the ExponentialSmoothing ones.
 

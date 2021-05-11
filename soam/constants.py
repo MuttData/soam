@@ -24,13 +24,6 @@ SEED = 42
 
 OUTLIER_SIGN_COL = "sign"
 
-# Exponential Smoother Model
-DATE_COL = "ds"
-DEFAULT_TRAIN_DAYS_LIST = [21, 30, 60]  # For DaysSelectorEstimator
-DEFAULT_TRAINING_DAYS = 30
-DEFAULT_TSPLIT_SPLITS = 5  # For TimeSeriesSplit
-DEFAULT_TSPLIT_TEST_SIZE = 2  # For TimeSeriesSplit
-
 # Status
 STATUS_ACTIVE = "active"
 STATUS_INACTIVE = "inactive"

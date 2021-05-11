@@ -5,7 +5,7 @@ import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest  # pylint: disable=import-error
 
-from soam.constants import DATE_COL, YHAT_COL
+from soam.constants import DS_COL, YHAT_COL
 from soam.models import SkExponentialSmoothing
 from soam.utilities.utils import add_future_dates
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
@@ -61,7 +61,7 @@ def test_fit_transform_exponential(
         # Setup expected prediction
         expected_predictions = pd.DataFrame(
             {
-                DATE_COL: X[DATE_COL].values[-output_length:],
+                DS_COL: X[DS_COL].values[-output_length:],
                 YHAT_COL: prediction_values.values,
             }
         )
