@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from jinja2 import Template
 import pandas as pd
+from pandas.core.base import NoNewAttributesMixin  # pylint: disable=unused-import
 
 from soam.constants import (
     DONT_AGGREGATE_SYMBOL,
@@ -105,6 +106,7 @@ class TimeSeriesExtractor(Step):
     # maybe define class type all this arguments?
     def build_query(
         self,
+        table_mappings: Dict = None,
         columns=None,
         prequery: str = "",
         dimensions: List[str] = None,
@@ -237,6 +239,26 @@ class TimeSeriesExtractor(Step):
             self._negate_dimensions(dimensions),
             self._dont_aggregate_dimensions(dimensions),
         )
+
+        # Table Mappings
+        table = []
+        if table_mappings is not None:
+            if self.table_name in table_mappings.keys():
+                if table_mappings.get(self.table_name) != "":
+                    table = [
+                        self.table_name
+                        + ' AS '
+                        + str(table_mappings.get(self.table_name))
+                    ]
+                    placeholders["table_name"] = table[0]
+                else:
+                    raise ValueError(
+                        f"That alias {table_mappings.get(self.table_name)} is not appropiate. Use at least one character."
+                    )
+            else:
+                raise ValueError(
+                    f"Table name inserted {table_mappings.keys()} is different from the one initiated on the TimeSeriesExtractor {self.table_name}"
+                )
 
         # Columns
         col_map = aggregated_column_mappings
