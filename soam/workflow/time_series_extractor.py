@@ -263,7 +263,7 @@ class TimeSeriesExtractor(Step):
             extra_where_conditions = [
                 cond.replace("%", "%%")
                 for cond in extra_where_conditions
-                if "%" in extra_where_conditions
+                if "%" in cond
             ]
             where_conds.extend(extra_where_conditions)
         if where_conds:

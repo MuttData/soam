@@ -720,7 +720,7 @@ class TestDatasetStore(PgTestCase):
         order_by = ["ad_type"]
         start_date = "2019-09-01"
         end_date = "2019-09-02"
-        extra_where_conditions = "game LIKE '%mario%'"
+        extra_where_conditions = ["game LIKE '%mario%'"]
 
         query = self.time_series_extractor.build_query(
             columns=columns,
