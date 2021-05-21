@@ -126,6 +126,9 @@ class TimeSeriesExtractor(Step):
 
         Parameters
         ----------
+        table_mappings: Dict
+            The name of the table and it's alias.
+            E.g.: {table_name: table_alias}
         columns: list of str
             The columns to retrieve.
         prequery: str
@@ -253,7 +256,7 @@ class TimeSeriesExtractor(Step):
                     placeholders["table_name"] = table[0]
                 else:
                     raise ValueError(
-                        f"That alias {table_mappings.get(self.table_name)} is not appropiate. Use at least one character."
+                        f"That alias '{table_mappings.get(self.table_name)}' is not appropiate. Use at least one character."
                     )
             else:
                 raise ValueError(
