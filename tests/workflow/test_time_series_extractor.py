@@ -140,6 +140,7 @@ class TestDatasetStore(PgTestCase):
         extra_where_conditions=None,
         extra_having_conditions=None,
         inner_join=None,
+        table_mapping=None,
     ):
         df = self.time_series_extractor.extract(
             build_query_kwargs=dict(
@@ -154,6 +155,7 @@ class TestDatasetStore(PgTestCase):
                 column_mappings=column_mappings,
                 aggregated_column_mappings=aggregated_column_mappings,
                 inner_join=inner_join,
+                table_mapping=table_mapping,
             )
         )
         # Fix for backwards compatible with original tests.
@@ -234,6 +236,33 @@ class TestDatasetStore(PgTestCase):
                     None,
                     "test_ad_network_join_data.ad_network = test_data.ad_network",
                 )
+            ],
+        )
+
+    def test_join_tables_with_alias(self):
+        columns = [
+            TIMESTAMP_COL,
+            "opportunities",
+            "b.ad_network",
+            "ad_network_group",
+        ]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-02', 300, 'source2', 'source_group_A'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            table_mapping='a',
+            inner_join=[
+                ("test_ad_network_join_data", 'b', "b.ad_network = a.ad_network",)
             ],
         )
 
