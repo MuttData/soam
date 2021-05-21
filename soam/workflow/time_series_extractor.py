@@ -106,7 +106,7 @@ class TimeSeriesExtractor(Step):
     # maybe define class type all this arguments?
     def build_query(
         self,
-        table_mappings: Dict = None,
+        table_mapping: str = None,
         columns=None,
         prequery: str = "",
         dimensions: List[str] = None,
@@ -126,9 +126,8 @@ class TimeSeriesExtractor(Step):
 
         Parameters
         ----------
-        table_mappings: Dict
-            The name of the table and it's alias.
-            E.g.: {table_name: table_alias}
+        table_mapping: str
+            The alias of the table.
         columns: list of str
             The columns to retrieve.
         prequery: str
@@ -197,6 +196,9 @@ class TimeSeriesExtractor(Step):
           {{ prequery }}
           SELECT {{ columns | join(", ") }}
           FROM {{ table_name }}
+          {% if table_mapping %}
+          AS {{ table_mapping }}
+          {% endif %}
           {% if join_tables %}
           {% for j_table in join_tables %}
           INNER JOIN {{ j_table.0 }}
@@ -230,6 +232,7 @@ class TimeSeriesExtractor(Step):
             "prequery": prequery,
             "columns": "*",
             "table_name": self.table_name,
+            "table_mapping": table_mapping,
             "join_tables": inner_join,
             "where": "",
             "group_by": "",
@@ -242,26 +245,6 @@ class TimeSeriesExtractor(Step):
             self._negate_dimensions(dimensions),
             self._dont_aggregate_dimensions(dimensions),
         )
-
-        # Table Mappings
-        table = []
-        if table_mappings is not None:
-            if self.table_name in table_mappings.keys():
-                if table_mappings.get(self.table_name) != "":
-                    table = [
-                        self.table_name
-                        + ' AS '
-                        + str(table_mappings.get(self.table_name))
-                    ]
-                    placeholders["table_name"] = table[0]
-                else:
-                    raise ValueError(
-                        f"That alias '{table_mappings.get(self.table_name)}' is not appropiate. Use at least one character."
-                    )
-            else:
-                raise ValueError(
-                    f"Table name inserted {table_mappings.keys()} is different from the one initiated on the TimeSeriesExtractor {self.table_name}"
-                )
 
         # Columns
         col_map = aggregated_column_mappings
