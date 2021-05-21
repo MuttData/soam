@@ -260,6 +260,11 @@ class TimeSeriesExtractor(Step):
         kwargs.update(date_kwargs)
         where_conds.extend(date_conds)
         if extra_where_conditions:
+            extra_where_conditions = [
+                cond.replace("%", "%%")
+                for cond in extra_where_conditions
+                if "%" in extra_where_conditions
+            ]
             where_conds.extend(extra_where_conditions)
         if where_conds:
             placeholders["where"] = where_conds  # type: ignore
