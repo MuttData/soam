@@ -731,7 +731,7 @@ class TestDatasetStore(PgTestCase):
         )
         # remove empty spaces and new lines
         returned_query = " ".join(query[0].split())
-        return_query = "SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' ORDER BY ad_type AND game LIKE '%mario%'"
+        return_query = "SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' AND game LIKE '%mario%' ORDER BY ad_type"
         self.assertEqual(returned_query, return_query)
 
     @classmethod
