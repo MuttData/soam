@@ -140,6 +140,7 @@ class TestDatasetStore(PgTestCase):
         extra_where_conditions=None,
         extra_having_conditions=None,
         inner_join=None,
+        table_mapping=None,
     ):
         df = self.time_series_extractor.extract(
             build_query_kwargs=dict(
@@ -154,6 +155,7 @@ class TestDatasetStore(PgTestCase):
                 column_mappings=column_mappings,
                 aggregated_column_mappings=aggregated_column_mappings,
                 inner_join=inner_join,
+                table_mapping=table_mapping,
             )
         )
         # Fix for backwards compatible with original tests.
@@ -234,6 +236,33 @@ class TestDatasetStore(PgTestCase):
                     None,
                     "test_ad_network_join_data.ad_network = test_data.ad_network",
                 )
+            ],
+        )
+
+    def test_join_tables_with_alias(self):
+        columns = [
+            TIMESTAMP_COL,
+            "opportunities",
+            "b.ad_network",
+            "ad_network_group",
+        ]
+        values = [
+            ['2019-09-01', 1000, 'source1', 'source_group_B'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-01', 1000, 'source2', 'source_group_A'],
+            ['2019-09-02', 300, 'source2', 'source_group_A'],
+        ]
+        self._test_load(
+            columns=columns,
+            dimensions=None,
+            dimensions_values=None,
+            start_date=None,
+            end_date=None,
+            order_by=None,
+            expected_values=values,
+            table_mapping='a',
+            inner_join=[
+                ("test_ad_network_join_data", 'b', "b.ad_network = a.ad_network",)
             ],
         )
 
@@ -682,7 +711,7 @@ class TestDatasetStore(PgTestCase):
         ]
         self.assertEqual(ret, expected)
 
-    def test_builded_query(self):
+    def test_builded_query_prequery(self):
         columns = [
             "timestamp",
             "game",
@@ -706,6 +735,32 @@ class TestDatasetStore(PgTestCase):
         # remove empty spaces and new lines
         returned_query = " ".join(query[0].split())
         return_query = "SET extra_float_digits = 3; SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' ORDER BY ad_type"
+        self.assertEqual(returned_query, return_query)
+
+    def test_builded_query_extra_cond(self):
+        columns = [
+            "timestamp",
+            "game",
+            "country",
+            "ad_network",
+            "ad_type",
+            "placement_id",
+        ]
+        order_by = ["ad_type"]
+        start_date = "2019-09-01"
+        end_date = "2019-09-02"
+        extra_where_conditions = ["game LIKE '%mario%'"]
+
+        query = self.time_series_extractor.build_query(
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            order_by=order_by,
+            extra_where_conditions=extra_where_conditions,
+        )
+        # remove empty spaces and new lines
+        returned_query = " ".join(query[0].split())
+        return_query = "SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' AND game LIKE '%mario%' ORDER BY ad_type"
         self.assertEqual(returned_query, return_query)
 
     @classmethod
