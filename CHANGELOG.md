@@ -5,8 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<<<<<<< HEAD
-=======
+## [0.3.7 - 2021-05-26]
+
+### Added
+- Time Series Extractor:
+    - Table mappings.
+    - Replace for % sign.
+    - Add columns_mapping docstring
+
+
 ## [0.3.6 - 2021-05-10]
 
 ### Added
@@ -15,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - y-train on Forecaster run method.
 
->>>>>>> a0024d3... Apply 5 suggestion(s) to 2 file(s)
 ## [0.3.5 - 2021-05-06]
 
 ### Changed
