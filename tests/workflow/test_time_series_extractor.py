@@ -711,7 +711,7 @@ class TestDatasetStore(PgTestCase):
         ]
         self.assertEqual(ret, expected)
 
-    def test_builded_query(self):
+    def test_builded_query_prequery(self):
         columns = [
             "timestamp",
             "game",
@@ -735,6 +735,32 @@ class TestDatasetStore(PgTestCase):
         # remove empty spaces and new lines
         returned_query = " ".join(query[0].split())
         return_query = "SET extra_float_digits = 3; SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' ORDER BY ad_type"
+        self.assertEqual(returned_query, return_query)
+
+    def test_builded_query_extra_cond(self):
+        columns = [
+            "timestamp",
+            "game",
+            "country",
+            "ad_network",
+            "ad_type",
+            "placement_id",
+        ]
+        order_by = ["ad_type"]
+        start_date = "2019-09-01"
+        end_date = "2019-09-02"
+        extra_where_conditions = ["game LIKE '%mario%'"]
+
+        query = self.time_series_extractor.build_query(
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            order_by=order_by,
+            extra_where_conditions=extra_where_conditions,
+        )
+        # remove empty spaces and new lines
+        returned_query = " ".join(query[0].split())
+        return_query = "SELECT timestamp, game, country, ad_network, ad_type, placement_id FROM test_data WHERE timestamp >= '2019-09-01' AND timestamp <= '2019-09-02' AND game LIKE '%mario%' ORDER BY ad_type"
         self.assertEqual(returned_query, return_query)
 
     @classmethod

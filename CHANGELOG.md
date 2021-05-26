@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<<<<<<< CHANGELOG.md
 ## [0.3.7 - 2021-05-26]
 
 ### Added
-- Table mappings to Time Series Extractor.
+- Time Series Extractor:
+    - Replace for % sign.
+    - Table mappings.
 
+=======
+## [0.3.7 - 2021-05-21]
+
+### Added
+- replace for % sign on time series extractor
+>>>>>>> CHANGELOG.md
 
 ## [0.3.6 - 2021-05-10]
 
