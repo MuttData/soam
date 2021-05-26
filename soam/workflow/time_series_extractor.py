@@ -105,6 +105,7 @@ class TimeSeriesExtractor(Step):
     # maybe define class type all this arguments?
     def build_query(
         self,
+        table_mapping: str = None,
         columns=None,
         prequery: str = "",
         dimensions: List[str] = None,
@@ -124,6 +125,8 @@ class TimeSeriesExtractor(Step):
 
         Parameters
         ----------
+        table_mapping: str
+            The alias of the table.
         columns: list of str
             The columns to retrieve.
         prequery: str
@@ -163,7 +166,10 @@ class TimeSeriesExtractor(Step):
             A list of conditions to be added to the "where" clause.
         extra_having_conditions:  list of str or None
             A list of conditions to be added to the "having" clause.
-        column_mappings: TODO: missing doc
+        column_mappings: dict
+            A dict with 'column names' as keys and 'column as column alias' as values.
+            E.g.: A dict like {'date':'date as fecha'} would result in
+            a SQL statement 'SELECT date as fecha'.
         aggregated_column_mappings: dict
             Contains the aggregation functions and aliases to replace the column
             values.
@@ -192,6 +198,9 @@ class TimeSeriesExtractor(Step):
           {{ prequery }}
           SELECT {{ columns | join(", ") }}
           FROM {{ table_name }}
+          {% if table_mapping %}
+          AS {{ table_mapping }}
+          {% endif %}
           {% if join_tables %}
           {% for j_table in join_tables %}
           INNER JOIN {{ j_table.0 }}
@@ -225,6 +234,7 @@ class TimeSeriesExtractor(Step):
             "prequery": prequery,
             "columns": "*",
             "table_name": self.table_name,
+            "table_mapping": table_mapping,
             "join_tables": inner_join,
             "where": "",
             "group_by": "",
@@ -260,6 +270,11 @@ class TimeSeriesExtractor(Step):
         kwargs.update(date_kwargs)
         where_conds.extend(date_conds)
         if extra_where_conditions:
+            extra_where_conditions = [
+                cond.replace("%", "%%")
+                for cond in extra_where_conditions
+                if "%" in cond
+            ]
             where_conds.extend(extra_where_conditions)
         if where_conds:
             placeholders["where"] = where_conds  # type: ignore
