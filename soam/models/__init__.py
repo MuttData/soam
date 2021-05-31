@@ -1,5 +1,3 @@
 """SoaM models."""
-
-from soam.models._exponential import SkExponentialSmoothing
-from soam.models._orbit import SkOrbit
-from soam.models._prophet import SkProphet
+# we can't call models from here because as it's been used as a wrapper
+# it try to call the model and fails importing

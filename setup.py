@@ -38,13 +38,13 @@ extra_dependencies = {
         'psycopg2-binary',
         'nbval',
         'pdftotext==2.1.5',
-        'statsmodels<0.12,>=0.11',
     ],
     'slack': ["slackclient",],
     'orbit': ['orbit-ml==1.0.13'],
     'prophet': ["pystan==2.19.1.1", "fbprophet==0.6",],
     'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
     'gsheets_report': ["muttlib[gsheets]>=1.0,<2"],
+    'statsmodels': ["statsmodels<0.12,>=0.11"],
 }
 
 # create 'all' and 'report' extras
