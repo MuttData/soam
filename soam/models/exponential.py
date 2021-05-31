@@ -3,16 +3,21 @@ import logging
 from typing import Dict, Tuple
 
 import pandas as pd
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 from soam.constants import DS_COL, YHAT_COL
-from soam.models._base import SkWrapper, sk_constructor_wrapper
+from soam.models.base import SkWrapper, sk_constructor_wrapper
 from soam.utilities.utils import SuppressStdOutStdErr
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # pylint: disable=super-init-not-called, attribute-defined-outside-init, unnecessary-pass, no-member
+
+try:
+    from statsmodels.tsa.holtwinters import ExponentialSmoothing
+except ImportError:
+    logger.warning("No ExponentialSmoothing support")
+    logger.warning("If you want to use it, ´pip install soam[statsmodels]´")
 
 
 class SkExponentialSmoothing(SkWrapper):

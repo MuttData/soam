@@ -1,16 +1,25 @@
 """Orbit model wrapper."""
+import logging
 from typing import List, Union
 import warnings
 
-from orbit.models.dlt import DLTFull
 import pandas as pd
 from typing_extensions import Literal
 
 from soam.constants import SEED
-from soam.models._base import SkWrapper, sk_constructor_wrapper
+from soam.models.base import SkWrapper, sk_constructor_wrapper
 from soam.utilities.utils import SuppressStdOutStdErr
 
 # pylint: disable=super-init-not-called, attribute-defined-outside-init, unnecessary-pass, no-member
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+try:
+    from orbit.models.dlt import DLTFull
+except ImportError:
+    logger.warning("No orbit support")
+    logger.warning("If you want to use it, ´pip install soam[orbit]´")
 
 
 class SkOrbit(SkWrapper):

@@ -3,13 +3,13 @@ from unittest.mock import MagicMock, patch
 from pandas.testing import assert_frame_equal
 import pytest
 
-from soam.models import SkOrbit
+from soam.models.orbit import SkOrbit
 from soam.utilities.utils import add_future_dates
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
 
 def test_fit(sample_data_df):  # pylint: disable=redefined-outer-name
-    with patch("soam.models._orbit.DLTFull") as model_patch:
+    with patch("soam.models.orbit.DLTFull") as model_patch:
         output_length = 10
         train_data = sample_data_df
         data = add_future_dates(train_data, output_length)
@@ -25,7 +25,7 @@ def test_fit(sample_data_df):  # pylint: disable=redefined-outer-name
 def test_predict_without_fit_fails(
     sample_data_df,
 ):  # pylint: disable=redefined-outer-name
-    with patch("soam.models._orbit.DLTFull") as model_patch:
+    with patch("soam.models.orbit.DLTFull") as model_patch:
         output_length = 10
         train_data = sample_data_df
         data = add_future_dates(train_data, output_length)
@@ -37,7 +37,7 @@ def test_predict_without_fit_fails(
 
 
 def test_fit_transform(sample_data_df):  # pylint: disable=redefined-outer-name
-    with patch("soam.models._orbit.DLTFull") as model_patch:
+    with patch("soam.models.orbit.DLTFull") as model_patch:
         output_length = 10
         train_data = sample_data_df
         data = add_future_dates(train_data, output_length)
