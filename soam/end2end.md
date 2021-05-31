@@ -33,11 +33,11 @@ Use **Apache Airflow** to create DAGs that fullfil the following:
 
 Once you have your data stored in your database, its time for SoaM to come into the scene.
 
-1. Here SoaM Time Series Extractor will come into action by querying the data needed from your database and returning a ready to work pandas DataFrame.
+1. Firstly, SoaM Time Series Extractor will come into action by querying the data needed from your database and returning a ready to work pandas DataFrame.
 
-2. After you have your DataFrame loaded, it's time for the SoaM Transformer. With the toolkit provided by this module you will be able to apply any SciKit-Learn transformation or even create a custom one for your specific use case.
+2. Then, after you have your DataFrame loaded, it's time for the SoaM Transformer. With the toolkit provided by this module you will be able to apply any SciKit-Learn transformation or even create a custom one for your specific use case.
 
-3. Once the data is cleaned, SoaM Forecaster comes into play to offer you the ability to apply different Machine Learning algortihms to your data such as: FBProphet, Orbit or even Exponential Smoother to forecast your time-series on a desired time-frame.
+3. Thirdly, and once the data is fully cleaned, SoaM Forecaster comes into play to offer you the ability to apply different Machine Learning algortihms on your data such as: [FBProphet](https://facebook.github.io/prophet/), [Orbit](https://github.com/uber/orbit) or even [Exponential Smoother](https://www.statsmodels.org/stable/generated/statsmodels.tsa.holtwinters.ExponentialSmoothing.html#statsmodels.tsa.holtwinters.ExponentialSmoothing) to forecast your time-series on a desired time-frame.
 
 4. Last but not least, it's time to plot and see the results! Here is when the SoaM Forecast Plotter appears and generates a beautiful plot where you will see your past data and the forecasted one.
 
