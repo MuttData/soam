@@ -13,6 +13,15 @@ see how to include .html content here: https://bookdown.org/yihui/rmarkdown-cook
 
 ## DIAGRAM
 
+```mermaid
+graph TD;
+  A-->B;
+  A-->C;
+  B-->D;
+  C-->D;
+```
+
+
 CREATE A DIAGRAM USE: https://docs.gitlab.com/ee/user/markdown.html#mermaid
 
 ## Cookiecutter strucutre
@@ -44,3 +53,6 @@ Once you have your data stored in your database, its time for SoaM to come into 
 5. Finally, SoaM Reporting provides tools to generate and share reports with your team or friends via Google Sheets, Email, PDF and/or Slack.
 
 To see how some of this can be easily implemented, check our [quickstart](notebook/examples/quickstart.ipynb)!
+
+
+### Add how could Airflow be applied one the quickstart.
