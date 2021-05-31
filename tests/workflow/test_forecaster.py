@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-from soam.models import SkProphet
+from soam.models.prophet import SkProphet
 from soam.utilities.utils import add_future_dates
 from soam.workflow import Forecaster
 from tests.helpers import sample_data_df  # pylint: disable=unused-import

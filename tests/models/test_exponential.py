@@ -6,7 +6,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest  # pylint: disable=import-error
 
 from soam.constants import DS_COL, YHAT_COL
-from soam.models import SkExponentialSmoothing
+from soam.models.exponential import SkExponentialSmoothing
 from soam.utilities.utils import add_future_dates
 from tests.helpers import sample_data_df  # pylint: disable=unused-import
 
@@ -28,7 +28,7 @@ def test_input_format_exponential(
 def test_predict_without_fit_fails_exponential(
     sample_data_df,
 ):  # pylint: disable=redefined-outer-name
-    with patch("soam.models._exponential.ExponentialSmoothing") as model_patch:
+    with patch("soam.models.exponential.ExponentialSmoothing") as model_patch:
         output_length = 10
         train_data = sample_data_df
         data = add_future_dates(train_data, output_length)
@@ -42,7 +42,7 @@ def test_predict_without_fit_fails_exponential(
 def test_fit_transform_exponential(
     sample_data_df,  # pylint: disable=redefined-outer-name
 ):
-    with patch("soam.models._exponential.ExponentialSmoothing") as model_patch:
+    with patch("soam.models.exponential.ExponentialSmoothing") as model_patch:
         output_length = 10
         train_data = sample_data_df
         data = add_future_dates(train_data, output_length)
