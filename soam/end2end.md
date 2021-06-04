@@ -1,5 +1,7 @@
 # End to End data product with SoaM:
 
+The purpose of this document is to show how a generic end to end data product using SoaM, Cookiecutter and Airflow will look like.
+
 ```mermaid
 graph LR;
   id0[(Database I)]-->id2[/SoaM Time Series Extractor/];
