@@ -1,20 +1,10 @@
-
-# ISSUE INFO:
-## Add example/document full end to end project of soam for structure and airflow for scheduling
-
-After some talks we found that it was not fully clear from the docs that SoaM is intended to structure internal parts of the code but the user would still need an external scheduler like Airflow.
-
-The docs should be explicit about this and describe a complete project.
-
-# WIP FILE
-
-# End to End data product w/SoaM:
+# End to End data product with SoaM:
 
 ```mermaid
 graph LR;
   id0[(Database I)]-->id2[/SoaM Time Series Extractor/];
   id1[(Database II)]-->id2;
-  id2-- Airflow Scheduler -->id3[/SoaM Transformer/];
+  id2-->id3[/SoaM Transformer/];
   id3-->id4[/SoaM Forecaster/];
   id5{{Forecasting Model}}-->id4;
   id4-->id6[(SoaM Predictions)];
@@ -52,6 +42,3 @@ Once you have your data stored in your database, its time for SoaM to come into 
 5. Finally, SoaM Reporting provides tools to generate and share reports with your team or friends via Google Sheets, Email, PDF and/or Slack.
 
 To see how some of this can be easily implemented, check our [quickstart](notebook/examples/quickstart.ipynb)!
-
-
-### Add how could Airflow be applied on the quickstart.
