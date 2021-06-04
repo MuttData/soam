@@ -9,15 +9,12 @@ The docs should be explicit about this and describe a complete project.
 # WIP FILE
 
 # End to End data product w/SoaM:
-see how to include .html content here: https://bookdown.org/yihui/rmarkdown-cookbook/include-html.html
-
-## DIAGRAM
 
 ```mermaid
 graph LR;
   id0[(Database I)]-->id2[/SoaM Time Series Extractor/];
   id1[(Database II)]-->id2;
-  id2-->id3[/SoaM Transformer/];
+  id2- Airflow Scheduler ->id3[/SoaM Transformer/];
   id3-->id4[/SoaM Forecaster/];
   id5{{Forecasting Model}}-->id4;
   id4-->id6[(SoaM Predictions)];
@@ -25,8 +22,6 @@ graph LR;
   id6-->id8[/SoaM Reporting/];
   id7-->id8;
 ```
-
-CREATE A DIAGRAM USE: https://docs.gitlab.com/ee/user/markdown.html#mermaid
 
 ## Cookiecutter strucutre
 
