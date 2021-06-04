@@ -15,10 +15,12 @@ see how to include .html content here: https://bookdown.org/yihui/rmarkdown-cook
 
 ```mermaid
 graph TD;
-  A-->B;
-  A-->C;
-  B-->D;
-  C-->D;
+  Database-->Time Series Extractor;
+  Time Series Extractor-->Transformer;
+  Transformer-->Forecaster;
+  Forecaster-->Forecaster Plotter;
+  Forecaster-->Reporting;
+  Forecaster Plotter-->Reporting;
 ```
 
 
@@ -55,4 +57,4 @@ Once you have your data stored in your database, its time for SoaM to come into 
 To see how some of this can be easily implemented, check our [quickstart](notebook/examples/quickstart.ipynb)!
 
 
-### Add how could Airflow be applied one the quickstart.
+### Add how could Airflow be applied on the quickstart.
