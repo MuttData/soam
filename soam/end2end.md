@@ -15,23 +15,17 @@ see how to include .html content here: https://bookdown.org/yihui/rmarkdown-cook
 
 ```mermaid
 graph LR;
-  id1[(Database)]-->id2[/Time Series Extractor/];
-  id2-->id3[/Transformer/];
-  id3-->id4[/Forecaster/];
-  id5{{Model}}-->id4;
-  id4-->id6[(Predictions)];
-  id6-->id7[/Forecaster Plotter/];
-  id6-->id8[/Reporting/];
+  id0[(Database I)]-->id2[/SoaM Time Series Extractor/];
+  id1[(Database II)]-->id2;
+  id2-->id3[/SoaM Transformer/];
+  id3-->id4[/SoaM Forecaster/];
+  id5{{Forecasting Model}}-->id4;
+  id4-->id6[(SoaM Predictions)];
+  id6-->id7[/SoaM Forecaster Plotter/];
+  id6-->id8[/SoaM Reporting/];
   id7-->id8;
 ```
 
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
 CREATE A DIAGRAM USE: https://docs.gitlab.com/ee/user/markdown.html#mermaid
 
 ## Cookiecutter strucutre
