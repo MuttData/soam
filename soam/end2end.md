@@ -14,7 +14,7 @@ The docs should be explicit about this and describe a complete project.
 graph LR;
   id0[(Database I)]-->id2[/SoaM Time Series Extractor/];
   id1[(Database II)]-->id2;
-  id2- Airflow Scheduler ->id3[/SoaM Transformer/];
+  id2-- Airflow Scheduler -->id3[/SoaM Transformer/];
   id3-->id4[/SoaM Forecaster/];
   id5{{Forecasting Model}}-->id4;
   id4-->id6[(SoaM Predictions)];
