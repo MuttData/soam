@@ -16,7 +16,7 @@ graph LR;
 ```
 
 ```mermaid
-graph LR;
+flowchart LR;
   id0[/SoaM Main Repo/]--Defines-->id1[/Cookiecutter/];
   subgraph DAG
   id2[(Load Daily ABT)]-->id3[/SoaM Instance/];
