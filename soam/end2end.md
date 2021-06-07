@@ -15,6 +15,18 @@ graph LR;
   id7-->id8;
 ```
 
+```mermaid
+graph LR;
+  id0[/SoaM Main Repo/]--Defines-->id1[/Cookiecutter/];
+  subgraph DAG
+  id2[(Load Daily ABT)]-->id3[/SoaM Instance/];
+  id3-->id4[Promote Results to Production];
+  end
+  id1--Generates-->id3;
+  id5[Airflow]--Schedules-->DAG;
+```
+
+
 ## Cookiecutter strucutre
 
 Cookiecutter is a CLI tool (Command Line Interface) to create an application boilerplate from a template. It uses a templating system — Jinja2 — to replace or customize folder and file names, as well as file content.
