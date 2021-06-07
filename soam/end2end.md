@@ -17,13 +17,13 @@ graph LR;
 
 ```mermaid
 flowchart LR;
-  id0[/SoaM Main Repo/]--Defines-->id1[/Cookiecutter/];
+  id5[/Airflow/]---Schedules---->DAG;
+  id0[/SoaM Main Repo/]---Defines-->id1[/Cookiecutter/];
   subgraph DAG
   id2[(Load Daily ABT)]-->id3[/SoaM Instance/];
   id3-->id4[Promote Results to Production];
   end
   id1--Generates-->id3;
-  id5[Airflow]--Schedules-->DAG;
 ```
 
 
