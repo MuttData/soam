@@ -1,6 +1,6 @@
 # End to End data product with SoaM:
 
-The purpose of this document is to show how a generic end to end data product using SoaM, Cookiecutter and Airflow will look like.
+The purpose of this document is to show how a generic end to end data product would look line using SoaM, Cookiecutter and Airflow.
 
 Take this example, imagine you need to run a process everyday that consists on loading the daily ABT, querying your database, transforming some datapoints, forecasting on a desired timeframe, plotting the results and sharing it by slack with your workteam. After that, promote results to the production environment. See the diagram below.
 
