@@ -70,7 +70,8 @@ for example to
 
 [//comment]: # (the postprocessing supports custom outputs?)
 
-For further info check our [end to end](soam/end2end.md) example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
+For further info check our **[end to end](end2end.md)** example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
+
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
