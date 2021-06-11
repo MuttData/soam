@@ -15,7 +15,7 @@ from soam.constants import (
     PLOT_CONFIG,
     Y_COL,
 )
-from soam.models import SkProphet
+from soam.models.prophet import SkProphet
 from soam.plotting import ForecastPlotterTask
 from soam.workflow import (
     Backtester,

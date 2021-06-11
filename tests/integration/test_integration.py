@@ -14,7 +14,7 @@ from soam.constants import (
     YHAT_COL,
 )
 from soam.core import SoamFlow
-from soam.models import SkProphet
+from soam.models.prophet import SkProphet
 from soam.plotting import ForecastPlotterTask
 from soam.reporting import SlackReportTask
 from soam.reporting.slack_report import (
