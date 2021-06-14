@@ -58,6 +58,7 @@ JOIN_TEMPLATE = """
 class TimeSeriesExtractor(Step):
     db: "muttlib.dbconn.BaseClient"
     table_name: str
+    build_query_kwargs: Dict[str, Any]
 
     def __init__(
         self,
@@ -76,9 +77,16 @@ class TimeSeriesExtractor(Step):
             The table's name.
         """
         super().__init__(**kwargs)
-
         self.db = db
         self.table_name = table_name
+        self.build_query_kwargs = {}  # this needs to be passed as a param
+
+    def get_params(self, deep=True):
+        d = super().get_params(deep)
+        d["db_conn_str"] = self.db.conn_str
+        del d["db"]
+        d["build_query_kwargs"] = self.build_query_kwargs
+        return d
 
     def extract(self, build_query_kwargs: Dict[str, Any],) -> pd.DataFrame:
         """
