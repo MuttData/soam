@@ -4,6 +4,7 @@ Utils
 -----
 Utility functions for the whole project.
 """
+import collections
 from copy import deepcopy
 import logging.config
 import os
@@ -295,3 +296,31 @@ def add_future_dates(
     future_df = pd.DataFrame(future_df)
     full_df = pd.concat([df, future_df], axis=0, ignore_index=True)
     return full_df
+
+
+def flatten_dict(d, parent_key='', sep='.'):
+    """
+    Flatten a nested dictionary, creating new keys for your new dictionary.
+
+    Parameters
+    ----------
+    d : Dict
+        dictionary to be flattened.
+    parent_key : str, optional
+        parent key, by default None.
+    sep : str, optional
+        separator, by defaut '.'.
+
+    Returns
+    -------
+    Dict
+        Flattened dictionary.
+    """
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, collections.MutableMapping):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
