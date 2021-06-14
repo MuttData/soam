@@ -21,7 +21,8 @@ flowchart LR;
   airflow[/Airflow/].->|schedules|promote_to_prod;
 ```
 
-In this case, SoaM and Airflow will be interacting elbow to elbow to get this running. It's important to understand the distinctions between them.  
+In this case, SoaM and Airflow will be interacting elbow to elbow to get this running. It's important to understand the distinctions between them.
+
 **SoaM will be you internal workflow manager, while Airflow will be your external manager**. Airflow will be in charge of scheduling all of your desired tasks through a DAG and retrying if an issue arises. Meanwhile SoaM, as your internal workflow manager, is the one in charge of managing our Python logic to carry out the desired steps mentioned before.
 
 See the following sections where we double click on this so that it's clearer for you.
