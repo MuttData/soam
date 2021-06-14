@@ -45,6 +45,7 @@ extra_dependencies = {
     'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
     'gsheets_report': ["muttlib[gsheets]>=1.0,<2"],
     'statsmodels': ["statsmodels<0.12,>=0.11"],
+    'mlflow': ["mlflow==1.17.0"],
 }
 
 # create 'all' and 'report' extras

@@ -2,7 +2,7 @@
 """
 Configurations
 ----------
-Configuration values for the SlackReport, MailReport and DBSaver.
+Configuration values for the SlackReport, MailReport, DBSaver and Mlflow.
 """
 from pathlib import Path
 import tempfile
@@ -61,6 +61,13 @@ EXTRACT_VALUES_TABLE = f"{table_name_preffix}{EXTRACT_VALUES_TABLE_BASENAME}"
 MAIL_TEMPLATE = get_default_jinja_template(
     resource_string(__name__, MAIL_REPORT).decode(UTF_ENCODING)
 ).module
+
+# Mlflow tracking config
+# Set to True if tracking is on
+TRACKING_IS_ACTIVE = False
+# Local file paths should be prefixed with "file:/", default is ./mlruns
+# http URIs and Databricks workspaces can be used too.
+TRACKING_URI = ''
 
 
 def get_db_cred(setting_path: Optional[str] = None) -> dict:
