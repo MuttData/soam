@@ -119,6 +119,7 @@ class TimeSeriesExtractor(Step):
         column_mappings: Dict = None,
         aggregated_column_mappings: Dict = None,
         inner_join: Optional[List[Tuple[str, str, str]]] = None,
+        group_by: Optional[List[str]] = None
     ) -> Tuple[str, Dict[str, Any]]:
         """
         Build the query to extract and aggregated dataset.
@@ -273,7 +274,6 @@ class TimeSeriesExtractor(Step):
             extra_where_conditions = [
                 cond.replace("%", "%%")
                 for cond in extra_where_conditions
-                if "%" in cond
             ]
             where_conds.extend(extra_where_conditions)
         if where_conds:

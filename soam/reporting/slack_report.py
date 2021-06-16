@@ -52,6 +52,7 @@ class SlackReport:
         plot_filename: Union[str, Path],
         greeting_message: Optional[str] = DEFAULT_GREETING_MESSAGE,
         farewell_message: Optional[str] = DEFAULT_FAREWELL_MESSAGE,
+        value_col: Optional[str] = YHAT_COL
     ) -> Union[Future, SlackResponse]:
         """
         Send Slack report.
@@ -73,14 +74,16 @@ class SlackReport:
             Sends the specified message with the predictions data via Slack.
         """
         if greeting_message == DEFAULT_GREETING_MESSAGE:
-            greeting_message.format(metric_name=self.metric_name)
+            greeting_message = greeting_message.format(metric_name=self.metric_name)
 
         summary_entries = []
         summary_entries.append(greeting_message)
 
         for _, row in prediction.iterrows():
             date = row[DS_COL].strftime('%Y-%b-%d')
-            value = "{:.2f}".format(row[YHAT_COL])
+            value = row[value_col]
+            if value_col == YHAT_COL: 
+                value = "{:.2f}".format(row[value_col])
             summary_entries.append(f"• *[{date}]* {value}\n")
 
         summary_entries.append(farewell_message)
