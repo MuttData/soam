@@ -9,12 +9,19 @@ TODO: review if SoamFlow is going to be the only class that can run the
  pipeline
 """
 from datetime import datetime
+import logging
 from typing import TYPE_CHECKING, Optional  # pylint:disable=unused-import
 
-import mlflow
 from prefect import Flow, Task
 
 from soam.cfg import TRACKING_IS_ACTIVE, TRACKING_URI
+
+logger = logging.getLogger(__name__)
+try:
+    from mlflow import end_run, set_tracking_uri, start_run
+except ModuleNotFoundError:
+    logger.debug("Mlflow dependency is not installed.")
+
 
 if TYPE_CHECKING:
     from soam.savers import Saver
@@ -47,7 +54,7 @@ class SoamFlow(Flow):
 
         if TRACKING_IS_ACTIVE:
             self.active_run = None
-            mlflow.set_tracking_uri(TRACKING_URI)
+            set_tracking_uri(TRACKING_URI)
             self.state_handlers.append(self.set_tracker_run)
 
     def add_task(self, task: Task) -> Task:
@@ -89,7 +96,7 @@ class SoamFlow(Flow):
             the new state of this object.
         """
         if new_state.is_running():
-            obj.active_run = mlflow.start_run(run_name="flow_run")
+            obj.active_run = start_run(run_name="flow_run")
         if new_state.is_finished():
-            mlflow.end_run()
+            end_run()
         return new_state

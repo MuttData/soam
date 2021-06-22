@@ -6,8 +6,8 @@ An abstract base class for the steps in the pipeline, including: postprocess,
 preprocess, extract and forecaster.
 """
 from abc import abstractmethod
+import logging
 
-import mlflow
 import pandas as pd
 from prefect import Task, context
 from sklearn.base import BaseEstimator
@@ -15,7 +15,11 @@ from sklearn.base import BaseEstimator
 from soam.cfg import TRACKING_IS_ACTIVE
 from soam.utilities.utils import flatten_dict
 
-# import logging
+logger = logging.getLogger(__name__)
+try:
+    from mlflow import end_run, log_params, start_run
+except ModuleNotFoundError:
+    logger.debug("Mlflow dependency is not installed.")
 
 
 class Step(Task, BaseEstimator):
@@ -75,13 +79,11 @@ class Step(Task, BaseEstimator):
             the new state of this object.
         """
         if new_state.is_running():
-            obj.active_run = mlflow.start_run(
-                nested=True, run_name=self.get_mlflow_run_name()
-            )
-            mlflow.log_params(flatten_dict(self.get_params()))
+            obj.active_run = start_run(nested=True, run_name=self.get_mlflow_run_name())
+            log_params(flatten_dict(self.get_params()))
 
         if new_state.is_finished():
-            mlflow.end_run()
+            end_run()
         return new_state
 
     @abstractmethod
