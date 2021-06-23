@@ -39,7 +39,7 @@ extra_dependencies = {
         'nbval',
         'pdftotext==2.1.5',
     ],
-    'slack': ["slackclient",],
+    'slack': ["slackclient>=2.0.0"],
     'orbit': ['orbit-ml==1.0.13'],
     'prophet': ["pystan==2.19.1.1", "fbprophet==0.6",],
     'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
