@@ -16,7 +16,7 @@ from soam.constants import (
     Y_COL,
 )
 from soam.models.prophet import SkProphet
-from soam.plotting import ForecastPlotterTask
+from soam.plotting.forecast_plotter import ForecastPlotterTask
 from soam.workflow import (
     Backtester,
     BaseDataFrameTransformer,

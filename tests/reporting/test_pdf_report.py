@@ -3,7 +3,7 @@ from dateutil.parser import parse
 import pdftotext
 import pytest
 
-from soam.reporting import PDFReportTask
+from soam.reporting.pdf_report import PDFReportTask
 
 
 @pytest.fixture(name='one_cell_notebook_template')

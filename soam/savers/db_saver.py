@@ -8,7 +8,7 @@ from prefect.engine.state import State
 
 from soam.core import SoamFlow
 from soam.data_models import Base, ForecastValues, SoamFlowRunSchema, SoamTaskRunSchema
-from soam.savers import Saver
+from soam.savers.savers import Saver
 from soam.utilities.helpers import session_scope
 
 logger = logging.getLogger(__name__)
