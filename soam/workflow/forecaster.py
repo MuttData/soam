@@ -11,7 +11,7 @@ from soam.constants import DS_COL, Y_COL
 from soam.core import Step
 
 if TYPE_CHECKING:
-    from soam.savers import Saver
+    from soam.savers.savers import Saver
 
 
 class Forecaster(Step):
