@@ -24,7 +24,7 @@ except ModuleNotFoundError:
 
 
 if TYPE_CHECKING:
-    from soam.savers import Saver
+    from soam.savers.savers import Saver
 
 
 class SoamFlow(Flow):
