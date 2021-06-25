@@ -14,7 +14,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from soam.core import Step
 
 if TYPE_CHECKING:
-    from soam.savers import Saver
+    from soam.savers.savers import Saver
 
 
 logger = logging.getLogger(__name__)

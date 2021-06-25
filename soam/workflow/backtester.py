@@ -22,8 +22,8 @@ from soam.workflow.forecaster import Forecaster
 from soam.workflow.transformer import DummyDataFrameTransformer, Transformer
 
 if TYPE_CHECKING:
-    from soam.plotting import ForecastPlotterTask
-    from soam.savers import Saver
+    from soam.plotting.forecast_plotter import ForecastPlotterTask
+    from soam.savers.savers import Saver
 
 
 logger = logging.getLogger(__name__)

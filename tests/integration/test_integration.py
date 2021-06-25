@@ -15,13 +15,13 @@ from soam.constants import (
 )
 from soam.core import SoamFlow
 from soam.models.prophet import SkProphet
-from soam.plotting import ForecastPlotterTask
-from soam.reporting import SlackReportTask
+from soam.plotting.forecast_plotter import ForecastPlotterTask
 from soam.reporting.slack_report import (
     DEFAULT_FAREWELL_MESSAGE,
     DEFAULT_GREETING_MESSAGE,
+    SlackReportTask,
 )
-from soam.savers import CSVSaver
+from soam.savers.csv_saver import CSVSaver
 from soam.utilities.utils import add_future_dates
 from soam.workflow import Backtester, Forecaster, Transformer
 from soam.workflow.backtester import METRICS_KEYWORD, RANGES_KEYWORD
