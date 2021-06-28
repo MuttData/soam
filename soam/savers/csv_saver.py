@@ -10,7 +10,7 @@ from prefect.engine.state import State
 
 from soam.constants import FLOW_FILE_NAME, LOCK_NAME
 from soam.core import SoamFlow
-from soam.savers import Saver
+from soam.savers.savers import Saver
 from soam.utilities.utils import get_file_path
 
 

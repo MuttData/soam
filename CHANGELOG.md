@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.4 - 2021-06-25]
+
+### Fixed
+- Fixed dependencies for gsheets report.
+- Removed imports from init in the modules were it wasn't necessary
+
+## [0.5.3 - 2021-06-23]
+
+### Changed
+- Pin slackclient version on setup.
+
+## [0.5.2 - 2021-06-23]
+
+### Added
+- SARIMAX Wrapper.
+
+## [0.5.1 - 2021-06-22]
+
+### Fixed
+- Added try/catch logic to mlflow imports on step and runner modules.
 
 ## [0.5.0 - 2021-06-11]
 

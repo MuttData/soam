@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from soam.reporting import GSheetsReportTask
+from soam.reporting.gsheets_report import GSheetsReportTask
 
 
 def test_init_fails_if_config_path_is_not_file():
