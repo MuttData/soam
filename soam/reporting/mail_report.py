@@ -1,4 +1,3 @@
-# mail_report.py
 """
 Mail Report
 -----------
@@ -27,8 +26,6 @@ logger = logging.getLogger(__name__)
 
 class MailReport:
     """
-    MailReport
-    ----------
     Builds and sends reports via mail.
     """
 
@@ -241,9 +238,8 @@ class MailReport:
 
 class MailReportTask(Step, MailReport):
     """
-    MailReportTask
-    --------------
-    Builds the task that sends reports via mail."""
+    Builds the task that sends reports via mail.
+    """
 
     def __init__(self, mail_recipients_list: List[str], metric_name: str, **kwargs):
         """

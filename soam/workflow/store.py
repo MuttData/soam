@@ -1,6 +1,6 @@
 """
 Store results
-----------
+-------------
 A class to store results in a table
 """
 
