@@ -6,7 +6,7 @@ Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
 from asyncio import Future
-from pathlib import Path, PosixPath
+from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 from muttlib.utils import path_or_string
@@ -169,9 +169,9 @@ class SlackMessage:
         """
         self.template = template
         self.arguments = arguments
-        self.attachment_path = None
+        self.attachment_path = attachment
         self._message = None
-        self._attachment = None
+        self._attachment: Optional[Path] = None
 
     @property
     def message(self) -> str:
@@ -185,7 +185,7 @@ class SlackMessage:
             return self._message
 
     @property
-    def attachment(self) -> Optional[PosixPath]:
+    def attachment(self) -> Optional[Path]:
         """Message property."""
         if self.attachment_path is None:
             return None
@@ -202,7 +202,7 @@ class SlackMessage:
 
 def send_slack_message(
     channel: str, msg: SlackMessage, thread_ts: Optional[int] = None
-):
+):  # pylint: disable=unused-argument
     """Send Slack message.
 
     Parameters
@@ -214,4 +214,4 @@ def send_slack_message(
     thread_ts : int, optional
         message timestamp to reply to in threaded fashion, by default None.
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
