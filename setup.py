@@ -17,6 +17,8 @@ extra_dependencies = {
         'sphinx',
         'sphinx_rtd_theme',
         'm2r2',
+        'sphinxcontrib.mermaid',
+        'sphinx-markdown-parser',
         'pre-commit==2.5.0',
         'isort==4.3.21',
         'black==19.10b0',
