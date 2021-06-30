@@ -70,8 +70,6 @@ for example to
 
 [//comment]: # (the postprocessing supports custom outputs?)
 
-For further info check our **[end to end](end2end.md)** example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
-
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
@@ -120,6 +118,9 @@ _Note_: The `pdf_report` extra might need to run the following command before in
 
 ## Usage
 See the [documentation](documentation) to get started with `soam`.
+
+For further info check our **[end to end](end2end.md)** example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
+
 
 ### Examples
 
