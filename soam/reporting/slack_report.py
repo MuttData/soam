@@ -201,8 +201,11 @@ class SlackMessage:
 
 
 def send_slack_message(
-    channel: str, msg: SlackMessage, thread_ts: Optional[int] = None
-):  # pylint: disable=unused-argument
+    slack_client: slack.WebClient,
+    channel: str,
+    msg: SlackMessage,
+    thread_ts: Optional[int] = None,
+):
     """Send Slack message.
 
     Parameters
@@ -214,4 +217,15 @@ def send_slack_message(
     thread_ts : int, optional
         message timestamp to reply to in threaded fashion, by default None.
     """
-    pass  # pylint: disable=unnecessary-pass
+    if msg.attachment is None:
+        response = slack_client.chat_postMessage(
+            channel=channel, text=msg.message, thread_ts=thread_ts
+        )
+    else:
+        response = slack_client.files_upload(
+            file=msg.attachment,
+            channels=channel,
+            initial_comment=msg.message,
+            thread_ts=thread_ts,
+        )
+    return response

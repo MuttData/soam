@@ -1,6 +1,8 @@
 """Slack report test."""
 
-from soam.reporting.slack_report import SlackMessage
+from unittest.mock import MagicMock
+
+from soam.reporting.slack_report import SlackMessage, send_slack_message
 
 SLACK_MSG_TEMPLATE = """
 Hello {{ user }}, welcome to SOAM {{ version }}"""
@@ -18,3 +20,14 @@ def test_slack_message_object(tmp_path):
     assert slack_msg.message == SLACK_MSG_TEMPLATE.format(**template_params)
     assert slack_msg.attachment == temp_file.resolve()
     assert slack_msg.attachment.read_text() == temp_file_content
+
+
+def test_send_slack_message_no_attachment():
+    client_mock = MagicMock()
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg = SlackMessage(SLACK_MSG_TEMPLATE, arguments=template_params)
+    test_channel = "test"
+    send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
+    client_mock.chat_postMessage.assert_called_once_with(
+        channel=test_channel, text=slack_msg.message, thread_ts=None
+    )
