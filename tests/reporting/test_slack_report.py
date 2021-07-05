@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock
 
+from jinja2 import Template
+
 from soam.reporting.slack_report import SlackMessage, send_slack_message
 
 SLACK_MSG_TEMPLATE = """
@@ -17,7 +19,7 @@ def test_slack_message_object(tmp_path):
     slack_msg = SlackMessage(
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file
     )
-    assert slack_msg.message == SLACK_MSG_TEMPLATE.format(**template_params)
+    assert slack_msg.message == Template(SLACK_MSG_TEMPLATE).render(**template_params)
     assert slack_msg.attachment == temp_file.resolve()
     assert slack_msg.attachment.read_text() == temp_file_content
 

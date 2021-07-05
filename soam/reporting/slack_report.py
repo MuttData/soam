@@ -9,6 +9,7 @@ from asyncio import Future
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
+from jinja2 import Template
 from muttlib.utils import path_or_string
 import pandas as pd
 import slack
@@ -179,7 +180,8 @@ class SlackMessage:
         if self._message is None:
             self._message = path_or_string(self.template)
             if self.arguments:
-                self._message = self._message.format(**self.arguments)  # type:ignore
+                template = Template(self._message)
+                self._message = template.render(**self.arguments)  # type:ignore
             return self._message  # type:ignore
         else:
             return self._message
