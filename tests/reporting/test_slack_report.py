@@ -31,3 +31,22 @@ def test_send_slack_message_no_attachment():
     client_mock.chat_postMessage.assert_called_once_with(
         channel=test_channel, text=slack_msg.message, thread_ts=None
     )
+
+
+def test_send_slack_message_with_attachment(tmp_path):
+    client_mock = MagicMock()
+    temp_file = tmp_path / "mytemp.txt"
+    temp_file_content = "test text"
+    temp_file.write_text(temp_file_content)
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file
+    )
+    test_channel = "test"
+    send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
+    client_mock.files_upload.assert_called_once_with(
+        file=slack_msg.attachment,
+        channels=test_channel,
+        initial_comment=slack_msg.message,
+        thread_ts=None,
+    )
