@@ -8,8 +8,8 @@ This is the priority order to understand the dependencies:
  5. cookiecuter
  6. darts
 
-[//comment]: # (TODO: Ask Pedro to improve the background documents
- with the knowledge learned from delver)
+<!--- # (TODO: Ask Pedro to improve the background documents
+ with the knowledge learned from delver)--->
 
 # Slack
 In our slack there is a channel #dev-soam, were we discuss project design
