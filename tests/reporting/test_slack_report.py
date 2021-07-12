@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock
 
 from jinja2 import Template
+import pytest
 
 from soam.reporting.slack_report import SlackMessage, send_slack_message
 
@@ -52,3 +53,14 @@ def test_send_slack_message_with_attachment(tmp_path):
         initial_comment=slack_msg.message,
         thread_ts=None,
     )
+
+
+def test_slack_message_with_non_existing_attachment_fails():
+    path_mock = MagicMock()
+    path_mock.exists.return_value = False
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=path_mock
+    )
+    with pytest.raises(ValueError):
+        slack_msg.attachment  # pylint: disable=pointless-statement
