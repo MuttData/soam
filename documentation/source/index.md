@@ -12,6 +12,8 @@ Contents
     classes
     references
     modules
+    mlflow_tracking
+    
 
 Indices and tables
 ==================

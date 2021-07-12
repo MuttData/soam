@@ -16,9 +16,6 @@
 import os
 import sys
 
-# At top on conf.py (with other import statements)
-from sphinx_markdown_parser.transform import AutoStructify
-
 sys.path.insert(0, os.path.abspath('../..'))
 
 
@@ -39,22 +36,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'm2r2',
     'sphinxcontrib.mermaid',
+    'sphinx.ext.autosectionlabel'
 ]
-
-
-github_doc_root = 'https://github.com/rtfd/recommonmark/tree/master/doc/'
-
-
-def setup(app):
-    app.add_config_value(
-        'recommonmark_config',
-        {
-            'url_resolver': lambda url: github_doc_root + url,
-            'auto_toc_tree_section': 'Contents',
-        },
-        True,
-    )
-    app.add_transform(AutoStructify)
 
 
 napoleon_google_docstring = False
@@ -89,5 +72,5 @@ html_context = {
     "gitlab_repo": "soam",
     "gitlab_version": "master",
     "conf_py_path": "/documentation/source/",
-    "source_suffix": ".md",
+    "source_suffix" : '.md'
 }
