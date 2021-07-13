@@ -1,5 +1,6 @@
 """Slack report test."""
 
+from io import BytesIO
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -13,7 +14,7 @@ Hello {{ user }}, welcome to SOAM {{ version }}"""
 
 
 def test_slack_message_object_with_path(tmp_path):
-    """Test slack message object."""
+    """Test slack message object with path as attachment."""
     temp_file = tmp_path / "mytemp.txt"
     temp_file_content = "test text"
     temp_file.write_text(temp_file_content)
@@ -26,18 +27,15 @@ def test_slack_message_object_with_path(tmp_path):
     assert Path(slack_msg.attachment).read_text() == temp_file_content
 
 
-def test_slack_message_object_with_file(tmp_path):
-    """Test slack message object."""
-    temp_file = tmp_path / "mytemp.txt"
-    temp_file_content = "test text"
-    temp_file.write_text(temp_file_content)
+def test_slack_message_object_with_file():
+    """Test slack message object with buffer as attachment."""
+    byte_file = BytesIO(b"abcdef")
     template_params = dict(user="test", version="0.1.0")
     slack_msg = SlackMessage(
-        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file.open()
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
     )
     assert slack_msg.message == Template(SLACK_MSG_TEMPLATE).render(**template_params)
-    assert slack_msg.attachment == str(temp_file.resolve())
-    assert Path(slack_msg.attachment).read_text() == temp_file_content
+    assert slack_msg.attachment == byte_file
 
 
 def test_send_slack_message_no_attachment():
@@ -51,7 +49,7 @@ def test_send_slack_message_no_attachment():
     )
 
 
-def test_send_slack_message_with_attachment(tmp_path):
+def test_send_slack_message_with_path_attachment(tmp_path):
     client_mock = MagicMock()
     temp_file = tmp_path / "mytemp.txt"
     temp_file_content = "test text"
@@ -59,6 +57,23 @@ def test_send_slack_message_with_attachment(tmp_path):
     template_params = dict(user="test", version="0.1.0")
     slack_msg = SlackMessage(
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file
+    )
+    test_channel = "test"
+    send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
+    client_mock.files_upload.assert_called_once_with(
+        file=slack_msg.attachment,
+        channels=test_channel,
+        initial_comment=slack_msg.message,
+        thread_ts=None,
+    )
+
+
+def test_send_slack_message_with_buffer_attachment():
+    client_mock = MagicMock()
+    byte_file = BytesIO(b"abcdef")
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
     )
     test_channel = "test"
     send_slack_message(client_mock, channel=test_channel, msg=slack_msg)

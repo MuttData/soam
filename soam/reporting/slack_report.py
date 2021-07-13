@@ -6,6 +6,7 @@ Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
 from asyncio import Future
+from io import BytesIO
 from pathlib import Path, PosixPath
 from typing import IO, Any, Dict, Optional, Union
 
@@ -185,7 +186,7 @@ class SlackMessage:
         return message
 
     @property
-    def attachment(self) -> Optional[str]:
+    def attachment(self) -> Optional[Union[str, IO]]:
         """Message property."""
         if self.attachment_ref is None:
             return None
@@ -196,8 +197,10 @@ class SlackMessage:
                 )
             # slack's client supports a string with the path for the file
             return str(self.attachment_ref.resolve())
+        elif isinstance(self.attachment_ref, BytesIO):
+            return self.attachment_ref
         else:
-            return str(Path(self.attachment_ref.name).resolve())
+            raise TypeError("Only PosixPath and BytesIO supported.")
 
 
 def send_slack_message(
