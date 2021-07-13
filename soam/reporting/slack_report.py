@@ -6,8 +6,8 @@ Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
 from asyncio import Future
-from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from pathlib import Path, PosixPath
+from typing import IO, Any, Dict, Optional, Union
 
 from jinja2 import Template
 from muttlib.utils import path_or_string
@@ -159,7 +159,10 @@ class SlackReportTask(Step, SlackReport):
 
 class SlackMessage:
     def __init__(
-        self, template, arguments: Dict = None, attachment: Optional[Path] = None
+        self,
+        template,
+        arguments: Dict = None,
+        attachment: Optional[Union[Path, IO]] = None,
     ):
         """Create Slack message.
 
@@ -170,9 +173,9 @@ class SlackMessage:
         """
         self.template = template
         self.arguments = arguments
-        self.attachment_path = attachment
+        self.attachment_ref = attachment
         self._message = None
-        self._attachment: Optional[Path] = None
+        self._attachment: Optional[str] = None
 
     @property
     def message(self) -> str:
@@ -187,19 +190,21 @@ class SlackMessage:
             return self._message
 
     @property
-    def attachment(self) -> Optional[Path]:
+    def attachment(self) -> Optional[str]:
         """Message property."""
-        if self.attachment_path is None:
+        if self.attachment_ref is None:
             return None
         if self._attachment is None:
-            if not self.attachment_path.exists():
-                raise ValueError(
-                    f"File does not exist: {str(self.attachment_path.resolve())}."
-                )
-            self._attachment = self.attachment_path.resolve()
-            return self._attachment
-        else:
-            return self._attachment
+            if isinstance(self.attachment_ref, PosixPath):
+                if not self.attachment_ref.exists():
+                    raise ValueError(
+                        f"File does not exist: {str(self.attachment_ref.resolve())}."
+                    )
+                # slack's client supports a string with the path for the file
+                self._attachment = str(self.attachment_ref.resolve())
+            else:
+                self._attachment = str(Path(self.attachment_ref.name).resolve())
+        return self._attachment
 
 
 def send_slack_message(

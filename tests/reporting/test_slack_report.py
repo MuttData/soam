@@ -1,5 +1,6 @@
 """Slack report test."""
 
+from pathlib import Path
 from unittest.mock import MagicMock
 
 from jinja2 import Template
@@ -10,7 +11,7 @@ SLACK_MSG_TEMPLATE = """
 Hello {{ user }}, welcome to SOAM {{ version }}"""
 
 
-def test_slack_message_object(tmp_path):
+def test_slack_message_object_with_path(tmp_path):
     """Test slack message object."""
     temp_file = tmp_path / "mytemp.txt"
     temp_file_content = "test text"
@@ -20,8 +21,22 @@ def test_slack_message_object(tmp_path):
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file
     )
     assert slack_msg.message == Template(SLACK_MSG_TEMPLATE).render(**template_params)
-    assert slack_msg.attachment == temp_file.resolve()
-    assert slack_msg.attachment.read_text() == temp_file_content
+    assert slack_msg.attachment == str(temp_file.resolve())
+    assert Path(slack_msg.attachment).read_text() == temp_file_content
+
+
+def test_slack_message_object_with_file(tmp_path):
+    """Test slack message object."""
+    temp_file = tmp_path / "mytemp.txt"
+    temp_file_content = "test text"
+    temp_file.write_text(temp_file_content)
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file.open()
+    )
+    assert slack_msg.message == Template(SLACK_MSG_TEMPLATE).render(**template_params)
+    assert slack_msg.attachment == str(temp_file.resolve())
+    assert Path(slack_msg.attachment).read_text() == temp_file_content
 
 
 def test_send_slack_message_no_attachment():
