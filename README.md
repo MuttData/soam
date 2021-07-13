@@ -8,8 +8,7 @@ projects. There come the name: Son of a Mutt = SoaM
 
 ## SoaM pipeline
 
-
-.. mermaid::
+```mermaid
 
    graph LR
     id0[(Database I)]-->id2[/SoaM Time Series Extractor/]
@@ -21,6 +20,7 @@ projects. There come the name: Son of a Mutt = SoaM
     id6-->id7[/SoaM Forecaster Plotter/]
     id6-->id8[/SoaM Reporting/]
     id7-->id8
+```
 
 This library pipeline supports any data source.
 The process is structured in different stages:
