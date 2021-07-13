@@ -174,8 +174,6 @@ class SlackMessage:
         self.template = template
         self.arguments = arguments
         self.attachment_ref = attachment
-        self._message = None
-        self._attachment: Optional[str] = None
 
     @property
     def message(self) -> str:
@@ -191,17 +189,15 @@ class SlackMessage:
         """Message property."""
         if self.attachment_ref is None:
             return None
-        if self._attachment is None:
-            if isinstance(self.attachment_ref, PosixPath):
-                if not self.attachment_ref.exists():
-                    raise ValueError(
-                        f"File does not exist: {str(self.attachment_ref.resolve())}."
-                    )
-                # slack's client supports a string with the path for the file
-                self._attachment = str(self.attachment_ref.resolve())
-            else:
-                self._attachment = str(Path(self.attachment_ref.name).resolve())
-        return self._attachment
+        if isinstance(self.attachment_ref, PosixPath):
+            if not self.attachment_ref.exists():
+                raise ValueError(
+                    f"File does not exist: {str(self.attachment_ref.resolve())}."
+                )
+            # slack's client supports a string with the path for the file
+            return str(self.attachment_ref.resolve())
+        else:
+            return str(Path(self.attachment_ref.name).resolve())
 
 
 def send_slack_message(
