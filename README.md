@@ -73,7 +73,7 @@ for example to
 For further info check our **[end to end](end2end.md)** example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
 
 ## Table of Contents
-- :ref:`Installation`
+- [Installation](#installation)
 - [Usage](#usage)
 - [Soam CLI](#soam-cli)
 - [Database Management](#database-management)
@@ -84,11 +84,7 @@ For further info check our **[end to end](end2end.md)** example where we explain
 - [Credits](#contributing)
 - [License](#license)
 
-.. _Installation:
-
-Installation
-------------
-
+## Installation
 
 Install the base lib via [pipy](https://pypi.org/project/soam/) by executing:
 
