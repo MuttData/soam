@@ -180,14 +180,11 @@ class SlackMessage:
     @property
     def message(self) -> str:
         """Message property."""
-        if self._message is None:
-            self._message = path_or_string(self.template)
-            if self.arguments:
-                template = Template(self._message)
-                self._message = template.render(**self.arguments)  # type:ignore
-            return self._message  # type:ignore
-        else:
-            return self._message
+        message = path_or_string(self.template)
+        if self.arguments:
+            template = Template(message)
+            message = template.render(**self.arguments)  # type:ignore
+        return message
 
     @property
     def attachment(self) -> Optional[str]:
