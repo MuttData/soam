@@ -6,9 +6,12 @@ Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
 from asyncio import Future
-from pathlib import Path
-from typing import Any, Optional, Union
+from io import BytesIO
+from pathlib import Path, PosixPath
+from typing import IO, Any, Dict, Optional, Union
 
+from jinja2 import Template
+from muttlib.utils import path_or_string
 import pandas as pd
 import slack
 from slack.web.slack_response import SlackResponse
@@ -153,3 +156,79 @@ class SlackReportTask(Step, SlackReport):
         return self.send_report(
             prediction, plot_filename, greeting_message, farewell_message
         )
+
+
+class SlackMessage:
+    def __init__(
+        self,
+        template,
+        arguments: Dict = None,
+        attachment: Optional[Union[Path, IO]] = None,
+    ):
+        """Create Slack message.
+
+        Args:
+            template: Jinja template.
+            template_args (dict): Arguments to be passed to the Jinja templates .
+            attachment (Path): Path to file (or image) to attach to the image.
+        """
+        self.template = template
+        self.arguments = arguments
+        self.attachment_ref = attachment
+
+    @property
+    def message(self) -> str:
+        """Message property."""
+        message = path_or_string(self.template)
+        if self.arguments:
+            template = Template(message)
+            message = template.render(**self.arguments)  # type:ignore
+        return message
+
+    @property
+    def attachment(self) -> Optional[Union[str, IO]]:
+        """Message property."""
+        if self.attachment_ref is None:
+            return None
+        if isinstance(self.attachment_ref, PosixPath):
+            if not self.attachment_ref.exists():
+                raise ValueError(
+                    f"File does not exist: {str(self.attachment_ref.resolve())}."
+                )
+            # slack's client supports a string with the path for the file
+            return str(self.attachment_ref.resolve())
+        elif isinstance(self.attachment_ref, BytesIO):
+            return self.attachment_ref
+        else:
+            raise TypeError("Only PosixPath and BytesIO supported.")
+
+
+def send_slack_message(
+    slack_client: slack.WebClient,
+    channel: str,
+    msg: SlackMessage,
+    thread_ts: Optional[int] = None,
+):
+    """Send Slack message.
+
+    Parameters
+    ----------
+    channel : str
+        slack channel to send the message to.
+    msg : SlackMessage
+        SlackMessage instance.
+    thread_ts : int, optional
+        message timestamp to reply to in threaded fashion, by default None.
+    """
+    if msg.attachment is None:
+        response = slack_client.chat_postMessage(
+            channel=channel, text=msg.message, thread_ts=thread_ts
+        )
+    else:
+        response = slack_client.files_upload(
+            file=msg.attachment,
+            channels=channel,
+            initial_comment=msg.message,
+            thread_ts=thread_ts,
+        )
+    return response
