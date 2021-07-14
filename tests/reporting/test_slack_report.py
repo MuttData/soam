@@ -78,7 +78,7 @@ def test_send_slack_message_with_buffer_attachment():
     test_channel = "test"
     send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
     client_mock.files_upload.assert_called_once_with(
-        file=slack_msg.attachment,
+        file=byte_file,
         channels=test_channel,
         initial_comment=slack_msg.message,
         thread_ts=None,
