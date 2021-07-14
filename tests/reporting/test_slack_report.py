@@ -1,7 +1,7 @@
 """Slack report test."""
 
 from io import BytesIO
-from pathlib import Path
+from pathlib import Path, PosixPath
 from unittest.mock import MagicMock
 
 from jinja2 import Template
@@ -86,7 +86,7 @@ def test_send_slack_message_with_buffer_attachment():
 
 
 def test_slack_message_with_non_existing_attachment_fails():
-    path_mock = MagicMock()
+    path_mock = MagicMock(spec=PosixPath)
     path_mock.exists.return_value = False
     template_params = dict(user="test", version="0.1.0")
     slack_msg = SlackMessage(
