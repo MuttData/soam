@@ -24,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed rendered comment in docs.
->>>>>>> 80be650e1ca3977b5546313fe97a583b5b6cbd79
 
 ## [0.5.4 - 2021-06-25]
 
