@@ -13,7 +13,7 @@ import logging
 from os.path import basename
 from pathlib import Path
 import smtplib
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from soam.cfg import MAIL_TEMPLATE, get_smtp_cred
 from soam.constants import PROJECT_NAME
@@ -32,7 +32,12 @@ class MailReport:
     Builds and sends reports via mail.
     """
 
-    def __init__(self, mail_recipients_list: List[str], metric_name: str):
+    def __init__(
+        self,
+        mail_recipients_list: List[str],
+        metric_name: str,
+        setting_path: Optional[str] = None,
+    ):
         """
         Create MailReport object.
 
@@ -42,9 +47,11 @@ class MailReport:
             The mails of the recipients for the report.
         metric_name : str
             Name of the metric being forecasted.
+        setting_path : str, optional
+            The path for the .ini document with the settings.
         """
         self.mail_recipients_list = mail_recipients_list
-        credentials = get_smtp_cred()
+        credentials = get_smtp_cred(setting_path)
         self.credentials = credentials
         self.metric_name = metric_name
 
