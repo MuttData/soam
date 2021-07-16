@@ -5,10 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.2 - 2021-07-16]
+## [0.6.3 - 2021-07-16]
 
 ### Fixed
-- Sphinx documentation.
+- Sphinx mermaid and structure.
+
+## [0.6.2 - 2021-07-13]
+
+### Changed
+- MailReport now accepts optional parameter to pass the settings.ini file to get_smtp_creds in the initialization.
 
 ## [0.6.1 - 2021-07-13]
 
