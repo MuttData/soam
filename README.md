@@ -123,7 +123,7 @@ See the [documentation](documentation) to get started with `soam`.
 
 ### Examples
 
-* Forecaster : here is a [notebook](./notebook/examples/forecaster.ipynb) using and explaining the forecaster stage.
+* Quickstart: here is a [notebook](https://gitlab.com/mutt_data/soam/-/blob/master/notebook/examples/quickstart.ipynb) using and explaining the SoaM modules.
 
 [//comment]: # (this can be a more accurate example in a separated repository)
 
