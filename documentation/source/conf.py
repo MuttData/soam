@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
     'm2r2',
-    'sphinxcontrib.mermaid'
+    'sphinxcontrib.mermaid',
 ]
 
 napoleon_google_docstring = False
@@ -70,5 +70,5 @@ html_context = {
     "gitlab_repo": "soam",
     "gitlab_version": "master",
     "conf_py_path": "/documentation/source/",
-    "source_suffix" : ".rst"
+    "source_suffix": ".rst",
 }
