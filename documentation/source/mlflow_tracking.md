@@ -3,7 +3,7 @@
 Mlflow tracking allows you to automatically track the input arguments, parameters, and metrics of the tasks in any
 given flow and then visualize them on its intuitive UI.
 
-You can enable tracking with Mlflog by setting `TRACKING_IS_ACTIVE` to *True* on `soam/cfg.py`.
+You can enable tracking with Mlflow by setting `TRACKING_IS_ACTIVE` to *True* on `soam/cfg.py`.
 MLflow runs can be recorded to local files, to a SQLAlchemy compatible database, or remotely to a tracking server.
 By default, the MLflow Python API logs runs locally to files in an `mlruns` directory wherever you ran the script that
 contains the flow you want to keep track of.
