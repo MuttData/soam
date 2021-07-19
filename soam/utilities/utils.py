@@ -78,12 +78,12 @@ def sanitize_arg(v, default=None):
 
     Parameters
     ----------
-        v: Value to check.
-        default: Value to set if
+    v: Value to check.
+    default: Value to set if.
 
     Returns
     -------
-        Santized value.
+    Santized value.
     """
     if default is None:
         default = {}

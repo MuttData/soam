@@ -16,7 +16,7 @@ extra_dependencies = {
         'docutils>=0.12,<0.17',
         'sphinx',
         'sphinx_rtd_theme',
-        'm2r2',
+        'm2r2>=0.3.0',
         'pre-commit==2.5.0',
         'isort==4.3.21',
         'black==19.10b0',
