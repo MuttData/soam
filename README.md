@@ -8,18 +8,18 @@ projects. There come the name: Son of a Mutt = SoaM
 
 ## SoaM pipeline
 
-
 ```mermaid
-graph LR;
-  id0[(Database I)]-->id2[/SoaM Time Series Extractor/];
-  id1[(Database II)]-->id2;
-  id2-->id3[/SoaM Transformer/];
-  id3-->id4[/SoaM Forecaster/];
-  id5{{Forecasting Model}}-->id4;
-  id4-->id6[(SoaM Predictions)];
-  id6-->id7[/SoaM Forecaster Plotter/];
-  id6-->id8[/SoaM Reporting/];
-  id7-->id8;
+
+   graph LR
+    id0[(Database I)]-->id2[/SoaM Time Series Extractor/]
+    id1[(Database II)]-->id2
+    id2-->id3[/SoaM Transformer/]
+    id3-->id4[/SoaM Forecaster/]
+    id5{{Forecasting Model}}-->id4
+    id4-->id6[(SoaM Predictions)]
+    id6-->id7[/SoaM Forecaster Plotter/]
+    id6-->id8[/SoaM Reporting/]
+    id7-->id8
 ```
 
 This library pipeline supports any data source.
