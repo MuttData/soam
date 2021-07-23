@@ -7,7 +7,11 @@ from unittest.mock import MagicMock
 from jinja2 import Template
 import pytest
 
-from soam.reporting.slack_report import SlackMessage, send_slack_message
+from soam.reporting.slack_report import (
+    SlackMessage,
+    send_multiple_slack_messages,
+    send_slack_message,
+)
 
 SLACK_MSG_TEMPLATE = """
 Hello {{ user }}, welcome to SOAM {{ version }}"""
@@ -94,3 +98,73 @@ def test_slack_message_with_non_existing_attachment_fails():
     )
     with pytest.raises(ValueError):
         slack_msg.attachment  # pylint: disable=pointless-statement
+
+
+def test_send_multiple_messages_to_channel():
+    client_mock = MagicMock()
+    byte_file = BytesIO(b"abcdef")
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg1 = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
+    )
+    slack_msg2 = SlackMessage(SLACK_MSG_TEMPLATE, arguments=template_params)
+    test_channel = "test"
+    send_multiple_slack_messages(
+        client_mock, channel=test_channel, messages=[slack_msg1, slack_msg2]
+    )
+    client_mock.files_upload.assert_called_once_with(
+        file=byte_file,
+        channels=test_channel,
+        initial_comment=slack_msg2.message,
+        thread_ts=None,
+    )
+    client_mock.chat_postMessage.assert_called_once_with(
+        channel=test_channel, text=slack_msg1.message, thread_ts=None
+    )
+
+
+def test_send_multiple_messages_to_channel_in_thread():
+    client_mock = MagicMock()
+    test_ts = "test_ts"
+    client_mock.files_upload.return_value = {"ts": test_ts}
+    byte_file = BytesIO(b"abcdef")
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg1 = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
+    )
+    slack_msg2 = SlackMessage(SLACK_MSG_TEMPLATE, arguments=template_params)
+    test_channel = "test"
+    send_multiple_slack_messages(
+        client_mock, channel=test_channel, messages=[[slack_msg1, slack_msg2]]
+    )
+    client_mock.files_upload.assert_called_once_with(
+        file=byte_file,
+        channels=test_channel,
+        initial_comment=slack_msg1.message,
+        thread_ts=None,
+    )
+    client_mock.chat_postMessage.assert_called_once_with(
+        channel=test_channel, text=slack_msg2.message, thread_ts=test_ts
+    )
+
+
+def test_send_multiple_messages_to_channel_in_thread_single():
+    client_mock = MagicMock()
+    test_ts = "test_ts"
+    client_mock.files_upload.return_value = {"ts": test_ts}
+    byte_file = BytesIO(b"abcdef")
+    template_params = dict(user="test", version="0.1.0")
+    slack_msg1 = SlackMessage(
+        SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
+    )
+    test_channel = "test"
+    send_multiple_slack_messages(
+        client_mock, channel=test_channel, messages=[[slack_msg1]]
+    )
+    client_mock.files_upload.assert_called_once_with(
+        file=byte_file,
+        channels=test_channel,
+        initial_comment=slack_msg1.message,
+        thread_ts=None,
+    )
+    client_mock.chat_postMessage.assert_not_called()
