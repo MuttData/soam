@@ -6,9 +6,10 @@ Slack reporting and message formatting tools. Its a postprocess that sends the
 model forecasts though the slack app.
 """
 from asyncio import Future
+from collections.abc import Iterable
 from io import BytesIO
 from pathlib import Path, PosixPath
-from typing import IO, Any, Dict, Optional, Union
+from typing import IO, Any, Dict, Optional, Sequence, Union
 
 from jinja2 import Template
 from muttlib.utils import path_or_string
@@ -232,3 +233,26 @@ def send_slack_message(
             thread_ts=thread_ts,
         )
     return response
+
+
+def send_slack_messages_in_thread(
+    slack_client: slack.WebClient, channel: str, messages: Sequence[SlackMessage]
+):
+    first_message = messages[0]
+    response = send_slack_message(slack_client, channel, first_message)
+    for msg in messages[1:]:
+        response = send_slack_message(
+            slack_client, channel, msg, thread_ts=response["ts"]
+        )
+
+
+def send_multiple_slack_messages(
+    slack_client: slack.WebClient,
+    channel: str,
+    messages: Sequence[Union[SlackMessage, Sequence[SlackMessage]]],
+):
+    for element in messages:
+        if isinstance(element, Iterable):
+            send_slack_messages_in_thread(slack_client, channel, element)
+        else:
+            send_slack_message(slack_client, channel, element)
