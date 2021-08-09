@@ -5,8 +5,7 @@ This is the priority order to understand the dependencies:
  2. alembic
  3. sqlalchemy
  4. jinja?
- 5. cookiecuter
- 6. darts
+ 5. darts
 
 <!--- # (TODO: Ask Pedro to improve the background documents
  with the knowledge learned from delver)--->
@@ -83,12 +82,6 @@ Used in: cfg.py
 Used in: console.py
 
 [click docs](https://click.palletsprojects.com/en/7.x/)
-
-
-## cookiecutter
-Used in: console.py
-
-[cookiecutter docs](https://cookiecutter.readthedocs.io/en/latest/)
 
 
 ## datetime
