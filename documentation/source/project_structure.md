@@ -50,9 +50,6 @@ This directory contains the migrations for the database that stores the data and
 ### [alembic.ini](../../soam/alembic.ini)
 Configures the alembic library to manage the migrations for the DBSaver.
 
-### templates
-Contains the directory structure that cookiecutter is going to generate.
-
 ### resources
 Files that will be used in the pipeline, like a template for an email report in a postprocess step.
 

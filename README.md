@@ -109,13 +109,7 @@ _Note_: The `pdf_report` extra might need to run the following command before in
 [Here](quickstart.ipynb) is an example for a quick start into SoaM. In it a time series with AAPL stock prices is loaded, processed and forecasted. As well, there's [other example](soamflowrun.ipynb) with the same steps, but exploding the power of flows.
 
 ## Usage
-For further info check our **[end to end](end2end.md)** example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
-
-## SoaM CLI
-After installing SoaM locally, there are some commands available:
-
-* `soam init --output`, scaffolding for a project ready to use SoaM. `cookiecutter` will then ask for parameters via prompt.
-[//comment]: # (TODO: Add further info about directories and their functionalities created by cookiecutter. Maybe in end2end.md?)
+For further info check our [end to end](end2end.md) example where we explained how SoaM will interact with Airflow on a generic project.
 
 ## Database management
 For database storing there are complementary tools:
