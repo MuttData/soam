@@ -106,17 +106,16 @@ _Note_: The `pdf_report` extra might need to run the following command before in
   $ `apt-get install texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev`
 
 ## Quick start
-[Here](quickstart.ipynb) is an example for a quick start into SoaM. In it a time series with AAPL stock prices is loaded, processed and forecasted. As well, there's [other example](soamflowrun.ipynb) with the same steps, but exploding the power of flows.
+[Here](https://gitlab.com/mutt_data/soam/-/blob/master/notebook/examples/quickstart.ipynb) is an example for a quick start into SoaM. In it a time series with AAPL stock prices is loaded, processed and forecasted. As well, there's [other example](https://gitlab.com/mutt_data/soam/-/blob/master/notebook/examples/soamflowrun.ipynb) with the same steps, but exploding the power of flows.
 
 ## Usage
-For further info check our [end to end](end2end.md) example where we explained how SoaM will interact with Airflow on a generic project.
+For further info check our [end to end](https://mutt_data.gitlab.io/soam/end2end.html) example where we explained how SoaM will interact with Airflow and Cookiecutter on a generic project.
 
 ## Database management
 For database storing there are complementary tools:
-* [muttlib.dbcon](https://gitlab.com/mutt_data/muttlib/) for database connections.
-* [Decouple](https://github.com/henriquebastos/python-decouple) storing the database information in a separated file.  With a [settings.ini](soam/settings.ini) file to store the database credentials and general configurations, when modifying it don't change the keys names.
+* [Decouple](https://github.com/henriquebastos/python-decouple) storing the database information in a separated file. With a `settings.ini` file to store the database credentials and general configurations, when modifying it don't change the keys names.
 * [Alembic](https://alembic.sqlalchemy.org/en/latest/) to create the database migrations. A brief description is below.
-* [SQLAlchemy](https://docs.sqlalchemy.org/en/) as an ORM, the schemas of the tables are defined in[data_models](soam/data_models.py).
+* [SQLAlchemy](https://docs.sqlalchemy.org/en/) as an ORM, the schemas of the tables are defined in [data_models](https://gitlab.com/mutt_data/soam/-/blob/master/soam/data_models.py).
 
 ### Alembic
 This package uses alembic and expects you to use it!
@@ -150,7 +149,7 @@ For more alembic commands visit the [documentation](https://alembic.sqlalchemy.o
 
 ## Developers guide
 If you are going to develop SoaM, you should checkout the documentation directory before adding code,
-you can start in the [project structure document](documentation/source/project_structure.md).
+you can start in the [project structure document](https://mutt_data.gitlab.io/soam/project_structure.html).
 
 ## Testing
 To run the default testsuite run this:
@@ -198,7 +197,7 @@ pytest --mpl
 ```
 
 ## Contributing
-We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](CONTRIBUTING.md).
+We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](https://mutt_data.gitlab.io/soam/CONTRIBUTING.html).
 
 ## Rules of Thumb
 This section contains some recommendations when working with SoaM to avoid common mistakes:
@@ -209,11 +208,13 @@ This section contains some recommendations when working with SoaM to avoid commo
 
 ## Credits
 Alejandro Rusi <br>
+Diego Leguizamón <br>
 Diego Lizondo <br>
 Eugenio Scafati <br>
 Fabian Wolfmann <br>
 Francisco Lopez Destain <br>
 Guido Trucco <br>
+Hugo Daniel Viotti <br>
 Juan Martin Pampliega <br>
 Pablo Andres Lorenzatto <br>
 Wenceslao Villegas
