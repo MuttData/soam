@@ -26,14 +26,6 @@ soam.cfg module
    :undoc-members:
    :show-inheritance:
 
-soam.console module
--------------------
-
-.. automodule:: soam.console
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 soam.constants module
 ---------------------
 

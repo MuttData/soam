@@ -94,7 +94,6 @@ setuptools.setup(
         "prefect==0.14.17",
         "filelock",
         "click",
-        "cookiecutter",
         "wheel",
         "muttlib>=1.1.2,<2",
         "numpy>=1.19,<1.20",
