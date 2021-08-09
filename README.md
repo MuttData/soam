@@ -109,7 +109,7 @@ _Note_: The `pdf_report` extra might need to run the following command before in
 [Here](quickstart.ipynb) is an example for a quick start into SoaM. In it a time series with AAPL stock prices is loaded, processed and forecasted. As well, there's [other example](soamflowrun.ipynb) with the same steps, but exploding the power of flows.
 
 ## Usage
-For further info check our **[end to end](end2end.md)** example where we explained how SoaM will interact with Airflow on a generic project.
+For further info check our [end to end](end2end.md) example where we explained how SoaM will interact with Airflow on a generic project.
 
 ## Database management
 For database storing there are complementary tools:

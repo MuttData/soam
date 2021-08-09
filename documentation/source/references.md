@@ -4,8 +4,7 @@ This is the priority order to understand the dependencies:
  1. prefect
  2. alembic
  3. sqlalchemy
- 4. jinja?
- 5. darts
+ 4. jinja
 
 <!--- # (TODO: Ask Pedro to improve the background documents
  with the knowledge learned from delver)--->
