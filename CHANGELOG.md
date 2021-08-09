@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Cookiecutter logic.
 
+## [0.8.1 - 2021-08-06]
+
+### Added
+- Notebook with use cases of the TimeSeriesExtractor, Slicer and Store classes.
+
 ## [0.8.0 - 2021-08-02]
 
 ### Added

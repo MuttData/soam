@@ -19,7 +19,7 @@ cache:
     - .cache/pip
     - apt-cache/
     - ${PRE_COMMIT_HOME}
-  policy: pull-push
+  policy: pull
 
 before_script:
   - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
