@@ -16,4 +16,4 @@ To visualize the logged runs just execute the script that contains the flow you 
 in the same directory as your script, then go to http://localhost:5000 on your browser to view the logs (if the default settings
 were used).
 
-Follow [this notebook](../../notebook/examples/mlflow_log_test.ipynb) to see an example on how to use this feature!
+Follow [this notebook](https://gitlab.com/mutt_data/soam/-/blob/master/notebook/examples/mlflow_log_test.ipynb) to see an example on how to use this feature!
