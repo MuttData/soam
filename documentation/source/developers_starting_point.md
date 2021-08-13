@@ -32,8 +32,8 @@ pip install --upgrade git+https://gitlab.com/mutt_data/muttlib#egg=muttlib
 
 # Next Steps
 * If you already have the project running the last step before making your first commit is to review the
-[development pipeline](https://mutt_data.gitlab.io/soam/development_pipeline.html).
-* If you want more information about the main classes or patterns in the project go to [classes document](https://mutt_data.gitlab.io/soam/classes.html).
+[development pipeline](./development_pipeline.html).
+* If you want more information about the main classes or patterns in the project go to [classes document](./classes.html).
 * If you need to understand a library, technology or concept in the project you can check the
-[references](https://mutt_data.gitlab.io/soam/references.html).
+[references](./references.html).
 

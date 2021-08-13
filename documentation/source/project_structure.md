@@ -4,7 +4,7 @@
 ### [gitignore](https://gitlab.com/mutt_data/soam/-/blob/master/.gitignore)
 This [description file](https://git-scm.com/docs/gitignore) specifies the excluded documents and folders from git.
 
-### [README](https://mutt_data.gitlab.io/soam/README.html)
+### [README](./README.html)
 This document contains a brief overview of the project working and how to use it, it's oriented to the users of the
 package.
 
@@ -16,23 +16,23 @@ determines how the SoaM package is going to be installed and what commands it su
 This [ini file](https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-cfg) defines default
 options for the setup.py commands.
 
-## [documentation](https://mutt_data.gitlab.io/soam/development_pipeline.html#documentation)
+## [documentation](./development_pipeline.html#documentation)
 Contains the technical documentation for the project, it's oriented to the development team.
 
 ### [images](https://gitlab.com/mutt_data/soam/-/tree/master/documentation/images)
 The diagrams and visualizations for the documentation.
 
-### [classes](https://mutt_data.gitlab.io/soam/classes.html)
+### [classes](./classes.html)
 Explanation and diagrams of the classes and patterns in the project.
 
-### [developers starting point](https://mutt_data.gitlab.io/soam/developers_starting_point.html)
+### [developers starting point](./developers_starting_point.html)
 Steps description to setup the project for development. If you are new in SoaM this is your next document in your path
 to start developing.
 
 ### project structure
 This document :D
 
-### [references](https://mutt_data.gitlab.io/soam/references.html)
+### [references](./references.html)
 Papers, articles and videos to understand the theoretical background, libraries and technologies used in the project.
 
 [//comment]: # (TODO: ### architecture)
