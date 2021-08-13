@@ -1,5 +1,5 @@
-# Contributing to soam
-Thanks for your interest in contributing to `soam` 🎉. These are the guidelines for contributions. Reading them will help you get started on how to make useful contributions.
+# Contributing to SoaM
+Thanks for your interest in contributing to SoaM 🎉. These are the guidelines for contributions. Reading them will help you get started on how to make useful contributions.
 
 ## Foreword
 This guide is not final. It will evolve over time, as we learn and add new voices to the project. Check it from time to time and feel free to make suggestions 😃
@@ -30,7 +30,7 @@ This guide is not final. It will evolve over time, as we learn and add new voice
 ## Code of Conduct
 One of our core values at Mutt is that **we are an open team**. We all make mistakes and need help fixing them. We foster psychological safety. We clearly express it when we don’t know something and ask for advice.
 
-We expect everyone contributing to `soam` to follow this principle. Be kind, don't be rude, keep it friendly; learn, teach, ask and help.
+We expect everyone contributing to SoaM to follow this principle. Be kind, don't be rude, keep it friendly; learn, teach, ask and help.
 
 ## Issues
 
@@ -51,7 +51,30 @@ If you find a security related bug or any kind of security rellated issue, **ple
 
 ## Development Setup
 ### Installation
-To set up your environment and start developing check this [guide](https://gitlab.com/mutt_data/soam/-/blob/master/documentation/source/developers_starting_point.md).
+
+The project runs with Python>=3.6
+
+To install the dependencies in [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#install-editable)
+in the root of the project run:
+
+```bash
+pip install -e ".[dev]"
+pip install -e ".[test]"
+```
+
+[//comment]: # (TODO: 'python setup.py develop' is not working, should be the same as 'pip install -e .')
+[//comment]: # (TODO: 'python setup.py develop' is failing to obtain muttlib.)
+
+This will install the package in
+[development mode](https://setuptools.readthedocs.io/en/latest/setuptools.html#develop-deploy-the-project-source-in-development-mode).
+
+Next steps:
+* If you already have the project running the last step before making your first commit is to review the
+[development pipeline](development_pipeline.md).
+* If you want more information about the main classes or patterns in the project go to [classes document](classes.md).
+* If you need to understand a library, technology or concept in the project you can check the
+[references](references.md).
+
 ### Pre-Commit for Version Control Integration
 
 We use [pre-commit](https://pre-commit.com) to run several code scans and hooks like linters and formatters, defined in `.pre-commit-config.yaml`, on each staged file  that make the development cycle easier.
@@ -63,7 +86,7 @@ pre-commit install -t push
 ```
 
 ## Style guide
-`soam` follows [PEP8](https://www.python.org/dev/peps/pep-0008/).
+SoaM follows [PEP8](https://www.python.org/dev/peps/pep-0008/).
 
 If you installed the [pre-commit hooks](#pre-commit) you shouldn't worry too much about style, since they will fix it for you or warn you about styling errors. We use the following hooks:
 
@@ -82,7 +105,7 @@ We use either [numpy style](https://numpydoc.readthedocs.io/en/latest/format.htm
 - Method/functions to explain what it does and what it's parameters are
 
 ## Testing
-`soam` uses the [pytest framework](https://docs.pytest.org/en/latest/) to test `soam`.
+SoaM uses the [pytest framework](https://docs.pytest.org/en/latest/) to test SoaM.
 
 To run the default test suite run this:
 ```bash
@@ -109,20 +132,34 @@ nox --session tests
 [Regression testing](https://en.wikipedia.org/wiki/Regression_testing) to ensure new changes have not broken previously working features.
 
 ## Documentation
-`soam` uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's [docs](https://mutt_data.gitlab.io/soam/) that are automatically built from [docstrings](#docstrings) and pushed by the [CI jobs](#cicd-jobs). Check the [style guide](#style-guide) section for notes on docstrings. Pushing all the docs is too cumbersome. You can generate them locally by doing:
+SoaM uses [Sphinx](https://www.sphinx-doc.org/en/master/) to autogenerate it's [docs](https://mutt_data.gitlab.io/soam/) that are automatically built from [docstrings](#docstrings) and pushed by the [CI jobs](#cicd-jobs). Check the [style guide](#style-guide) section for notes on docstrings. Pushing all the docs is too cumbersome. You can generate them locally by doing:
 
 ```bash
 pip install .[all]
-cd docs
-make html
+cd documentation
+rm -r build
+sphinx-apidoc -f -o source ../soam # To create the modules documentation
+make html # To bundle the documentation
 ```
 
 And open `docs/build/html/index.html` on your browser of choice.
 
+Note that for simple tests that don't depend on external libraries you can install only the Sphinx deps.
+
+This documentation is created during CI using [GitLab Pages](https://docs.gitlab.com/ee/user/project/pages/).
+
 Alternatively you can see the docs for the `master` branch [here.](https://mutt_data.gitlab.io/soam/index.html)
 
+We are using the following extensions:
+ - [napoleon](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html) to
+ create the rst files from the code documentation.
+ - [autodoc](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html) to
+ include the code documentation that napoleon generates.
+ - [m2r2](https://github.com/crossnox/m2r2) to easily include markdown files in the
+ documentation.
+
 ## Versioning
-`soam` uses [SemVer](https://semver.org). To keep things easy, we've included [bump2version](https://github.com/c4urself/bump2version/) as a dev dependency. You can use `bump2version minor` to increase the minor number.
+SoaM uses [SemVer](https://semver.org). To keep things easy, we've included [bump2version](https://github.com/c4urself/bump2version/) as a dev dependency. You can use `bump2version minor` to increase the minor number.
 
 Please remember to bump the version when submitting your PR!
 
@@ -132,7 +169,7 @@ Before fully deprecating a feature or making a breaking change, give users a `De
 
 ### Decorator
 
-`soam` uses [deprecated](https://github.com/tantale/deprecated) decorators to implement `DeprecationWarning`.
+SoaM uses [deprecated](https://github.com/tantale/deprecated) decorators to implement `DeprecationWarning`.
 
 Add a `DeprecationWarning` considering indicate:
   - How to achieve similar behavior if an alternative is available or a reason for the deprecation if no clear alternative is available.
@@ -183,7 +220,7 @@ Deprecation warning must be added in minor releases and EOL will be on the next 
 ## PRs
 Also called MRs (Merge Requests) in gitlab.
 
-`soam` development follows a simple workflow:
+SoaM development follows a simple workflow:
 - Assign yourself an issue
 	- If there's none, [create it](#issues)
 	- If you can't assign it yourself, ask someone to do it for you
@@ -213,7 +250,7 @@ RFC stands for **R**equest **f**or **C**omments. It means you consider the issue
 
 ### CI/CD jobs
 
-All commits pushed to branches in pull requests will trigger CI jobs that install `soam` in a gitlab-provided docker-env and all the extras, run all tests and check for linting. Look at [.gitlab-ci.yml](.gitlab-ci.yml) for more details on this and as well as the official [docs](https://docs.gitlab.com/ce/ci/README.html). Note that only PRs that pass the CI will be allowed to merge.
+All commits pushed to branches in pull requests will trigger CI jobs that install SoaM in a gitlab-provided docker-env and all the extras, run all tests and check for linting. Look at [.gitlab-ci.yml](.gitlab-ci.yml) for more details on this and as well as the official [docs](https://docs.gitlab.com/ce/ci/README.html). Note that only PRs that pass the CI will be allowed to merge.
 
 `NOTE:` If your commit message contains [ci skip] or [skip ci], without capitalization, the job will be skipped i.e. no CI job will be spawned for that push.
 
