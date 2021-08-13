@@ -17,8 +17,3 @@ Prefect Task and Flow states when they are updated.
 ##### Forecasting class diagram
 ![forecaster](../images/Forecaster_class_diagram.png)
 
-https://gitlab.com/mutt_data/onboarding/-/blob/master/docs/modern_python_apps.md#documentation
-
-[//comment]: # (TODO: create some flow and class diagrams, some expected or possible architecture implementations.)
-
-

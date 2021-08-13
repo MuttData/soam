@@ -1,4 +1,4 @@
-Welcome to soam's documentation!
+Welcome to SoaM's documentation!
 ================================
 
 Contents
@@ -10,13 +10,10 @@ Contents
     README
     CONTRIBUTING
     end2end
-    developers_starting_point
-    development_pipeline
+    mlflow_tracking
     project_structure
     classes
-    references
     modules
-    mlflow_tracking
 
 
 

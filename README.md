@@ -2,7 +2,7 @@
 
 [![pipeline status](https://gitlab.com/mutt_data/soam/badges/master/pipeline.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [![coverage report](https://gitlab.com/mutt_data/soam/badges/master/coverage.svg)](https://gitlab.com/mutt_data/soam/-/commits/master) [![pypi version](https://img.shields.io/pypi/v/soam?color=blue)](https://pypi.org/project/soam/)
 
-SoaM is library created by [Mutt](https://muttdata.ai/).
+SoaM is a [Prefect](https://docs.prefect.io/) based library created by [Mutt](https://muttdata.ai/).
 Its goal is to create a forecasting framework, this tool is developed with conjunctions of experience on previous
 projects. There come the name: Son of a Mutt = SoaM
 
@@ -30,7 +30,7 @@ The process is structured in different stages:
 * Postprocessing: modifies the results based on business/real information or create analysis with the predicted values,
  such as an anomaly detection.
 
-## Overview of the Steps Run in SoaM (planned)
+## Overview of the Steps Run in SoaM
 
 ### Extraction
 This stage extracts data from the needed sources to build the condensed dataset for the next steps. This tends to be
@@ -53,6 +53,14 @@ A variety of models are currently supported to fit and predict data. They can be
 * [Orbit DLT Full](https://orbit-ml.readthedocs.io/en/latest/tutorials/dlt.html)
 * [Prophet](https://pypi.org/project/fbprophet)
 * [SARIMAX](https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html)
+
+### Backtesting
+#### Window policies
+To do backtesting the data is splited in train and validation, there are two spliting methods:
+- Sliding: create a fixed size window for the training data that ends at the beginning of the validation data.
+- Expanding: create the training data from remaining data since the start of the series until the validation data.
+
+For more information review this document: [backtesting at scale](https://eng.uber.com/backtesting-at-scale/)
 
 ### Postprocessing
 [//comment]: # (TODO: explain postprocessing stage chaining)
@@ -198,6 +206,38 @@ pytest --mpl
 
 ## Contributing
 We appreciate for considering to help out maintaining this project. If you'd like to contribute please read our [contributing guidelines](https://mutt_data.gitlab.io/soam/CONTRIBUTING.html).
+
+## CI
+
+To run the CI jobs locally you have to run it with [nox](https://nox.thea.codes/en/stable/):
+In the project root directory, there is a noxfile.py file defining all the jobs, these jobs will be executed when calling from CI or you can call them locally.
+
+You can run all the jobs with the command `nox`, from the project root directory or run just one job with `nox --session test` command, for example.
+
+[//comment]: # (TODO: Link or explain how to run test and check locally)
+[//comment]: # (TODO: Review the following CI explanation)
+
+The .gitlab-ci.yml file configures the gitlab CI to run nox.
+Nox let us execute some test and checks before making the commit.
+We are using:
+* Linting job:
+    * [isort](https://pycqa.github.io/isort/) to reorder imports
+    * [pylint](https://github.com/PyCQA/pylint) to be pep8 compliant
+    * [black](https://github.com/psf/black) to format for code conventions
+    * [mypy](http://mypy-lang.org/) for static type checking
+* [bandit](https://bandit.readthedocs.io/en/latest/) for security checks
+* [pytest](https://docs.pytest.org/) to run all the tests in the test folder.
+* [pyreverse](https://pythonhosted.org/theape/documentation/developer/explorations/explore_graphs/explore_pyreverse.html) to create diagrams of the project
+
+This runs on a gitlab machine after every commit.
+
+We are caching the environments for each job on each branch.
+On every first commit of a branch, you will have to change the policy also if you add dependencies or a new package to the project.
+Gitlab cache policy:
+* `pull`: pull the cached files from the cloud.
+* `push`: push the created files to the cloud.
+* `pull-push`: pull the cached files and push the newly created files.
+
 
 ## Rules of Thumb
 This section contains some recommendations when working with SoaM to avoid common mistakes:
