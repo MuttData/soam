@@ -1,4 +1,4 @@
-# End to End data product with SoaM:
+# End to End data product with SoaM
 
 The purpose of this document is to show how a generic end to end data product would look line using SoaM and [Airflow](http://airflow.apache.org/).
 
