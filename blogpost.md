@@ -31,41 +31,41 @@ This library pipeline supports any data source. The process is structured in dif
 Time Series Extractor
 
 ### Preprocessing
-Transformer
-Merge Concat?
-Slicer?
+- Transformer
+- Merge Concat?
+- Slicer?
 
 ### Forecasting
-Exponential Smoothing
-Orbit DLT Full
-Prophet
-SARIMAX
-Custom
+- Exponential Smoothing
+- Orbit DLT Full
+- Prophet
+- SARIMAX
+- Custom
 
 ### Post Processing
-Store
-Anomalies
-Backtester
-Plotting
-Reporting
+- Store
+- Anomalies
+- Backtester
+- Plotting
+- Reporting
 
 ## Documentation
-Sphinx docs.
-Quickstar I and II.
-Notebooks with examples.
-Documents with examples.
-End2end product using Soam and Airflow.
+- Sphinx docs.
+- Quickstar I and II.
+- Notebooks with examples.
+- Documents with examples.
+- End2end product using Soam and Airflow.
 
 ## Continuous Integration and Continuous Deployment
-Deployment practices.
-Contributing.
-Tests.
-Changelog.
-Version Control.
-Pre commit and Code linting (black, pylint).
-Deployment of updated docs on sphinx.
-Docstrings control.
-Deployment of version to git registry.
+- Deployment practices.
+- Contributing.
+- Tests.
+- Changelog.
+- Version Control.
+- Pre commit and Code linting (black, pylint).
+- Deployment of updated docs on sphinx.
+- Docstrings control.
+- Deployment of version to git registry.
 
 ## Next Steps
 Plans and possible future releases.
