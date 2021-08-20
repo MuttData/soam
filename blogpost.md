@@ -6,7 +6,7 @@ SoaM is a library created by [Mutt](https://muttdata.ai/). It’s goal is to cre
 We developed this library because we were encountering the need of a strong and clear framework for forecasting projects and we didn’t find an open source solution that fitted our needs. As Mutter’s, one of our core values is Efficient Execution, upon this: we always seek ways to optimize our time. We understood that by developing this we wouldn't need to think and code the same thing on different projects and we could leverage its power and replicate it around all of them when needed.
 
 ### How can you use it?
-You can download it directly from [PyPI](https://pypi.org/project/soam/).
+You can install it directly from [PyPI](https://pypi.org/project/soam/) with a simple: `pip install soam`.
 
 ### How are we using it today?
 Of course, SoaM is present in lot’s of our projects. As an example, on one of them where we are building a DataOps platform to improve data pipeline creation we are leveraging SoaM modules to extract a time series from Redshift, make a forecast of it, detect anomalies, plot the results and send a report to our Slack channel. This really facilitates our workload and structures our code the Mutt way.
