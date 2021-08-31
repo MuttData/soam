@@ -93,7 +93,6 @@ setuptools.setup(
         "python-decouple",
         "prefect==0.14.17",
         "filelock",
-        "click",
         "wheel",
         "muttlib>=1.1.2,<2",
         "numpy>=1.19,<1.20",
@@ -101,6 +100,5 @@ setuptools.setup(
     ],
     extras_require=extra_dependencies,
     python_requires="~=3.6",
-    entry_points={'console_scripts': ['soam = soam.console:cli']},
 )
 # TODO: check why 'python setup.py develop' is failing to obtain muttlib, but 'pip install -e .' is working

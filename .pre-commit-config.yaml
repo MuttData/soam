@@ -51,3 +51,12 @@ repos:
       exclude: templates/.+|notebook/.+
       files: \.py$
       types: [python]
+-   repo: https://github.com/MuttData/gfm-diagram
+    rev: v0.3.0
+    hooks:
+    - id: gfmd
+      name: gfmd
+      entry: gfmd
+      types: [file]
+      files: 'README.md'
+      require_serial: true
