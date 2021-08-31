@@ -1,4 +1,8 @@
-"""Wrapping functions for SkLearn API."""
+"""
+Wrapping functions for SkLearn API.
+
+This is inspired by wrappers developed in https://github.com/heidelbergcement/hcrystalball.
+"""
 import abc
 from abc import abstractmethod
 import inspect
