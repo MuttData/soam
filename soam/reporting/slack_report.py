@@ -31,11 +31,6 @@ class SlackReport:
     Generates the report to share via Slack.
     """
 
-    warnings.warn(
-        "This class will be deprecated in v1. Using SlackMessage and send_slack_message methods instead is recommended.",
-        PendingDeprecationWarning,
-    )
-
     def __init__(
         self, channel_id: str, metric_name: str, setting_path: Optional[str],
     ):
