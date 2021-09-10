@@ -26,53 +26,6 @@ DEFAULT_GREETING_MESSAGE = "Hello everyone! Here are the results of the forecast
 DEFAULT_FAREWELL_MESSAGE = "Cheers!\n SoaM."
 
 
-class SlackMessage:
-    def __init__(
-        self,
-        template,
-        arguments: Dict = None,
-        attachment: Optional[Union[Path, IO]] = None,
-        title: Optional[str] = '',
-    ):
-        """Create Slack message.
-
-        Args:
-            template: Jinja template.
-            template_args (dict): Arguments to be passed to the Jinja templates .
-            attachment (Path): Path to file (or image) to attach to the image.
-        """
-        self.template = template
-        self.arguments = arguments
-        self.attachment_ref = attachment
-        self.title = title
-
-    @property
-    def message(self) -> str:
-        """Message property."""
-        message = path_or_string(self.template)
-        if self.arguments:
-            template = Template(message)
-            message = template.render(**self.arguments)  # type:ignore
-        return message
-
-    @property
-    def attachment(self) -> Optional[Union[str, IO]]:
-        """Message property."""
-        if self.attachment_ref is None:
-            return None
-        if isinstance(self.attachment_ref, PosixPath):
-            if not self.attachment_ref.exists():
-                raise ValueError(
-                    f"File does not exist: {str(self.attachment_ref.resolve())}."
-                )
-            # slack's client supports a string with the path for the file
-            return str(self.attachment_ref.resolve())
-        elif isinstance(self.attachment_ref, BytesIO):
-            return self.attachment_ref
-        else:
-            raise TypeError("Only PosixPath and BytesIO supported.")
-
-
 class SlackReport:
     """
     Generates the report to share via Slack.
@@ -233,6 +186,53 @@ class SlackReportTask(Step, SlackReport):
         return self.send_report(
             prediction, plot_filename, greeting_message, farewell_message
         )
+
+
+class SlackMessage:
+    def __init__(
+        self,
+        template,
+        arguments: Dict = None,
+        attachment: Optional[Union[Path, IO]] = None,
+        title: Optional[str] = '',
+    ):
+        """Create Slack message.
+
+        Args:
+            template: Jinja template.
+            template_args (dict): Arguments to be passed to the Jinja templates .
+            attachment (Path): Path to file (or image) to attach to the image.
+        """
+        self.template = template
+        self.arguments = arguments
+        self.attachment_ref = attachment
+        self.title = title
+
+    @property
+    def message(self) -> str:
+        """Message property."""
+        message = path_or_string(self.template)
+        if self.arguments:
+            template = Template(message)
+            message = template.render(**self.arguments)  # type:ignore
+        return message
+
+    @property
+    def attachment(self) -> Optional[Union[str, IO]]:
+        """Message property."""
+        if self.attachment_ref is None:
+            return None
+        if isinstance(self.attachment_ref, PosixPath):
+            if not self.attachment_ref.exists():
+                raise ValueError(
+                    f"File does not exist: {str(self.attachment_ref.resolve())}."
+                )
+            # slack's client supports a string with the path for the file
+            return str(self.attachment_ref.resolve())
+        elif isinstance(self.attachment_ref, BytesIO):
+            return self.attachment_ref
+        else:
+            raise TypeError("Only PosixPath and BytesIO supported.")
 
 
 def send_slack_message(
