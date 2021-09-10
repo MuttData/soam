@@ -219,7 +219,6 @@ def test_integration_forecast_and_report(
         channels="channel_id",
         file=plot_filename,
         initial_comment=expected_msg,
-        title="mae Forecast",
         thread_ts=None,
     )
     assert_saved_data(tmp_path, test_run_name)

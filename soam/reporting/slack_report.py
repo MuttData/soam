@@ -103,34 +103,6 @@ class SlackReport:
         self.channel_id = channel_id
         self.metric_name = metric_name
 
-    def send_slack_message(
-        self, msg: SlackMessage, thread_ts: Optional[int] = None,
-    ):
-        """Send Slack message.
-
-        Parameters
-        ----------
-        channel : str
-            slack channel to send the message to.
-        msg : SlackMessage
-            SlackMessage instance.
-        thread_ts : int, optional
-            message timestamp to reply to in threaded fashion, by default None.
-        """
-        if msg.attachment is None:
-            response = self.slack_client.chat_postMessage(
-                channel=self.channel_id, text=msg.message, thread_ts=thread_ts
-            )
-        else:
-            response = self.slack_client.files_upload(
-                file=msg.attachment,
-                channels=self.channel_id,
-                initial_comment=msg.message,
-                thread_ts=thread_ts,
-                title=msg.title,
-            )
-        return response
-
     def send_report(
         self,
         prediction: pd.DataFrame,
@@ -193,7 +165,9 @@ class SlackReport:
                 title=f"{self.metric_name} Forecast",
             )
 
-        return self.send_slack_message(msg=msg)
+        return send_slack_message(
+            slack_client=self.slack_client, channel=self.channel_id, msg=msg
+        )
 
 
 class SlackReportTask(Step, SlackReport):

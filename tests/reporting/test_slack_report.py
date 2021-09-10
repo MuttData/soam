@@ -11,11 +11,10 @@ import pytest
 
 from soam.reporting.slack_report import (
     SlackMessage,
-    SlackReport,
     send_anomaly_report,
     send_multiple_slack_messages,
+    send_slack_message,
 )
-from tests.integration.test_integration import create_settings_file
 
 SLACK_MSG_TEMPLATE = """
 Hello {{ user }}, welcome to SOAM {{ version }}"""
@@ -46,16 +45,12 @@ def test_slack_message_object_with_file():
     assert slack_msg.attachment == byte_file
 
 
-def test_send_slack_message_no_attachment(tmp_path):
+def test_send_slack_message_no_attachment():
     client_mock = MagicMock()
     template_params = dict(user="test", version="0.1.0")
     slack_msg = SlackMessage(SLACK_MSG_TEMPLATE, arguments=template_params)
     test_channel = "test"
-    test_metric = "test_metric"
-    setting_path = create_settings_file(tmp_path, "[settings]\nSLACK_TOKEN=token")
-    slack_report = SlackReport(test_channel, test_metric, setting_path)
-    slack_report.slack_client = client_mock
-    slack_report.send_slack_message(msg=slack_msg)
+    send_slack_message(slack_client=client_mock, channel=test_channel, msg=slack_msg)
     client_mock.chat_postMessage.assert_called_once_with(
         channel=test_channel, text=slack_msg.message, thread_ts=None
     )
@@ -71,21 +66,16 @@ def test_send_slack_message_with_path_attachment(tmp_path):
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file
     )
     test_channel = "test"
-    test_metric = "test_metric"
-    setting_path = create_settings_file(tmp_path, "[settings]\nSLACK_TOKEN=token")
-    slack_report = SlackReport(test_channel, test_metric, setting_path)
-    slack_report.slack_client = client_mock
-    slack_report.send_slack_message(msg=slack_msg)
+    send_slack_message(slack_client=client_mock, channel=test_channel, msg=slack_msg)
     client_mock.files_upload.assert_called_once_with(
         file=slack_msg.attachment,
         channels=test_channel,
         initial_comment=slack_msg.message,
         thread_ts=None,
-        title='',
     )
 
 
-def test_send_slack_message_with_buffer_attachment(tmp_path):
+def test_send_slack_message_with_buffer_attachment():
     client_mock = MagicMock()
     byte_file = BytesIO(b"abcdef")
     template_params = dict(user="test", version="0.1.0")
@@ -93,17 +83,12 @@ def test_send_slack_message_with_buffer_attachment(tmp_path):
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
     )
     test_channel = "test"
-    test_metric = "test_metric"
-    setting_path = create_settings_file(tmp_path, "[settings]\nSLACK_TOKEN=token")
-    slack_report = SlackReport(test_channel, test_metric, setting_path)
-    slack_report.slack_client = client_mock
-    slack_report.send_slack_message(msg=slack_msg)
+    send_slack_message(slack_client=client_mock, channel=test_channel, msg=slack_msg)
     client_mock.files_upload.assert_called_once_with(
         file=byte_file,
         channels=test_channel,
         initial_comment=slack_msg.message,
         thread_ts=None,
-        title='',
     )
 
 
