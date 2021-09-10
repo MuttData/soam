@@ -135,7 +135,7 @@ class Backtester(Step):
 
         if preprocessor is None:
             preprocessor = Transformer(DummyDataFrameTransformer())
-            
+
         self.forecaster = forecaster
         self.preprocessor = preprocessor
         self.forecast_plotter = forecast_plotter
