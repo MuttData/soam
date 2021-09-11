@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.5- 2021-09-10]
 
-### Added
-- Backtesting notebook example.
+### Fixed
+- Update SlackReport to use current API.
 
 ## [0.9.4- 2021-08-17]
 
@@ -256,7 +256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2021-03-15
 
 ### Added
-- Prophet model wrapper.
+- Prophet model wrapper from `pomopt` project.
 - `add_future_dates` utils to add prediction dates onto time_series DataFrames.
 - New tests for `Forecaster` module.
 

@@ -31,11 +31,6 @@ class SlackReport:
     Generates the report to share via Slack.
     """
 
-    warnings.warn(
-        "This class will be deprecated in v1. Using SlackMessage and send_slack_message methods instead is recommended.",
-        PendingDeprecationWarning,
-    )
-
     def __init__(
         self, channel_id: str, metric_name: str, setting_path: Optional[str],
     ):
@@ -85,23 +80,41 @@ class SlackReport:
         if greeting_message == DEFAULT_GREETING_MESSAGE:
             greeting_message.format(metric_name=self.metric_name)
 
+        if isinstance(plot_filename, str):
+            plot_filename = Path(plot_filename)
+
         prediction[f"{YHAT_COL}_str"] = prediction[YHAT_COL].apply(
             lambda f: "{:.2f}".format(f)  # pylint: disable=unnecessary-lambda
         )
-        summary_message = _df_to_report_string(
-            prediction,
-            DS_COL,
-            f"{YHAT_COL}_str",
-            greeting_message=greeting_message,
-            farewell_message=farewell_message,
-        )
-        prediction = prediction.drop(columns=[f"{YHAT_COL}_str"])
 
-        return self.slack_client.files_upload(
-            channels=self.channel_id,
-            file=str(plot_filename),
-            initial_comment=summary_message,
-            title=f"{self.metric_name} Forecast",
+        if len(prediction) == 0:
+            msg = SlackMessage(
+                greeting_message,
+                attachment=plot_filename,
+                title=f"{self.metric_name} Forecast",
+            )
+        else:
+            summary_message = _df_to_report_string(
+                prediction,
+                DS_COL,
+                f"{YHAT_COL}_str",
+                greeting_message=greeting_message,
+                farewell_message=farewell_message,
+            )
+            prediction = prediction.drop(columns=[f"{YHAT_COL}_str"])
+
+            msg = SlackMessage(
+                summary_message,
+                arguments={
+                    "detection_window": len(prediction),
+                    "metric_name": self.metric_name,
+                },
+                attachment=plot_filename,
+                title=f"{self.metric_name} Forecast",
+            )
+
+        return send_slack_message(
+            slack_client=self.slack_client, channel=self.channel_id, msg=msg
         )
 
 
@@ -176,6 +189,7 @@ class SlackMessage:
         template,
         arguments: Dict = None,
         attachment: Optional[Union[Path, IO]] = None,
+        title: Optional[str] = '',
     ):
         """Create Slack message.
 
@@ -187,6 +201,7 @@ class SlackMessage:
         self.template = template
         self.arguments = arguments
         self.attachment_ref = attachment
+        self.title = title
 
     @property
     def message(self) -> str:
