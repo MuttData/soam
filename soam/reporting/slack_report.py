@@ -170,6 +170,53 @@ class SlackReportTask(Step, SlackReport):
         )
 
 
+class SlackAnomalyReportTask(Step):
+    """
+    Builds up the task of the anomaly report designed for Slack.
+    """
+
+    def __init__(self, **kwargs: Any):
+        """
+        Parameters
+        ----------
+        channel_id: str
+            Slack channel id where the report will be sent.
+        metric_name: str
+            Performance metric being measured.
+        setting_path: str
+            Setting path.
+        kwargs:
+            Extra args to pass.
+        """
+        Step.__init__(self, **kwargs)  # type: ignore
+
+    def run(  # type: ignore
+        self,
+        slack_client: slack.WebClient,
+        channel_id: str,
+        plot: Union[Path, IO],
+        metric_name: str,
+        anomaly_df: pd.DataFrame,
+        date_col: str,
+    ):
+        """
+        Parameters
+        ----------
+        channel_id: str
+            Slack channel id where the report will be sent.
+        plot: str, pathlib.Path or buffer
+            Anomaly plot
+        metric_name: str
+            Metric to report.
+        anomaly_df: pd.DataFrame
+            DataFrame with anomalous values. Must have the following columns: ['y','yhat','yhat_lower','yhat_upper']
+        date_col: str
+            Name of the date column
+        """
+        return send_anomaly_report(
+            slack_client, channel_id, plot, metric_name, anomaly_df, date_col
+        )
+
 class SlackMessage:
     def __init__(
         self,
