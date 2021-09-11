@@ -5,10 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.4 - 2021-07-19]
+## [0.7.0 - 2021-07-23]
 
 ### Added
-- Added installation instructions for prophet on the quickstart.
+- Multiple slack message support.
+
+## [0.6.5 - 2021-07-23]
+
+### Removed
+- default tmp dir creation.
+
+## [0.6.4 - 2021-07-19]
+
+### Fixed
+- Added the sphinxcontrib.mermaid extension in dev.
 
 ## [0.6.3 - 2021-07-16]
 

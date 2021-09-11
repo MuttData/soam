@@ -15,6 +15,7 @@ extra_dependencies = {
         'bump2version',
         'docutils>=0.12,<0.17',
         'sphinx',
+        'sphinxcontrib.mermaid',
         'sphinx_rtd_theme',
         'm2r2>=0.3.0',
         'pre-commit==2.5.0',

@@ -4,12 +4,10 @@ Configurations
 ----------
 Configuration values for the SlackReport, MailReport, DBSaver and Mlflow.
 """
-from pathlib import Path
-import tempfile
 from typing import Optional
 
 from decouple import AutoConfig
-from muttlib.utils import get_default_jinja_template, make_dirs
+from muttlib.utils import get_default_jinja_template
 from pkg_resources import resource_string
 
 SQLITE = "sqlite"
@@ -19,16 +17,6 @@ SOAM_RUN_FACTOR_CONF_TABLE_BASENAME = "soam_flow_run_factor_conf"
 SOAM_TASK_RUNS_TABLE_BASENAME = "tasks_runs"
 FORECASTER_VALUES_TABLE_BASENAME = "forecaster_values"
 EXTRACT_VALUES_TABLE_BASENAME = "extract_values"
-
-# Setup paths
-# _p = Path("/tmp/soam/")
-_p = tempfile.mkdtemp()
-SQL_DIR = make_dirs(Path(_p, "resources"))
-LOG_DIR = make_dirs(Path(_p, "tmp", "logs"))
-DATA_DIR = make_dirs(Path(_p, "tmp", "data"))
-DATA_DIR_TABULAR = make_dirs(Path(_p, "tmp", "data", "tabular"))
-FIG_DIR = make_dirs(Path(_p, "tmp", "figures"))
-RES_DIR = make_dirs(Path(_p, "tmp", "results"))
 
 # Report paths and configs
 MAIL_REPORT = "resources/mail_report.html"
