@@ -99,6 +99,24 @@ pages:
     refs:
       - master
 
+# Deploy from master to package registry
+# If PYPI_USERNAME/PYPI_PASSWORD are not set, defaults to gitlab
+# package registry, thus using the required variables to do so
+# The package will be uploaded to PYPI_URL, which can be overrided
+# not to upload to gitlab's PYPI
+deploy:
+  stage: deploy_stage
+  script:
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - export TWINE_USERNAME=${PYPI_USERNAME:=gitlab-ci-token}
+    - export TWINE_PASSWORD=${PYPI_PASSWORD:=$CI_JOB_TOKEN}
+    - export PYPI_REPO=${PYPI_URL:=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi}
+    - python -m twine upload --verbose --repository-url ${PYPI_REPO} dist/*
+  only:
+    refs:
+      - master
+
 tag_release_version:
   stage: version_stage
   script:
@@ -110,7 +128,6 @@ tag_release_version:
     - ''
   only:
     refs:
-      - merge_requests
       - master
 
 release:
@@ -128,7 +145,6 @@ release:
     - ''
   only:
     refs:
-      - merge_requests
       - master
 
 check_version:

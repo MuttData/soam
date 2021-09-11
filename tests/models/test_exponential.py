@@ -19,8 +19,7 @@ def test_input_format_exponential(
     data = add_future_dates(train_data, output_length)
     X, y = data[data.columns[:-1]], data[data.columns[-1]]
     wrapper = SkExponentialSmoothing()
-    # wrapper.assert_not_called()
-    endog = wrapper._transform_to_input_format(X, y)
+    endog = wrapper._transform_to_input_format(X, y)  # pylint: disable=protected-access
     expected_endog = pd.Series(data.y.values, index=data.ds.values)
     assert_series_equal(endog, expected_endog)
 
