@@ -251,7 +251,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2021-03-15
 
 ### Added
-- Prophet model wrapper from `pomopt` project.
+- Prophet model wrapper.
 - `add_future_dates` utils to add prediction dates onto time_series DataFrames.
 - New tests for `Forecaster` module.
 
