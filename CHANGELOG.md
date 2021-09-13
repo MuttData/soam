@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Update SlackReport to use current API.
 
+### Added
+- Add client_token to SlackReport init.
+
 ## [0.9.4- 2021-08-17]
 
 ### Added
