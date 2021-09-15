@@ -32,7 +32,11 @@ class SlackReport:
     """
 
     def __init__(
-        self, channel_id: str, metric_name: str, setting_path: Optional[str],
+        self,
+        channel_id: str,
+        metric_name: str,
+        setting_path: Optional[str] = None,
+        client_token: Optional[str] = None,
     ):
         """
         Initialization of the Slack Report object.
@@ -46,7 +50,15 @@ class SlackReport:
         setting_path: str
             Setting path.
         """
-        credentials = get_slack_cred(setting_path)
+        if setting_path and client_token:
+            raise ValueError("Either setting_path or client_token should be provided")
+        if setting_path:
+            credentials = get_slack_cred(setting_path)
+        elif client_token:
+            credentials = {"token": client_token}
+        else:
+            raise TypeError("Either setting_path or client_token must be provided.")
+
         self.slack_client = slack.WebClient(credentials["token"])
         self.channel_id = channel_id
         self.metric_name = metric_name
