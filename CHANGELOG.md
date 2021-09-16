@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.5- 2021-09-10]
+
+### Added
+- Backtesting notebook example.
+
 ## [0.9.4- 2021-08-17]
 
 ### Added
@@ -251,7 +256,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2021-03-15
 
 ### Added
+<<<<<<< HEAD
 - Prophet model wrapper from `pomopt` project.
+=======
+- Prophet model wrapper.
+>>>>>>> dc7dd923fc491fc9d3a609a80126add805ab1d2f
 - `add_future_dates` utils to add prediction dates onto time_series DataFrames.
 - New tests for `Forecaster` module.
 
