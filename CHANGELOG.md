@@ -5,10 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.9.5- 2021-09-10]
+## [0.9.6- 2021-09-10]
+
+### Fixed
+- Update SlackReport to use current API.
 
 ### Added
-- Backtesting notebook example.
+- Add client_token to SlackReport init.
 
 ## [0.9.4- 2021-08-17]
 
@@ -256,7 +259,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2021-03-15
 
 ### Added
-- Prophet model wrapper.
+- Prophet model wrapper from `pomopt` project.
 - `add_future_dates` utils to add prediction dates onto time_series DataFrames.
 - New tests for `Forecaster` module.
 
