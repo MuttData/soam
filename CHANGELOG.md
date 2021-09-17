@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Slack Anomaly Report Task
 
+## [0.9.6- 2021-09-10]
+
+### Fixed
+- Update SlackReport to use current API.
+
+### Added
+- Add client_token to SlackReport init.
+>>>>>>> ec8276626b283e1773b31457e4c84dd2c28b4306
+
 ## [0.9.4- 2021-08-17]
 
 ### Added

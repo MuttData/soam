@@ -134,7 +134,7 @@ class Backtester(Step):
                 # self.state_handlers.append(saver.save_step)
 
         if preprocessor is None:
-            preprocessor = DummyDataFrameTransformer()
+            preprocessor = Transformer(DummyDataFrameTransformer())
 
         self.forecaster = forecaster
         self.preprocessor = preprocessor
