@@ -3,13 +3,14 @@
 from datetime import date
 from io import BytesIO
 from pathlib import Path, PosixPath
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from jinja2 import Template
 import pandas as pd
 import pytest
 
 from soam.reporting.slack_report import (
+    SlackAnomalyReportTask,
     SlackMessage,
     send_anomaly_report,
     send_multiple_slack_messages,
@@ -219,3 +220,23 @@ def test_send_no_anomaly_report():
         initial_comment=expected_message,
         thread_ts=None,
     )
+
+
+def test_slack_anomaly_report_task():
+    with patch("soam.reporting.slack_report.send_anomaly_report") as send_report_mock:
+        task = SlackAnomalyReportTask()
+        client_mock = MagicMock()
+        plot_file = BytesIO(b"abcdef")
+        anomaly_df = pd.DataFrame(
+            [
+                [date(2021, 1, 1), 1.5, 1.01, 2.2, 0.5],
+                [date(2021, 1, 2), 4.01, 4.02, 4.7, 3.9],
+            ],
+            columns=["date", "y", "yhat", "yhat_upper", "yhat_lower"],
+        )
+        metric_name = "test"
+        test_channel = "test"
+        task.run(client_mock, test_channel, plot_file, metric_name, anomaly_df, "date")
+        send_report_mock.assert_called_once_with(
+            client_mock, test_channel, plot_file, metric_name, anomaly_df, "date"
+        )
