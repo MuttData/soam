@@ -50,7 +50,7 @@ def test_send_slack_message_no_attachment():
     template_params = dict(user="test", version="0.1.0")
     slack_msg = SlackMessage(SLACK_MSG_TEMPLATE, arguments=template_params)
     test_channel = "test"
-    send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
+    send_slack_message(slack_client=client_mock, channel=test_channel, msg=slack_msg)
     client_mock.chat_postMessage.assert_called_once_with(
         channel=test_channel, text=slack_msg.message, thread_ts=None
     )
@@ -66,7 +66,7 @@ def test_send_slack_message_with_path_attachment(tmp_path):
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=temp_file
     )
     test_channel = "test"
-    send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
+    send_slack_message(slack_client=client_mock, channel=test_channel, msg=slack_msg)
     client_mock.files_upload.assert_called_once_with(
         file=slack_msg.attachment,
         channels=test_channel,
@@ -83,7 +83,7 @@ def test_send_slack_message_with_buffer_attachment():
         SLACK_MSG_TEMPLATE, arguments=template_params, attachment=byte_file
     )
     test_channel = "test"
-    send_slack_message(client_mock, channel=test_channel, msg=slack_msg)
+    send_slack_message(slack_client=client_mock, channel=test_channel, msg=slack_msg)
     client_mock.files_upload.assert_called_once_with(
         file=byte_file,
         channels=test_channel,
