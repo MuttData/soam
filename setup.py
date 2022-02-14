@@ -95,7 +95,7 @@ setuptools.setup(
         "filelock",
         "wheel",
         "muttlib>=1.1.2,<2",
-        "numpy>=1.19,<1.20",
+        "numpy>=1.20,<2",
         "matplotlib==3.3.4",
     ],
     extras_require=extra_dependencies,
