@@ -85,7 +85,7 @@ setuptools.setup(
     test_suite='test',
     install_requires=[
         "jinja2",
-        "pandas>=1.0.0",
+        "pandas>=1.0.0,<1.3.0",
         "Cython<0.29.18,>=0.29",
         "sqlalchemy<1.4.0,>=1.3.0",
         "sqlalchemy_utils",
