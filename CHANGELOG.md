@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1- 2022-02-14]
+
+### Fixed
+- Prophet dependency issues
+
 ## [0.10.0- 2021-09-10]
 
 ### Added
@@ -17,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add client_token to SlackReport init.
->>>>>>> ec8276626b283e1773b31457e4c84dd2c28b4306
 
 ## [0.9.4- 2021-08-17]
 
