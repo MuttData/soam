@@ -254,14 +254,14 @@ def test_integration_backtester_multi_fold_default_aggregation(
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 2.0269522786354313,
+                    'avg': 1.9589275037323055,
                     'max': 3.135813436023453,
-                    'min': 1.344995687583762,
+                    'min': 1.140917192970902,
                 },
                 'mse': {
-                    'avg': 6.761216280050696,
+                    'avg': 6.503752202773445,
                     'max': 12.666927167728852,
-                    'min': 3.233004063171241,
+                    'min': 2.4605681674505524,
                 },
             },
             'plots': '0_forecast_2018020100_2020080100_.png',
@@ -478,14 +478,14 @@ def test_integration_backtester_multi_fold_custom_plot_aggregation_default_metri
             ),
             METRICS_KEYWORD: {
                 'mae': {
-                    'avg': 2.0269522786354313,
+                    'avg': 1.9589275037323055,
                     'max': 3.135813436023453,
-                    'min': 1.344995687583762,
+                    'min': 1.140917192970902,
                 },
                 'mse': {
-                    'avg': 6.761216280050696,
+                    'avg': 6.503752202773445,
                     'max': 12.666927167728852,
-                    'min': 3.233004063171241,
+                    'min': 2.4605681674505524,
                 },
             },
             'plots': '0_forecast_2015080100_2018020100_.png',
