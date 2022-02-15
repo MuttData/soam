@@ -143,7 +143,9 @@ class CSVSaver(Saver):
         """
         if new_state.is_successful():
             flow_run_file = self.flow_file_path
-            lock = FileLock(str(self.flow_run_lock))
+            lock = FileLock(  # pylint: disable=abstract-class-instantiated
+                str(self.flow_run_lock)
+            )
 
             with lock.acquire(timeout=5):
                 read_df = pd.read_csv(flow_run_file)
