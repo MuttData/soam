@@ -1,1 +1,103 @@
-// TODO
+name: Integration workflow - validation & testing
+
+run-name: ${{github.repository}} is getting updated by ${{github.actor}} 
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  PIP_CACHE_DIR: ${{github.workspace}}/.cache/pip
+  PRE_COMMIT_HOME: ${{github.workspace}}/.cache/pre-commit
+  POSTGRES_DB: soam_db
+  POSTGRES_USER: soam_usr
+  POSTGRES_PASSWORD: soam_pass
+  TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
+
+jobs:
+  prev_steps:
+    runs-on: ubuntu-latest
+    container: python:3.8.5
+    steps:
+    - name: Cache Nox
+      uses: actions/cache@v3
+      with:
+        path: |
+          .nox/
+          .cache/pip
+          apt-cache/
+          ${PRE_COMMIT_HOME}
+    
+    - name: Running Configuration
+      run: |
+        export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
+        apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" upgrade -y
+        apt-get install texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev -y
+    
+    - name: Installing Nox
+      run: pip install nox 
+
+  
+
+
+# stages:
+#   - validate
+#   - test_stage
+
+
+# check_version:
+#   stage: validate
+#   script:
+#     - pip install packaging
+#     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+#     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+#     - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- soam/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
+#     - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+#     - exit_status=$?
+#     - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
+#     - exit $exit_status
+#   only:
+#     refs:
+#       - merge_requests
+#     variables:
+#       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+
+# check_changelog:
+#   stage: validate
+#   script:
+#     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+#     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+#     - added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -- CHANGELOG.md | awk '{print $1}')
+#     - if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+#   only:
+#     refs:
+#       - merge_requests
+#     variables:
+#       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+
+  tests:
+    needs: [check_version, check_changelog]
+    steps:
+    - name: Tests
+      run: nox --sessions tests
+    
+    - name: Lint
+      run: nox --sessions lint
+    
+    - name: DocString Coverage
+      run: |
+        pip install interrogate
+        interrogate soam -c pyproject.toml -vv
+    
+    - name: Bandit
+      run: nox --sessions bandit
+    
+    - name: Pyreverse
+      run: |
+        apt-get -qq update
+        apt-get -qq install -y graphviz
+        nox --sessions pyreverse
+
+
