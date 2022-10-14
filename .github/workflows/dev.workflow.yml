@@ -17,7 +17,7 @@ env:
   TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
 
 jobs:
-  prev_steps:
+  setup:
     runs-on: ubuntu-latest
     container: python:3.8.5
     steps:
@@ -39,46 +39,31 @@ jobs:
     - name: Installing Nox
       run: pip install nox 
 
-  
+  validate:
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+    - name: Check version
+      run: |
+        pip install packaging
+        git fetch origin ${{github.head_ref}}
+        git fetch origin ${{github.base_ref}}
+        lib_ber=$(git diff origin/${{github.head_ref}}/${{github.base_ref}})
+        python -c "import sys; prom packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+        exit_status=$?
+        if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
+        exit $exit_status
+    
+    - name: Check changelog
+      run: |
+        git fetch origin ${{github.head_ref}}
+        git fetch origin ${{github.base_ref}}      
+        added_lines=$(git diff --numstat origin/${{github.base_ref}}  origin/${{github.head_ref}} -- CHANGELOG.md | awk '{print $1}')
+        if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
 
-
-# stages:
-#   - validate
-#   - test_stage
-
-
-# check_version:
-#   stage: validate
-#   script:
-#     - pip install packaging
-#     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-#     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-#     - lib_ver=$(git diff origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME -- soam/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
-#     - python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
-#     - exit_status=$?
-#     - if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
-#     - exit $exit_status
-#   only:
-#     refs:
-#       - merge_requests
-#     variables:
-#       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-
-# check_changelog:
-#   stage: validate
-#   script:
-#     - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-#     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-#     - added_lines=$(git diff --numstat origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -- CHANGELOG.md | awk '{print $1}')
-#     - if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
-#   only:
-#     refs:
-#       - merge_requests
-#     variables:
-#       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
-
-  tests:
-    needs: [check_version, check_changelog]
+  test_stage:
+    runs-on: ubuntu-latest
+    needs: [validate]
     steps:
     - name: Tests
       run: nox --sessions tests
