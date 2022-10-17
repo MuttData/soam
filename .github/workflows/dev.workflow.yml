@@ -1,8 +1,14 @@
+#act pull_request  -j build-deploy 
+
 name: Integration workflow - validation & testing
 
 run-name: ${{github.repository}} is getting updated by ${{github.actor}} 
 
 on:
+  push:
+    branches:
+      - main
+      - master
   pull_request:
     branches:
       - main
@@ -17,31 +23,10 @@ env:
   TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    container: python:3.8.5
-    steps:
-    - name: Cache Nox
-      uses: actions/cache@v3
-      with:
-        path: |
-          .nox/
-          .cache/pip
-          apt-cache/
-          ${PRE_COMMIT_HOME}
-    
-    - name: Running Configuration
-      run: |
-        export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
-        apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" upgrade -y
-        apt-get install texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev -y
-    
-    - name: Installing Nox
-      run: pip install nox 
-
   validate:
     runs-on: ubuntu-latest
-    needs: [setup]
+    container: python:3.8.5
+    if:  github.event_name == 'pull_request'
     steps:
     - name: Check version
       run: |
@@ -53,7 +38,7 @@ jobs:
         exit_status=$?
         if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
         exit $exit_status
-    
+
     - name: Check changelog
       run: |
         git fetch origin ${{github.head_ref}}
@@ -63,8 +48,12 @@ jobs:
 
   test_stage:
     runs-on: ubuntu-latest
-    needs: [validate]
+    container: python:3.8.5
     steps:
+    - uses: actions/checkout@v3
+    - name: Installing Nox
+      run: pip install -U nox 
+
     - name: Tests
       run: nox --sessions tests
     
