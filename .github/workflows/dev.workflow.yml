@@ -51,7 +51,8 @@ jobs:
           POSTGRES_DB: soam_db
           POSTGRES_USER: soam_usr
           POSTGRES_PASSWORD: soam_pass
-        ports: 5432:5432
+        ports: 
+        - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
