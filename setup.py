@@ -43,9 +43,10 @@ extra_dependencies = {
     'slack': ["slackclient>=2.0.0"],
     'orbit': ['orbit-ml==1.0.13'],
     'prophet': ["pystan==2.19.1.1", "fbprophet==0.7.1", "holidays>=0.10.2"],
-    'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
+    'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6","ipython_genutils"],
     'gsheets_report': ["gspread_pandas", "muttlib[gsheets]>=1.0,<2"],
     'statsmodels': ["statsmodels<0.12,>=0.11"],
+    'protobuf': ["protobuf~=3.2"],
     'mlflow': ["mlflow==1.17.0"],
 }
 
@@ -84,7 +85,7 @@ setuptools.setup(
     tests_require=["pytest", "pytest-cov", "pytest-html", "betamax"],
     test_suite='test',
     install_requires=[
-        "jinja2",
+        "Jinja2>=2.11.3,<3.1.0",
         "pandas>=1.0.0,<1.3.0",
         "Cython<0.29.18,>=0.29",
         "sqlalchemy<1.4.0,>=1.3.0",
