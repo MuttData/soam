@@ -49,7 +49,6 @@ jobs:
 
   test_stage:
     runs-on: ubuntu-latest
-    continue-on-error: true
     container:
       image: python:3.8.5
       options: --user root
@@ -63,6 +62,7 @@ jobs:
       run: pip install -U nox 
 
     - name: Tests
+      continue-on-error: true
       run: |
         sudo apt-get install -y libpoppler-cpp-dev libpoppler-dev poppler-utils
         pip install pdftotext
