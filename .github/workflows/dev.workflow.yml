@@ -66,6 +66,8 @@ jobs:
     - name: Tests
       #continue-on-error: true
       env:
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
         POSTGRES_DB: soam_db
         POSTGRES_USER: soam_usr
         TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
