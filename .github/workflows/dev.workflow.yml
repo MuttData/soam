@@ -48,6 +48,14 @@ jobs:
     container:
       image: python:3.8.5
       options: --user root
+    services:
+      postgres:
+        image: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
     - uses: actions/checkout@v3
 
@@ -58,24 +66,24 @@ jobs:
       run: pip install -U nox
 
     - name: Tests
-      continue-on-error: true
+      #continue-on-error: true
       run: |
         sudo apt-get install -y libpoppler-cpp-dev libpoppler-dev poppler-utils
         pip install pdftotext
         nox --sessions tests
 
     - name: Lint
-      continue-on-error: true
+      #continue-on-error: true
       run: nox --sessions lint
 
     - name: DocString Coverage
-      continue-on-error: true
+      #continue-on-error: true
       run: |
         pip install interrogate
         interrogate soam -c pyproject.toml -vv
 
     - name: Bandit
-      continue-on-error: true
+      #continue-on-error: true
       run: nox --sessions bandit
 
     - name: Pyreverse
