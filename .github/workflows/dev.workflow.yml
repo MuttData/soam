@@ -32,16 +32,13 @@ jobs:
       HEAD_BRANCH: ${{ github.head_ref }}
     steps:
     - uses: actions/checkout@v3
-    - name: Check version
+    - name: Comparing if new version
       run: |
         pip install packaging
         git fetch origin $HEAD_BRANCH
         git fetch origin $TARGET_BRANCH
         lib_ver=$(git diff origin/$HEAD_BRANCH origin/$TARGET_BRANCH -- soam/__init__.py | grep __version__ | cut -d = -f 2 | xargs) 
-        python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[0]) > version.parse(sys.argv[1]))" $lib_ver
-        exit_status=$?
-        if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
-        exit $exit_status
+        python -c "import sys; from packaging import version; v1, v2 = sys.argv[1].split(); exit(not version.parse(v1) > version.parse(v2))" $lib_ver
 
     - name: Check changelog
       run: |
@@ -52,6 +49,7 @@ jobs:
 
   test_stage:
     runs-on: ubuntu-latest
+    continue-on-error: true
     container:
       image: python:3.8.5
       options: --user root
