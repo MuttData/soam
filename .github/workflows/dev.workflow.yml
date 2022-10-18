@@ -13,10 +13,6 @@ on:
 env:
   PIP_CACHE_DIR: ${{github.workspace}}/.cache/pip
   PRE_COMMIT_HOME: ${{github.workspace}}/.cache/pre-commit
-  POSTGRES_DB: soam_db
-  POSTGRES_USER: soam_usr
-  POSTGRES_PASSWORD: soam_pass
-  TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
 
 jobs:
   validate:
@@ -51,6 +47,8 @@ jobs:
     services:
       postgres:
         image: postgres
+        env:
+          POSTGRES_PASSWORD: soam_pass
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -67,6 +65,10 @@ jobs:
 
     - name: Tests
       #continue-on-error: true
+      env:
+        POSTGRES_DB: soam_db
+        POSTGRES_USER: soam_usr
+        TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
       run: |
         sudo apt-get install -y libpoppler-cpp-dev libpoppler-dev poppler-utils
         pip install pdftotext
