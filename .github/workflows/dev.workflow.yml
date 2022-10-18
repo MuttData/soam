@@ -27,13 +27,17 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.8.5
     if:  github.event_name == 'pull_request'
+    env:
+      TARGET_BRANCH: ${{ github.base_ref }}
+      HEAD_BRANCH: ${{ github.head_ref }}
     steps:
+    - uses: actions/checkout@v3
     - name: Check version
       run: |
         pip install packaging
-        git fetch origin ${{github.head_ref}}
-        git fetch origin ${{github.base_ref}}
-        lib_ber=$(git diff origin/${{github.head_ref}}/${{github.base_ref}})
+        git fetch origin HEAD_BRANCH
+        git fetch origin TARGET_BRANCH
+        lib_ber=$(git diff origin/HEAD_BRANCH/TARGET_BRANCH)
         python -c "import sys; prom packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
         exit_status=$?
         if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
@@ -41,9 +45,9 @@ jobs:
 
     - name: Check changelog
       run: |
-        git fetch origin ${{github.head_ref}}
-        git fetch origin ${{github.base_ref}}      
-        added_lines=$(git diff --numstat origin/${{github.base_ref}}  origin/${{github.head_ref}} -- CHANGELOG.md | awk '{print $1}')
+        git fetch origin HEAD_BRANCH
+        git fetch origin TARGET_BRANCH      
+        added_lines=$(git diff --numstat origin/TARGET_BRANCH  origin/HEAD_BRANCH -- CHANGELOG.md | awk '{print $1}')
         if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
 
   test_stage:
@@ -55,7 +59,9 @@ jobs:
       run: pip install -U nox 
 
     - name: Tests
-      run: nox --sessions tests
+      run: |
+        pip install pdftotext
+        nox --sessions tests
     
     - name: Lint
       run: nox --sessions lint
