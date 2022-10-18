@@ -32,15 +32,14 @@ jobs:
       HEAD_BRANCH: ${{ github.head_ref }}
     steps:
     - uses: actions/checkout@v3
-    - name: Comparing if new version
+    - name: New Version Check
       run: |
         pip install packaging
         git fetch origin $HEAD_BRANCH
         git fetch origin $TARGET_BRANCH
         lib_ver=$(git diff origin/$HEAD_BRANCH origin/$TARGET_BRANCH -- soam/__init__.py | grep __version__ | cut -d = -f 2 | xargs) 
-        python -c "import sys; from packaging import version; print(sys.argv[1])" $lib_ver
-        echo $lib_ver
-        
+        python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+
     - name: Check changelog
       run: |
         git fetch origin $HEAD_BRANCH
