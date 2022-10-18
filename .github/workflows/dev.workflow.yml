@@ -32,16 +32,13 @@ jobs:
       HEAD_BRANCH: ${{ github.head_ref }}
     steps:
     - uses: actions/checkout@v3
-    - name: Installing sudo package
-      run: apt update && apt install sudo
-      
     - name: Check version
       run: |
         pip install packaging
         git fetch origin $HEAD_BRANCH
         git fetch origin $TARGET_BRANCH
         lib_ber=$(git diff origin/$HEAD_BRANCH origin/$TARGET_BRANCH -- soam/__init__.py | grep __version__ | cut -d = -f 2 | xargs) 
-        python -c "import sys; prom packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+        python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
         exit_status=$?
         if [ $exit_status -eq 1 ]; then echo "Error comparing versions"; fi;
         exit $exit_status
@@ -60,6 +57,10 @@ jobs:
       options: --user root
     steps:
     - uses: actions/checkout@v3
+
+    - name: Installing sudo package
+      run: apt update && apt install sudo
+      
     - name: Installing Nox
       run: pip install -U nox 
 
