@@ -48,7 +48,12 @@ jobs:
       postgres:
         image: postgres
         env:
+          POSTGRES_DB: soam_db
+          POSTGRES_USER: soam_usr
           POSTGRES_PASSWORD: soam_pass
+      ports:
+
+        - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -64,13 +69,11 @@ jobs:
       run: pip install -U nox
 
     - name: Tests
-      #continue-on-error: true
+      continue-on-error: true
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
-        POSTGRES_DB: soam_db
-        POSTGRES_USER: soam_usr
-        TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
+      #  TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
       run: |
         sudo apt-get install -y libpoppler-cpp-dev libpoppler-dev poppler-utils
         pip install pdftotext
