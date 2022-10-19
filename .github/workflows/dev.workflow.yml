@@ -80,7 +80,9 @@ jobs:
 
     - name: Lint
       #continue-on-error: true
-      run: nox --sessions lint
+      run: |
+        pip install --upgrade pre-commit
+        nox --sessions lint
 
     - name: DocString Coverage
       #continue-on-error: true
