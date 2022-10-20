@@ -75,7 +75,7 @@ jobs:
         POSTGRES_PORT: 5432
         TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
       run: |
-        sudo apt-get install -y libpoppler-cpp-dev libpoppler-dev poppler-utils
+        sudo apt-get install -y texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev libpoppler-dev poppler-utils
         pip install pdftotext
         nox --sessions tests
 
