@@ -2,6 +2,7 @@
 
 name: Integration workflow - validation & testing
 
+#tal persona is working in PR_NAME
 run-name: ${{github.repository}} is getting updated by ${{github.actor}}
 
 on:
