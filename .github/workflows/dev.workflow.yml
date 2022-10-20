@@ -79,7 +79,7 @@ jobs:
       run: |
         sudo apt-get install -y texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev libpoppler-dev poppler-utils
         pip install pdftotext
-        nox --sessions lint
+        nox --sessions test
 
     - name: Lint
       continue-on-error: true
