@@ -68,16 +68,7 @@ jobs:
     - name: Installing Nox
       run: pip install -U nox
 
-    - name: Tests
-      continue-on-error: true
-      env:
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-        TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
-      run: |
-        sudo apt-get install -y texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev libpoppler-dev poppler-utils
-        pip install pdftotext
-        nox --sessions tests
+
 
     - name: Lint
       continue-on-error: true
@@ -85,6 +76,17 @@ jobs:
         pip install --upgrade pre-commit
         nox --sessions lint
 
+    - name: Tests
+      continue-on-error: true
+      env:
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+        TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
+        
+      run: |
+        sudo apt-get install -y texlive-xetex texlive-fonts-recommended libpoppler-cpp-dev libpoppler-dev poppler-utils
+        pip install pdftotext
+        nox --sessions tests
     - name: DocString Coverage
       #continue-on-error: true
       run: |
