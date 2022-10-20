@@ -1,0 +1,136 @@
+#act pull_request  -j build-deploy
+
+name: Integration workflow - validation & testing
+
+run-name: ${{github.repository}} is getting updated by ${{github.actor}}
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  PIP_CACHE_DIR: ${{github.workspace}}/.cache/pip
+  PRE_COMMIT_HOME: ${{github.workspace}}/.cache/pre-commit
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    container: python:3.8.5
+    #if:  github.event_name == 'pull_request'
+    env:
+      TARGET_BRANCH: ${{ github.base_ref }}
+      HEAD_BRANCH: ${{ github.head_ref }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: New Version Check
+      run: |
+        pip install packaging
+        git fetch origin $HEAD_BRANCH
+        git fetch origin $TARGET_BRANCH
+        lib_ver=$(git diff origin/$HEAD_BRANCH origin/$TARGET_BRANCH -- soam/__init__.py | grep __version__ | cut -d = -f 2 | xargs)
+        python -c "import sys; from packaging import version; exit(not version.parse(sys.argv[1]) > version.parse(sys.argv[2]))" $lib_ver
+
+    - name: Check changelog
+      run: |
+        git fetch origin $HEAD_BRANCH
+        git fetch origin $TARGET_BRANCH
+        added_lines=$(git diff --numstat origin/$TARGET_BRANCH  origin/$HEAD_BRANCH -- CHANGELOG.md | awk '{print $1}')
+        if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
+
+  test_stage:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.8.5
+      options: --user root
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: soam_db
+          POSTGRES_USER: soam_usr
+          POSTGRES_PASSWORD: soam_pass
+        ports: 
+        - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Installing sudo package
+      run: apt update && apt install sudo
+
+    - name: Installing Nox
+      run: pip install -U nox
+
+    - name: Tests
+      continue-on-error: true
+      env:
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+      #  TEST_DB_CONNSTR: "postgresql://soam_usr:soam_pass@postgres:5432/soam_db"
+      run: |
+        sudo apt-get install -y libpoppler-cpp-dev libpoppler-dev poppler-utils
+        pip install pdftotext
+        nox --sessions tests
+
+    - name: Lint
+      continue-on-error: true
+      run: |
+        pip install --upgrade pre-commit
+        nox --sessions lint
+
+    - name: DocString Coverage
+      #continue-on-error: true
+      run: |
+        pip install interrogate
+        interrogate soam -c pyproject.toml -vv
+
+    - name: Bandit
+      #continue-on-error: true
+      run: nox --sessions bandit
+
+    - name: Pyreverse
+      run: |
+        apt-get -qq update
+        apt-get -qq install -y graphviz
+        nox --sessions pyreverse
+
+  # version_stage:
+  #   runs-on: ubuntu-latest
+  #   container: python:3.8.5
+  #   steps:
+
+  # script:
+  #   - echo "TAG=v$(grep __version__ ./soam/__init__.py | cut -d "'" -f 2)" >> variables.env
+  # artifacts:
+  #   reports:
+  #     dotenv: variables.env
+  # before_script:
+  #   - ''
+  # only:
+  #   refs:
+  #     - master
+
+  release_stage:
+    name: Release Stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Adding Github Workflows
+          draft: false
+          prerelease: false
