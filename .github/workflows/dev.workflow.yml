@@ -70,7 +70,6 @@ jobs:
       run: pip install -U nox
 
     - name: Tests
-      continue-on-error: true
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
@@ -82,19 +81,16 @@ jobs:
         nox --sessions test
 
     - name: Lint
-      continue-on-error: true
       run: |
         pip install --upgrade pre-commit
         nox --sessions lint
 
     - name: DocString Coverage
-      #continue-on-error: true
       run: |
         pip install interrogate
         interrogate soam -c pyproject.toml -vv
 
     - name: Bandit
-      #continue-on-error: true
       run: nox --sessions bandit
 
     - name: Pyreverse
