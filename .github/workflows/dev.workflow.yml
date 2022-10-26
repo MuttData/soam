@@ -14,7 +14,7 @@ env:
 
 jobs:
   validate:
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     container: python:3.8.5
     env:
       TARGET_BRANCH: ${{ github.base_ref }}
@@ -36,8 +36,9 @@ jobs:
         added_lines=$(git diff --numstat origin/$TARGET_BRANCH  origin/$HEAD_BRANCH -- CHANGELOG.md | awk '{print $1}')
         if [ -z $added_lines ] || [ $added_lines -eq 0 ]; then echo "Changelog has not been modified" && exit 1; else echo "Changelog has been modified" && exit 0; fi;
 
+
   test_stage:
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     needs: validate
     container:
       image: python:3.8.5
@@ -49,7 +50,7 @@ jobs:
           POSTGRES_DB: soam_db
           POSTGRES_USER: soam_usr
           POSTGRES_PASSWORD: soam_pass
-          
+
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -96,7 +97,7 @@ jobs:
         nox --sessions pyreverse
 
   # version_stage:
-  #   runs-on: [self-hosted]
+  #   runs-on: ubuntu-latest
   #   container: python:3.8.5
   #   steps:
 
@@ -113,7 +114,7 @@ jobs:
 
   release_stage:
     name: Release Stage
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     needs: test_stage
     steps:
       - name: Checkout code
