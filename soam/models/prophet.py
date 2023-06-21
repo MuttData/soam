@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 try:
-    from fbprophet import Prophet
+    from prophet import Prophet
 except ImportError:
     logger.warning("No Prophet support")
     logger.warning("If you want to use it, ´pip install soam[prophet]´")

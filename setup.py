@@ -42,7 +42,7 @@ extra_dependencies = {
     ],
     'slack': ["slackclient>=2.0.0"],
     'orbit': ['orbit-ml==1.0.13'],
-    'prophet': ["pystan==2.19.1.1", "fbprophet==0.7.1", "holidays>=0.10.2"],
+    'prophet': ["pystan==2.19.1.1", "prophet==1.1.1", "holidays>=0.10.2"],
     'pdf_report': ["jupytext==1.10.2", "papermill==2.3.2", "nbconvert==5.6",],
     'gsheets_report': ["gspread_pandas", "muttlib[gsheets]>=1.0,<2"],
     'statsmodels': ["statsmodels<0.12,>=0.11"],
