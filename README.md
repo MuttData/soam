@@ -55,7 +55,7 @@ Currently there are implementations to store in CSV files and SQL databases.
 A variety of models are currently supported to fit and predict data. They can be extended to create custom ones.
 * [Exponential Smoothing](https://www.statsmodels.org/stable/examples/notebooks/generated/exponential_smoothing.html)
 * [Orbit DLT Full](https://orbit-ml.readthedocs.io/en/latest/tutorials/dlt.html)
-* [Prophet](https://pypi.org/project/fbprophet)
+* [Prophet](https://pypi.org/project/prophet)
 * [SARIMAX](https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html)
 
 ### Backtesting
